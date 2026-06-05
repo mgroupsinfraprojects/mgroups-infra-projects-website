@@ -1,0 +1,24 @@
+{% extends "admin/base.html" %}
+{% block title %}Website Settings{% endblock %}
+{% block content %}
+<h1>Website Settings</h1>
+<form method="post" enctype="multipart/form-data" class="admin-form two-col">
+    <label>Company Name<input name="company_name" value="{{ site.company_name }}"></label>
+    <label>Tagline<input name="tagline" value="{{ site.tagline }}"></label>
+    <label>Hero Title<input name="hero_title" value="{{ site.hero_title }}"></label>
+    <label>Phone<input name="phone" value="{{ site.phone }}"></label>
+    <label>WhatsApp<input name="whatsapp" value="{{ site.whatsapp }}"></label>
+    <label>Email<input name="email" value="{{ site.email }}"></label>
+    <label>Primary Color<input name="primary_color" value="{{ site.primary_color }}"></label>
+    <label>Secondary Color<input name="secondary_color" value="{{ site.secondary_color }}"></label>
+    <label class="full">Hero Subtitle<textarea name="hero_subtitle" rows="4">{{ site.hero_subtitle }}</textarea></label>
+    <label class="full">Short Description<textarea name="short_description" rows="3">{{ site.short_description }}</textarea></label>
+    <label class="full">Address<textarea name="address" rows="3">{{ site.address }}</textarea></label>
+    <label class="full">Google Map Embed Code<textarea name="map_embed" rows="4">{{ site.map_embed }}</textarea></label>
+    <label>Facebook<input name="facebook" value="{{ site.facebook }}"></label>
+    <label>Instagram<input name="instagram" value="{{ site.instagram }}"></label>
+    <label>LinkedIn<input name="linkedin" value="{{ site.linkedin }}"></label>
+    <label>Logo Upload<input type="file" name="logo" accept="image/*"></label>
+    <div class="full"><button class="btn" type="submit">Save Settings</button></div>
+</form>
+{% endblock %}

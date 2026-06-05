@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% block title %}About & Experience{% endblock %}
+{% block content %}
+<h1>About & Experience</h1>
+<form method="post" class="admin-form two-col">
+    <label class="full">Short Description<textarea name="short_description" rows="3">{{ about.short_description }}</textarea></label>
+    <label class="full">Full Company Description<textarea name="full_description" rows="8">{{ about.full_description }}</textarea></label>
+    <label class="full">Mission<textarea name="mission" rows="3">{{ about.mission }}</textarea></label>
+    <label class="full">Vision<textarea name="vision" rows="3">{{ about.vision }}</textarea></label>
+    <label class="full">Core Values<textarea name="core_values" rows="6">{{ about.core_values }}</textarea></label>
+    <label class="full">Experience Summary<textarea name="experience_summary" rows="6">{{ about.experience_summary }}</textarea></label>
+    <label>Years Experience<input name="years_experience" value="{{ about.years_experience }}"></label>
+    <label>Completed Projects<input name="completed_projects" value="{{ about.completed_projects }}"></label>
+    <label>Active Projects<input name="active_projects" value="{{ about.active_projects }}"></label>
+    <label>Team Members<input name="team_members" value="{{ about.team_members }}"></label>
+    <div class="full"><button class="btn" type="submit">Save About Content</button></div>
+</form>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ site.company_name }} | Infrastructure & Civil Works{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <p class="eyebrow">{{ site.tagline }}</p>
+            <h1>{{ site.hero_title }}</h1>
+            <p class="lead">{{ site.hero_subtitle }}</p>
+            <div class="hero-actions">
+                <a class="btn" href="{{ url_for('contact') }}">Request Consultation</a>
+                <a class="btn ghost" href="{{ url_for('projects') }}">View Projects</a>
+            </div>
+        </div>
+        <div class="hero-card">
+            {% if site.logo_path %}<img src="{{ url_for('static', filename=site.logo_path) }}" alt="{{ site.company_name }} logo">{% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container split">
+        <div>
+            <p class="eyebrow">About Company</p>
+            <h2>Reliable execution for civil and infrastructure works.</h2>
+        </div>
+        <div>
+            <p>{{ about.short_description }}</p>
+            <a class="text-link" href="{{ url_for('about') }}">Read company profile →</a>
+        </div>
+    </div>
+</section>
+
+<section class="section soft">
+    <div class="container">
+        <div class="section-head">
+            <p class="eyebrow">Services</p>
+            <h2>What We Do</h2>
+        </div>
+        <div class="card-grid">
+            {% for service in services %}
+            <article class="service-card">
+                {% if service.image_path %}<img src="{{ url_for('static', filename=service.image_path) }}" alt="{{ service.title }}">{% endif %}
+                <span class="icon-chip">{{ service.icon }}</span>
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.description }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container stats-grid">
+        <div><strong>{{ about.years_experience }}</strong><span>Years Experience</span></div>
+        <div><strong>{{ about.completed_projects }}</strong><span>Completed Projects</span></div>
+        <div><strong>{{ about.active_projects }}</strong><span>Active Projects</span></div>
+        <div><strong>{{ about.team_members }}</strong><span>Team Members</span></div>
+    </div>
+</section>
+
+<section class="section soft">
+    <div class="container">
+        <div class="section-head row-between">
+            <div>
+                <p class="eyebrow">Works</p>
+                <h2>Recent Projects</h2>
+            </div>
+            <a class="text-link" href="{{ url_for('projects') }}">View all →</a>
+        </div>
+        <div class="project-grid">
+            {% for project in projects %}
+            <article class="project-card">
+                <div class="project-image">
+                    {% if project.image_path %}<img src="{{ url_for('static', filename=project.image_path) }}" alt="{{ project.title }}">{% else %}<span>No image</span>{% endif %}
+                </div>
+                <div class="project-body">
+                    <span class="status">{{ project.status }}</span>
+                    <h3><a href="{{ url_for('project_detail', project_id=project.id) }}">{{ project.title }}</a></h3>
+                    <p>{{ project.location }}{% if project.year %} · {{ project.year }}{% endif %}</p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="container cta-box">
+        <h2>Need civil or infrastructure project support?</h2>
+        <p>Send your work details. The team can review the requirement and contact you.</p>
+        <a class="btn" href="{{ url_for('contact') }}">Contact Now</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "admin/base.html" %}
+{% block title %}Services{% endblock %}
+{% block content %}
+<div class="admin-title-row"><h1>Services</h1><a class="btn" href="{{ url_for('admin_service_new') }}">Add Service</a></div>
+<table class="admin-table"><tr><th>Order</th><th>Title</th><th>Status</th><th>Action</th></tr>
+{% for service in services %}<tr><td>{{ service.sort_order }}</td><td>{{ service.title }}</td><td>{{ 'Active' if service.is_active else 'Hidden' }}</td><td><a href="{{ url_for('admin_service_edit', service_id=service.id) }}">Edit</a><form method="post" action="{{ url_for('admin_service_delete', service_id=service.id) }}" class="inline" onsubmit="return confirm('Delete service?')"><button>Delete</button></form></td></tr>{% endfor %}
+</table>
+{% endblock %}

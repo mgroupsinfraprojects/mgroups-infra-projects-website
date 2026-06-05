@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Projects | {{ site.company_name }}{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><p class="eyebrow">Projects</p><h1>Works & Projects</h1><p>Add your completed and ongoing works from admin.</p></div></section>
+<section class="section soft"><div class="container"><div class="project-grid">
+{% for project in projects %}
+<article class="project-card">
+    <div class="project-image">{% if project.image_path %}<img src="{{ url_for('static', filename=project.image_path) }}" alt="{{ project.title }}">{% else %}<span>No image</span>{% endif %}</div>
+    <div class="project-body">
+        <span class="status">{{ project.status }}</span>
+        <h2><a href="{{ url_for('project_detail', project_id=project.id) }}">{{ project.title }}</a></h2>
+        <p>{{ project.category }} · {{ project.location }}{% if project.year %} · {{ project.year }}{% endif %}</p>
+        <p>{{ project.description[:130] }}{% if project.description|length > 130 %}...{% endif %}</p>
+    </div>
+</article>
+{% endfor %}
+</div></div></section>
+{% endblock %}

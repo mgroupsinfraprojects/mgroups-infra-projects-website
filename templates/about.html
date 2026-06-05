@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}About | {{ site.company_name }}{% endblock %}
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <p class="eyebrow">About Us</p>
+        <h1>{{ site.company_name }}</h1>
+        <p>{{ about.short_description }}</p>
+    </div>
+</section>
+<section class="section">
+    <div class="container content-grid">
+        <article class="content-card wide">
+            <h2>Company Profile</h2>
+            <p class="preline">{{ about.full_description }}</p>
+        </article>
+        <article class="content-card">
+            <h3>Mission</h3>
+            <p>{{ about.mission }}</p>
+        </article>
+        <article class="content-card">
+            <h3>Vision</h3>
+            <p>{{ about.vision }}</p>
+        </article>
+        <article class="content-card wide">
+            <h3>Core Values</h3>
+            <p class="preline">{{ about.core_values }}</p>
+        </article>
+        <article class="content-card wide">
+            <h3>Experience Summary</h3>
+            <p class="preline">{{ about.experience_summary }}</p>
+        </article>
+    </div>
+</section>
+{% endblock %}
