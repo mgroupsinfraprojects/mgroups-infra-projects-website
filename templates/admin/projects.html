@@ -1,8 +1,0 @@
-{% extends "admin/base.html" %}
-{% block title %}Projects{% endblock %}
-{% block content %}
-<div class="admin-title-row"><h1>Projects / Works</h1><a class="btn" href="{{ url_for('admin_project_new') }}">Add Project</a></div>
-<table class="admin-table"><tr><th>Title</th><th>Location</th><th>Status</th><th>Year</th><th>Action</th></tr>
-{% for project in projects %}<tr><td>{{ project.title }}</td><td>{{ project.location }}</td><td>{{ project.status }}</td><td>{{ project.year }}</td><td><a href="{{ url_for('admin_project_edit', project_id=project.id) }}">Edit</a><form method="post" action="{{ url_for('admin_project_delete', project_id=project.id) }}" class="inline" onsubmit="return confirm('Delete project?')"><button>Delete</button></form></td></tr>{% endfor %}
-</table>
-{% endblock %}
