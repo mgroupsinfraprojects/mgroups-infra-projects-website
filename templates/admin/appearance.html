@@ -1,0 +1,105 @@
+{% extends "admin/base.html" %}
+{% from "admin/_field_style.html" import field_controls with context %}
+{% block title %}Visibility & Appearance{% endblock %}
+{% block content %}
+<h1>Visibility & Appearance</h1>
+<section class="admin-panel">
+    <p class="admin-note">Use this page to control what is visible publicly. Phone number is hidden by default for privacy. Text, fonts and colors can be changed without code.</p>
+</section>
+<form method="post" class="admin-form two-col settings-admin">
+    {{ csrf_field()|safe }}
+
+    <h2 class="full admin-section-title">Public Visibility Controls</h2>
+    <label class="check"><input type="checkbox" name="show_phone_public" {% if is_on('show_phone_public') %}checked{% endif %}> Show phone number publicly</label>
+    <label class="check"><input type="checkbox" name="show_whatsapp_public" {% if is_on('show_whatsapp_public') %}checked{% endif %}> Show WhatsApp button/link publicly</label>
+    <label class="check"><input type="checkbox" name="show_email_public" {% if is_on('show_email_public', true) %}checked{% endif %}> Show email publicly</label>
+    <label class="check"><input type="checkbox" name="show_address_public" {% if is_on('show_address_public', true) %}checked{% endif %}> Show address publicly</label>
+    <label class="check"><input type="checkbox" name="show_registered_name_public" {% if is_on('show_registered_name_public', true) %}checked{% endif %}> Show registered name</label>
+    <label class="check"><input type="checkbox" name="show_udyam_public" {% if is_on('show_udyam_public', true) %}checked{% endif %}> Show Udyam number</label>
+    <label class="check"><input type="checkbox" name="show_gstin_public" {% if is_on('show_gstin_public', true) %}checked{% endif %}> Show GSTIN</label>
+    <label class="check"><input type="checkbox" name="show_enterprise_type_public" {% if is_on('show_enterprise_type_public', true) %}checked{% endif %}> Show enterprise type</label>
+    <label class="check"><input type="checkbox" name="show_business_commencement_public" {% if is_on('show_business_commencement_public') %}checked{% endif %}> Show business commencement date</label>
+    <label class="check"><input type="checkbox" name="show_major_activity_public" {% if is_on('show_major_activity_public', true) %}checked{% endif %}> Show major activity</label>
+    <label class="check"><input type="checkbox" name="show_whatsapp_float" {% if is_on('show_whatsapp_float') %}checked{% endif %}> Show floating WhatsApp button</label>
+    <label class="check"><input type="checkbox" name="show_footer_contact" {% if is_on('show_footer_contact', true) %}checked{% endif %}> Show footer contact block</label>
+
+    <h2 class="full admin-section-title">Homepage Sections</h2>
+    {% for key,label,default in [
+        ('show_trust_strip','Trust strip', true),('show_credentials_section','Credentials section', true),('show_service_areas_section','Service areas section', true),('show_about_section','About section', true),('show_services_section','Services section', true),('show_stats_section','Stats band', false),('show_projects_section','Projects section', true),('show_why_section','Why choose us section', true),('show_cta_section','Bottom CTA section', true),('show_hero_logo_panel','Hero logo panel', true),('show_hero_metrics','Hero metrics', false),('show_project_placeholder_images','Project image placeholder blocks', false)
+    ] %}
+    <label class="check"><input type="checkbox" name="{{ key }}" {% if is_on(key, default) %}checked{% endif %}> {{ label }}</label>
+    {% endfor %}
+
+    <h2 class="full admin-section-title">Navigation Controls</h2>
+    <label class="check"><input type="checkbox" name="show_gallery_nav" {% if is_on('show_gallery_nav', true) %}checked{% endif %}> Show Gallery menu</label>
+    <label class="check"><input type="checkbox" name="show_service_area_nav" {% if is_on('show_service_area_nav', true) %}checked{% endif %}> Show Service Areas menu</label>
+    <label class="check"><input type="checkbox" name="show_contact_nav" {% if is_on('show_contact_nav', true) %}checked{% endif %}> Show Contact menu/button</label>
+    <label class="check"><input type="checkbox" name="show_footer_credentials" {% if is_on('show_footer_credentials', true) %}checked{% endif %}> Show footer credentials</label>
+
+    <h2 class="full admin-section-title">Typography</h2>
+    <label>Heading Font<select name="heading_font"><option>Poppins</option><option>Inter</option><option>Montserrat</option><option>Manrope</option><option>Roboto Slab</option></select></label>
+    <label>Body Font<select name="body_font"><option>Inter</option><option>Manrope</option><option>Poppins</option><option>Montserrat</option><option>Roboto Slab</option></select></label>
+    <label>Navigation Font<select name="nav_font"><option>Inter</option><option>Manrope</option><option>Poppins</option><option>Montserrat</option></select></label>
+    <label>Body Text Size<input name="body_text_size" value="{{ site.body_text_size }}" placeholder="16px"></label>
+    <label>Hero Title Size<input name="hero_title_size" value="{{ site.hero_title_size }}" placeholder="clamp(3rem,6vw,5.4rem)"></label>
+    <label>Section Title Size<input name="section_title_size" value="{{ site.section_title_size }}" placeholder="clamp(2rem,3.6vw,3rem)"></label>
+    <label>Container Width<input name="container_width" value="{{ site.container_width }}" placeholder="1160px"></label>
+    <label>Card Radius<input name="card_radius" value="{{ site.card_radius }}" placeholder="20px"></label>
+    <label>Button Radius<input name="button_radius" value="{{ site.button_radius }}" placeholder="11px"></label>
+
+    <h2 class="full admin-section-title">Colors</h2>
+    <label>Primary Color<input type="color" name="primary_color" value="{{ site.primary_color or '#0D1F35' }}"></label>
+    <label>Secondary Color<input type="color" name="secondary_color" value="{{ site.secondary_color or '#C4822A' }}"></label>
+    <label>Accent Color<input type="color" name="accent_color" value="{{ site.accent_color or '#E8A046' }}"></label>
+    <label>Header Background<input type="color" name="header_bg_color" value="{{ site.header_bg_color or '#0D1F35' }}"></label>
+    <label>Footer Background<input type="color" name="footer_bg_color" value="{{ site.footer_bg_color or '#07121F' }}"></label>
+    <label>Body Background<input type="color" name="body_bg_color" value="{{ site.body_bg_color or '#FFFFFF' }}"></label>
+    <label>Soft Section Background<input type="color" name="soft_bg_color" value="{{ site.soft_bg_color or '#F5F8FC' }}"></label>
+    <label>Card Background<input type="color" name="card_bg_color" value="{{ site.card_bg_color or '#FFFFFF' }}"></label>
+    <label>Text Color<input type="color" name="text_color" value="{{ site.text_color or '#1C2E3F' }}"></label>
+    <label>Muted Text Color<input type="color" name="muted_text_color" value="{{ site.muted_text_color or '#5A7089' }}"></label>
+    <label>Border Color<input type="color" name="line_color" value="{{ site.line_color or '#D8E6F0' }}"></label>
+    <label>Button Text Color<input type="color" name="button_text_color" value="{{ site.button_text_color or '#FFFFFF' }}"></label>
+
+    <h2 class="full admin-section-title">Editable Public Text</h2>
+    <label>Hero Badge<input name="hero_badge_label" value="{{ site.hero_badge_label }}">{{ field_controls("appearance", "hero_badge_label", true, "Style active") }}</label>
+    <label>Hero Primary Button<input name="hero_cta_primary" value="{{ site.hero_cta_primary }}">{{ field_controls("appearance", "hero_cta_primary", true, "Style active") }}</label>
+    <label>Hero Secondary Button<input name="hero_cta_secondary" value="{{ site.hero_cta_secondary }}">{{ field_controls("appearance", "hero_cta_secondary", true, "Style active") }}</label>
+    <label>Trust Item 1<input name="trust_item_1" value="{{ site.trust_item_1 }}">{{ field_controls("appearance", "trust_item_1", true, "Style active") }}</label>
+    <label>Trust Item 2<input name="trust_item_2" value="{{ site.trust_item_2 }}">{{ field_controls("appearance", "trust_item_2", true, "Style active") }}</label>
+    <label>Trust Item 3<input name="trust_item_3" value="{{ site.trust_item_3 }}">{{ field_controls("appearance", "trust_item_3", true, "Style active") }}</label>
+    <label>Trust Item 4<input name="trust_item_4" value="{{ site.trust_item_4 }}">{{ field_controls("appearance", "trust_item_4", true, "Style active") }}</label>
+    <label>Trust Item 5<input name="trust_item_5" value="{{ site.trust_item_5 }}">{{ field_controls("appearance", "trust_item_5", true, "Style active") }}</label>
+
+    {% for field,label in [
+        ('credentials_eyebrow','Credentials Eyebrow'),('credentials_title','Credentials Title'),('credentials_link_text','Credentials Link Text'),
+        ('service_areas_eyebrow','Service Areas Eyebrow'),('service_areas_title','Service Areas Title'),('service_areas_all_label','Service Areas All Label'),
+        ('about_eyebrow','About Eyebrow'),('about_title','About Title'),('about_link_text','About Link Text'),
+        ('services_eyebrow','Services Eyebrow'),('services_title','Services Title'),('services_link_text','Services Link Text'),
+        ('projects_eyebrow','Projects Eyebrow'),('projects_title','Projects Title'),('projects_link_text','Projects Link Text'),('image_pending_text','Image Pending Text'),
+        ('why_eyebrow','Why Eyebrow'),('why_title','Why Title'),('cta_title','CTA Title'),('cta_text','CTA Text'),('cta_button_text','CTA Button Text'),
+        ('contact_page_title','Contact Page Title'),('contact_page_intro','Contact Page Intro'),('contact_card_title','Contact Card Title'),('contact_form_title','Contact Form Title'),
+        ('footer_company_heading','Footer Company Heading'),('footer_contact_heading','Footer Contact Heading')
+    ] %}
+    <label class="{% if 'Title' in label or 'Intro' in label or field in ['cta_text'] %}full{% endif %}">{{ label }}{% if 'Title' in label or 'Intro' in label or field in ['cta_text'] %}<textarea name="{{ field }}" rows="2">{{ site.get(field, '') }}</textarea>{% else %}<input name="{{ field }}" value="{{ site.get(field, '') }}">{% endif %}{{ field_controls('appearance', field, true, 'Style active') }}</label>
+    {% endfor %}
+
+    <h2 class="full admin-section-title">Why Choose Us Cards</h2>
+    {% for i in [1,2,3,4] %}
+    <label>Card {{ i }} Title<input name="why_card_{{ i }}_title" value="{{ site.get('why_card_' ~ i ~ '_title', '') }}">{{ field_controls('appearance', 'why_card_' ~ i ~ '_title', true, 'Style active') }}</label>
+    <label>Card {{ i }} Text<textarea name="why_card_{{ i }}_text" rows="2">{{ site.get('why_card_' ~ i ~ '_text', '') }}</textarea>{{ field_controls('appearance', 'why_card_' ~ i ~ '_text', true, 'Style active') }}</label>
+    {% endfor %}
+
+    <h2 class="full admin-section-title">Advanced</h2>
+    <label class="full">Custom CSS<textarea name="custom_css" rows="8" placeholder="Optional CSS. Use only if needed.">{{ site.custom_css }}</textarea></label>
+
+    <div class="full"><button class="btn" type="submit">Save Visibility & Appearance</button></div>
+</form>
+<script>
+  // Select saved font values after render.
+  for (const name of ['heading_font','body_font','nav_font']) {
+    const el = document.querySelector(`[name="${name}"]`);
+    if (el) el.value = {{ site|tojson }}[name] || el.value;
+  }
+</script>
+{% endblock %}

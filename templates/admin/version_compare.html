@@ -1,0 +1,7 @@
+{% extends "admin/base.html" %}
+{% block title %}Version Difference{% endblock %}
+{% block content %}
+<h1>Side-by-side Version Difference</h1>
+<section class="admin-panel"><p><strong>Left:</strong> #{{ left.id }} {{ left.title }} — {{ left.created_at }}<br><strong>Right:</strong> #{{ right.id }} {{ right.title }} — {{ right.created_at }}</p></section>
+<div class="diff-wrap">{{ diff_table|safe }}</div>
+{% endblock %}

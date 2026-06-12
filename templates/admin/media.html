@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% block title %}Media Library & Cropper{% endblock %}
+{% block content %}
+<div class="admin-title-row"><h1>Media Library & Cropper</h1><div><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='home') }}">Preview Site</a></div></div>
+<section class="admin-panel"><p class="admin-note">Upload reusable project/gallery images. Crop creates a new image copy and keeps the original file. For Cloudinary production, uploaded public URLs are stored by the normal image upload forms; local media library listing is mainly for local/SQLite testing.</p></section>
+<form method="post" enctype="multipart/form-data" class="admin-form two-col">
+  {{ csrf_field()|safe }}
+  <label>Upload image<input type="file" name="image" accept="image/*" required></label>
+  <label>Prefix<input name="prefix" value="media"></label>
+  <div class="full"><button class="btn" type="submit">Upload to Media Library</button></div>
+</form>
+{% if images %}
+<section class="admin-panel"><h2>Images</h2><div class="admin-card-grid media-grid">
+{% for img in images %}
+<div class="mini-card">
+  <img src="{{ img.url }}" alt="{{ img.name }}" style="max-height:180px;object-fit:cover;width:100%;border-radius:12px">
+  <strong>{{ img.name }}</strong><small>{{ img.size_kb }} KB</small>
+  <form method="post" action="{{ url_for('admin_media_crop', filename=img.name) }}" class="crop-form">
+    {{ csrf_field()|safe }}
+    <div class="style-grid">
+      <label>X<input type="number" name="x" value="0" min="0"></label>
+      <label>Y<input type="number" name="y" value="0" min="0"></label>
+      <label>Width<input type="number" name="w" value="600" min="1"></label>
+      <label>Height<input type="number" name="h" value="400" min="1"></label>
+    </div>
+    <button class="btn secondary" type="submit">Create Cropped Copy</button>
+  </form>
+</div>
+{% endfor %}
+</div></section>
+{% else %}<section class="admin-panel"><p>No local uploaded images yet.</p></section>{% endif %}
+{% endblock %}

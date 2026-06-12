@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Services{% if field_visible('settings','company_name') %} | {{ site.company_name }}{% endif %}{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><p class="eyebrow" style="{{ style_inline('appearance','services_eyebrow') }}">Services</p><h1 style="{{ style_inline('appearance','services_title') }}">{{ site.services_title or 'What We Do' }}</h1><p>{{ site.short_description }}</p></div></section>
+<section class="section soft"><div class="container"><div class="card-grid">{% for service in services %}<article class="service-card">{% if item_field_visible(service,'service','image_path') and service.image_path %}<img src="{{ media_url(service.image_path) }}" alt="{{ service.title }}">{% endif %}{% if item_field_visible(service,'service','icon') %}<span class="icon-chip" style="{{ item_style_inline(service,'service','icon') }}">{{ service.icon }}</span>{% endif %}{% if item_field_visible(service,'service','title') %}<h3 style="{{ item_style_inline(service,'service','title') }}">{{ service.title }}</h3>{% endif %}{% if item_field_visible(service,'service','description') %}<p style="{{ item_style_inline(service,'service','description') }}">{{ service.description }}</p>{% endif %}</article>{% endfor %}</div></div></section>
+{% endblock %}

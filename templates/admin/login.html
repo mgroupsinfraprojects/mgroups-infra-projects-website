@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% block title %}Admin Login{% endblock %}
+{% block content %}
+<div class="login-card">
+    <h1>Admin Login</h1>
+    <p>Default: admin / ChangeMe@123</p>
+    <form method="post" class="admin-form">
+    {{ csrf_field()|safe }}
+        <label>Username<input name="username" required></label>
+        <label>Password<input type="password" name="password" required></label>
+        <button class="btn" type="submit">Login</button>
+    </form>
+</div>
+{% endblock %}

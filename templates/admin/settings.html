@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+{% from "admin/_field_style.html" import field_controls with context %}
+{% block title %}Website Settings{% endblock %}
+{% block content %}
+<div class="admin-title-row"><h1>Website Settings</h1><div><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='home') }}">Live Preview</a>{% if draft_settings %}<a class="btn secondary" href="{{ url_for('admin_settings', draft=1) }}">Load Draft</a>{% endif %}</div></div>
+<section class="admin-panel">
+    <p class="admin-note">Each content field has its own <strong>Public</strong> checkbox. You can keep data saved internally while hiding it from the public website. Phone and WhatsApp are private by default.</p>
+</section>
+<form method="post" enctype="multipart/form-data" class="admin-form two-col settings-admin">
+    {{ csrf_field()|safe }}
+    <h2 class="full admin-section-title">Company & Hero</h2>
+    {% for field,label,kind in [
+        ('company_name','Company Name','input'),('tagline','Tagline','input'),('hero_title','Hero Title','input'),('hero_subtitle','Hero Subtitle','textarea4'),('short_description','Short Description','textarea3')
+    ] %}
+    <label class="{% if kind.startswith('textarea') or field in ['hero_title'] %}full{% endif %}">{{ label }}
+        {% if kind.startswith('textarea') %}<textarea name="{{ field }}" rows="{{ kind[-1] }}">{{ form_site.get(field,'') }}</textarea>{% else %}<input name="{{ field }}" value="{{ form_site.get(field,'') }}">{% endif %}
+        {{ field_controls('settings', field, form_visible('settings', field)) }}
+    </label>
+    {% endfor %}
+
+    <h2 class="full admin-section-title">Private/Internal Contact Details</h2>
+    {% for field,label,kind in [
+        ('phone','Phone','input'),('whatsapp','WhatsApp','input'),('email','Email','input'),('notification_email','Notification Email','input'),('public_phone_label','Public Phone Privacy Message','textarea2'),('address','Address','textarea3'),('business_area','Business Service Area','textarea2'),('service_areas','Service Areas, one per line','textarea4')
+    ] %}
+    <label class="{% if kind.startswith('textarea') %}full{% endif %}">{{ label }}
+        {% if kind.startswith('textarea') %}<textarea name="{{ field }}" rows="{{ kind[-1] }}">{{ form_site.get(field,'') }}</textarea>{% else %}<input name="{{ field }}" value="{{ form_site.get(field,'') }}">{% endif %}
+        {{ field_controls('settings', field, form_visible('settings', field)) }}
+    </label>
+    {% endfor %}
+
+    <h2 class="full admin-section-title">Credentials</h2>
+    {% for field,label,kind in [
+        ('registered_name','Registered Name','input'),('enterprise_type','Enterprise Type','input'),('udyam_registration','Udyam Registration','input'),('gstin','GSTIN','input'),('business_commencement','Business Commencement','input'),('experience_documents','Experience Documents','input'),('contractor_registrations','Contractor Registrations','input'),('major_activity','Major Activity','textarea3'),('credential_note','Credential Note','textarea3')
+    ] %}
+    <label class="{% if kind.startswith('textarea') %}full{% endif %}">{{ label }}
+        {% if kind.startswith('textarea') %}<textarea name="{{ field }}" rows="{{ kind[-1] }}">{{ form_site.get(field,'') }}</textarea>{% else %}<input name="{{ field }}" value="{{ form_site.get(field,'') }}">{% endif %}
+        {{ field_controls('settings', field, form_visible('settings', field)) }}
+    </label>
+    {% endfor %}
+
+    <h2 class="full admin-section-title">SEO, Map & Legal</h2>
+    {% for field,label,kind in [
+        ('seo_title','SEO Title','input'),('seo_description','SEO Description','textarea3'),('google_business_url','Google Business Profile URL','input'),('map_embed','Google Map Embed Code','textarea4'),('privacy_policy','Privacy Policy','textarea5'),('terms_text','Terms Text','textarea5')
+    ] %}
+    <label class="full">{{ label }}
+        {% if kind.startswith('textarea') %}<textarea name="{{ field }}" rows="{{ kind[-1] }}">{{ form_site.get(field,'') }}</textarea>{% else %}<input name="{{ field }}" value="{{ form_site.get(field,'') }}">{% endif %}
+        {{ field_controls('settings', field, form_visible('settings', field), 'Show/use publicly') }}
+    </label>
+    {% endfor %}
+
+    <h2 class="full admin-section-title">Social & Logo</h2>
+    {% for field,label in [('facebook','Facebook'),('instagram','Instagram'),('linkedin','LinkedIn')] %}
+    <label>{{ label }}<input name="{{ field }}" value="{{ form_site.get(field,'') }}">{{ field_controls('settings', field, form_visible('settings', field)) }}</label>
+    {% endfor %}
+    <label>Logo Upload<input type="file" name="logo" accept="image/*">{{ field_controls('settings', 'logo_path', form_visible('settings','logo_path'), 'Show logo publicly') }}</label>
+    <div class="full admin-actions"><button class="btn" type="submit" name="action" value="publish">Publish Settings</button><button class="btn secondary" type="submit" name="action" value="draft">Save Draft</button><button class="btn secondary" type="submit" name="action" value="preview">Save Draft & Preview</button><a class="btn secondary" href="{{ url_for('admin_appearance') }}">Edit Visibility, Text & Colors</a></div>
+</form>
+{% endblock %}

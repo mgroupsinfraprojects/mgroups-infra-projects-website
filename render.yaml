@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: mgroups-infra-projects
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 2 --threads 4 --timeout 120
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "1"
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_DEFAULT_PASSWORD
+        value: ChangeMe@123
+      # Add DATABASE_URL from a PostgreSQL service for persistent admin data.
+      # Add CLOUDINARY_URL for persistent image storage.
+      # Optional SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, SMTP_FROM, SMTP_TO for enquiry email notification.

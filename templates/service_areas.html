@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Service Areas | {{ site.company_name }}{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><p class="eyebrow">Service Areas</p><h1>Where We Work</h1><p>Update service areas from Admin → Website Settings. Each area receives its own SEO-friendly page.</p></div></section>
+<section class="section"><div class="container"><div class="card-grid">
+{% for area in areas %}
+<article class="service-card"><span class="icon-chip">AREA</span><h2>{{ area.name }}</h2><p>Civil construction, infrastructure works, project coordination, renovation, and site execution services in {{ area.name }}.</p><a class="text-link" href="{{ url_for('service_area_detail', slug=area.slug) }}">View area page →</a></article>
+{% else %}
+<article class="content-card"><h2>No areas added</h2><p>Add service areas from admin settings.</p></article>
+{% endfor %}
+</div></div></section>
+{% endblock %}

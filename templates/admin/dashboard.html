@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Admin Dashboard</h1>
+<div class="admin-stats">
+    <div><strong>{{ counts.services }}</strong><span>Services</span></div>
+    <div><strong>{{ counts.projects }}</strong><span>Projects</span></div>
+    <div><strong>{{ counts.gallery }}</strong><span>Gallery Items</span></div>
+    <div><strong>{{ counts.unread }}</strong><span>Unread Enquiries</span></div>
+</div>
+<section class="admin-panel"><h2>Production Setup Status</h2><p class="admin-note">For a stable Render website, SECRET_KEY, DATABASE_URL, CLOUDINARY_URL, and SMTP settings should be configured.</p><div class="admin-env-grid">{% for key, ok in production_checks.items() %}<div><strong>{{ key }}</strong><br><span class="{{ 'ok' if ok else 'warn' }}">{{ 'Configured' if ok else 'Missing' }}</span></div>{% endfor %}</div></section>
+<section class="admin-panel"><h2>Quick Actions</h2><p class="admin-note">Use backup before major updates. Use PostgreSQL and Cloudinary environment variables on Render for stable production data.</p><p><a class="btn" href="{{ url_for('backup_json') }}">Download Full Backup</a> <a class="btn secondary" href="{{ url_for('restore_backup') }}">Restore Backup</a> <a class="btn secondary" href="{{ url_for('export_enquiries_csv') }}">Export Enquiries CSV</a></p></section>
+<section class="admin-panel"><h2>Recent Enquiries</h2>
+<table class="admin-table"><tr><th>Name</th><th>Phone</th><th>Message</th><th>Date</th></tr>{% for e in enquiries %}<tr><td>{{ e.name }}</td><td>{{ e.phone }}</td><td>{{ e.message[:80] }}</td><td>{{ e.created_at }}</td></tr>{% else %}<tr><td colspan="4">No enquiries yet.</td></tr>{% endfor %}</table>
+</section>
+<section class="admin-panel"><h2>Recent Admin Activity</h2>
+<table class="admin-table"><tr><th>Action</th><th>Admin</th><th>Detail</th><th>Date</th></tr>{% for log in logs %}<tr><td>{{ log.action }}</td><td>{{ log.admin_username }}</td><td>{{ log.detail }}</td><td>{{ log.created_at }}</td></tr>{% else %}<tr><td colspan="4">No activity yet.</td></tr>{% endfor %}</table>
+</section>
+{% endblock %}

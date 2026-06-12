@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Civil & Infrastructure Works in {{ area.name }} | {{ site.company_name }}{% endblock %}
+{% block meta_description %}{{ site.company_name }} provides civil construction, infrastructure, renovation, and project execution services in {{ area.name }}.{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><p class="eyebrow">Service Area</p><h1>Civil & Infrastructure Works in {{ area.name }}</h1><p>{{ site.company_name }} supports civil construction, infrastructure development, site coordination, and project execution requirements in {{ area.name }}.</p></div></section>
+<section class="section soft"><div class="container"><div class="section-head"><p class="eyebrow">Available Services</p><h2>Services in {{ area.name }}</h2></div><div class="card-grid">
+{% for service in services %}<article class="service-card"><span class="icon-chip">{{ service.icon }}</span><h3>{{ service.title }}</h3><p>{{ service.description }}</p></article>{% endfor %}
+</div></div></section>
+<section class="cta"><div class="container cta-box"><h2>Need work support in {{ area.name }}?</h2><p>Send your project scope, location, and timeline.</p><a class="btn btn-primary" href="{{ url_for('contact') }}">Contact Now</a></div></section>
+{% endblock %}

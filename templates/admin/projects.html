@@ -1,0 +1,9 @@
+{% extends "admin/base.html" %}
+{% block title %}Projects{% endblock %}
+{% block content %}
+<div class="admin-title-row"><h1>Projects / Works</h1><div><a class="btn secondary" href="{{ url_for('admin_ordering') }}#projects-order">Drag Order</a><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='projects') }}">Preview</a><a class="btn" href="{{ url_for('admin_project_new') }}">Add Project</a></div></div>
+<table class="admin-table sortable-table" data-reorder-kind="projects"><tr><th>Drag</th><th>Order</th><th>Title</th><th>Location</th><th>Public State</th><th>Status</th><th>Year</th><th>Action</th></tr>
+{% for project in projects %}<tr data-id="{{ project.id }}" draggable="true"><td class="drag-handle">☰</td><td>{{ project.sort_order }}</td><td>{{ project.title }}</td><td>{{ project.location }}</td><td><span class="pill {{ 'ok' if project.is_published else 'warn' }}">{{ 'Published' if project.is_published else 'Draft' }}</span></td><td>{{ project.status }}</td><td>{{ project.year }}</td><td><a href="{{ url_for('admin_project_edit', project_id=project.id) }}">Edit</a><form method="post" action="{{ url_for('admin_project_delete', project_id=project.id) }}" class="inline" onsubmit="return confirm('Delete project?')">{{ csrf_field()|safe }}<button>Delete</button></form></td></tr>{% endfor %}
+</table>
+<p class="admin-note">Drag rows to reorder. Draft rows are visible in admin preview but hidden from public website.</p>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% block title %}Role Permissions{% endblock %}
+{% block content %}
+<h1>Role Permissions</h1>
+<section class="admin-panel"><p class="admin-note">Owner always has full control. Viewer is read-only. Use this page to decide what editor users can change. This gives per-page admin write permissions; field privacy is controlled beside each field in Website Settings, About, Services, Projects, and Gallery.</p></section>
+<form method="post" class="admin-form">{{ csrf_field()|safe }}
+<table class="admin-table"><thead><tr><th>Admin Area</th><th>Editor can publish/change?</th><th>Notes</th></tr></thead><tbody>
+{% for key,label,note in areas %}
+<tr><td><strong>{{ label }}</strong><br><small>{{ key }}</small></td><td><label><input type="checkbox" name="perm_editor_{{ key }}" {% if is_on('perm_editor_' ~ key, defaults.get(key, False)) %}checked{% endif %}> Allow editor</label></td><td>{{ note }}</td></tr>
+{% endfor %}
+</tbody></table>
+<div class="admin-actions"><button class="btn" type="submit">Save Permissions</button></div>
+</form>
+{% endblock %}

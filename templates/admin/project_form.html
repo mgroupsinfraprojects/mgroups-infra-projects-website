@@ -1,0 +1,24 @@
+{% extends "admin/base.html" %}
+{% from "admin/_field_style.html" import item_controls with context %}
+{% block title %}{{ 'Edit' if project else 'Add' }} Project{% endblock %}
+{% block content %}
+<h1>{{ 'Edit' if project else 'Add' }} Project / Work</h1>
+<section class="admin-panel"><p class="admin-note">Use Draft mode while writing. Publish only after live preview. Keep project value private unless approved.</p></section>
+<form method="post" enctype="multipart/form-data" class="admin-form two-col">
+    {{ csrf_field()|safe }}
+    <label>Publish State<select name="publish_state"><option value="draft" {% if project and not project.is_published %}selected{% endif %}>Draft / private</option><option value="published" {% if not project or project.is_published %}selected{% endif %}>Published / public</option></select></label>
+    <label>Sort Order<input type="number" name="sort_order" value="{{ project.sort_order if project else 0 }}"></label>
+    {% for field,label,placeholder in [
+        ('title','Project Title',''),('location','Location','City / District / State'),('category','Category','Civil Construction / Road / Renovation'),('year','Year',''),('client_type','Client Type','Residential / Commercial / Government / Private'),('site_area','Site / Area','e.g. 2400 sq.ft / 2 km road / 12 flats'),('duration','Duration','e.g. 45 days / 3 months'),('project_value','Project Value','Optional; leave blank if confidential')
+    ] %}
+    <label>{{ label }}<input name="{{ field }}" value="{{ project|attr(field) if project else '' }}" placeholder="{{ placeholder }}" {% if field=='title' %}required{% endif %}>{{ item_controls('project', field, item_field_visible(project,'project',field)) }}</label>
+    {% endfor %}
+    <label>Status<select name="status"><option {% if project and project.status=='Ongoing' %}selected{% endif %}>Ongoing</option><option {% if project and project.status=='Completed' %}selected{% endif %}>Completed</option><option {% if project and project.status=='Upcoming' %}selected{% endif %}>Upcoming</option><option {% if project and project.status=='Documented Work' %}selected{% endif %}>Documented Work</option><option {% if project and project.status=='Experience Document Available' %}selected{% endif %}>Experience Document Available</option><option {% if project and project.status=='Document Available' %}selected{% endif %}>Document Available</option></select>{{ item_controls('project','status',item_field_visible(project,'project','status')) }}</label>
+    <label>Main Image<input type="file" name="image" accept="image/*">{{ item_controls('project','image_path',item_field_visible(project,'project','image_path'),'Show image publicly') }}</label>
+    {% for field,label,rows in [('description','Short Overview',5),('scope_of_work','Scope of Work',5),('challenge','Challenge',4),('solution','Execution Approach / Solution',5),('outcome','Outcome',4)] %}
+    <label class="full">{{ label }}<textarea name="{{ field }}" rows="{{ rows }}">{{ project|attr(field) if project else '' }}</textarea>{{ item_controls('project', field, item_field_visible(project,'project',field)) }}</label>
+    {% endfor %}
+    <label class="check full"><input type="checkbox" name="is_featured" {% if project and project.is_featured %}checked{% endif %}> Featured on homepage</label>
+    <div class="full admin-actions"><button class="btn" type="submit" name="action" value="publish">Save</button><button class="btn secondary" type="submit" name="action" value="preview">Save & Preview</button><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='projects') }}">Preview Current</a></div>
+</form>
+{% endblock %}

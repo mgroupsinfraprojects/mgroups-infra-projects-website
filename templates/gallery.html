@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Gallery{% if field_visible('settings','company_name') %} | {{ site.company_name }}{% endif %}{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><p class="eyebrow">Gallery</p><h1>Gallery</h1><p>Public work images approved by admin.</p></div></section>
+<section class="section soft"><div class="container gallery-grid">{% for item in items %}<article class="gallery-card">{% if item_field_visible(item,'gallery','image_path') and item.image_path %}<img src="{{ media_url(item.image_path) }}" alt="{{ item.title }}">{% endif %}{% if item_field_visible(item,'gallery','title') %}<h3 style="{{ item_style_inline(item,'gallery','title') }}">{{ item.title }}</h3>{% endif %}{% if item_field_visible(item,'gallery','caption') and item.caption %}<p style="{{ item_style_inline(item,'gallery','caption') }}">{{ item.caption }}</p>{% endif %}</article>{% else %}<p>No gallery images published yet.</p>{% endfor %}</div></section>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "admin/base.html" %}
+{% block title %}Visual Page Builder{% endblock %}
+{% block content %}
+<div class="admin-title-row"><h1>Visual WYSIWYG Page Builder</h1><div><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='home', draft=1) }}">Preview</a></div></div>
+<section class="admin-panel"><p class="admin-note">Create reusable homepage blocks. Draft blocks stay private. Published blocks appear on the homepage below the normal sections. Body supports safe HTML formatting.</p></section>
+<div class="builder-layout"><form method="post" enctype="multipart/form-data" class="admin-form two-col builder-form">
+  {{ csrf_field()|safe }}
+  <label>Publish State<select name="publish_state"><option value="draft">Draft / private</option><option value="published">Published / public</option></select></label>
+  <label>Page<select name="page"><option value="home">Home</option></select></label>
+  <label>Block Type<select name="block_type"><option>text</option><option>hero</option><option>image_text</option><option>cta</option><option>notice</option></select></label>
+  <label>Sort Order<input type="number" name="sort_order" value="0"></label>
+  <label class="full">Title<input name="title" placeholder="Section title"></label>
+  <label class="full">Body / WYSIWYG HTML<textarea class="wysiwyg-editor" name="body" rows="8" placeholder="Use bold, headings, lists, links, or pasted HTML"></textarea></label>
+  <label>Image<input type="file" name="image" accept="image/*"></label>
+  <label>Button Text<input name="button_text" placeholder="Optional button"></label>
+  <label class="full">Button URL<input name="button_url" placeholder="/contact or https://..."></label>
+  <h2 class="full admin-section-title">Block Style</h2>
+  <label>Title Font<input name="title_font" placeholder="Montserrat"></label>
+  <label>Title Size<input name="title_size" placeholder="32px"></label>
+  <label>Title Weight<select name="title_weight"><option></option><option>400</option><option>600</option><option>700</option><option>800</option><option>900</option></select></label>
+  <label>Body Font<input name="body_font" placeholder="Manrope"></label>
+  <label>Body Size<input name="body_size" placeholder="16px"></label>
+  <label>Body Weight<select name="body_weight"><option></option><option>400</option><option>500</option><option>600</option><option>700</option></select></label>
+  <div class="full admin-actions"><button class="btn" type="submit">Save Block</button></div>
+</form>
+<section class="admin-panel builder-preview-panel"><h2>Inline Live Preview</h2><p class="admin-note">Type in Title/Body/Button fields. This preview updates before saving, similar to a lightweight Webflow/Wix canvas.</p><div class="visual-canvas" id="builderCanvas"><h2 id="liveTitle">Section title preview</h2><div id="liveBody">Body preview appears here.</div><a class="btn" id="liveButton" href="#">Button</a></div><iframe class="preview-frame" src="{{ url_for('admin_preview', page='home', draft=1) }}"></iframe></section></div>
+<script>
+(function(){
+  const q=(n)=>document.querySelector('[name="'+n+'"]');
+  const title=document.getElementById('liveTitle'), body=document.getElementById('liveBody'), btn=document.getElementById('liveButton');
+  function sync(){
+    if(title) title.textContent=(q('title')&&q('title').value)||'Section title preview';
+    if(body) body.innerHTML=(q('body')&&q('body').value)||'Body preview appears here.';
+    if(btn) { btn.textContent=(q('button_text')&&q('button_text').value)||'Button'; btn.href=(q('button_url')&&q('button_url').value)||'#'; }
+  }
+  ['title','body','button_text','button_url'].forEach(n=>{const el=q(n); if(el) el.addEventListener('input', sync);});
+  sync();
+})();
+</script>
+{% if blocks %}
+<section class="admin-panel"><h2>Blocks</h2><div class="admin-card-grid sortable-cards" data-reorder-kind="page_blocks">{% for block in blocks %}<div class="mini-card" data-id="{{ block.id }}" draggable="true"><div class="drag-handle">☰ Drag</div><span class="pill {{ 'ok' if block.is_published else 'warn' }}">{{ 'Published' if block.is_published else 'Draft' }}</span><strong>{{ block.title or block.block_type }}</strong><p>{{ block.page }} · order {{ block.sort_order }}</p><form method="post" action="{{ url_for('admin_page_builder_delete', block_id=block.id) }}">{{ csrf_field()|safe }}<button type="submit">Delete</button></form></div>{% endfor %}</div></section>
+{% endif %}
+{% endblock %}
