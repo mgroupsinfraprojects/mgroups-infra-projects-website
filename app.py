@@ -246,6 +246,288 @@ DEFAULT_SETTINGS = {
     "company_name": "M-GROUPS INFRA PROJECTS",
     "registered_name": "MGROUPS INFRA PROJECTS",
     "tagline": "Registered Civil Engineering & Infrastructure Services Enterprise",
+    "hero_title": "Building Tamil Nadu's Infrastructure, One Project at a Time",
+    "hero_subtitle": "M-GROUPS INFRA PROJECTS is a registered civil contractor based in Nagercoil, executing roads, coastal works, overhead tanks, waterways, and municipal infrastructure across Kanniyakumari and Tamil Nadu.",
+    "short_description": "Udyam-registered, GST-compliant civil contractor with on-ground experience in coastal works, municipal construction, and site execution across South Tamil Nadu.",
+    "phone": "",
+    "whatsapp": "",
+    "public_phone_label": "Phone number hidden for privacy. Please use the contact form or WhatsApp enquiry button.",
+    "email": "mgroupsinfraprojects@gmail.com",
+    "address": "2/5-1A, North Street, Erachakulam, Nagercoil, Kanniyakumari, Tamil Nadu - 629901",
+    "map_embed": "",
+    "facebook": "",
+    "instagram": "",
+    "linkedin": "",
+    "logo_path": "uploads/m-groups-logo.jpeg",
+    "seo_title": "M-GROUPS INFRA PROJECTS | Registered Civil & Infrastructure Works in Tamil Nadu",
+    "seo_description": "M-GROUPS INFRA PROJECTS is a Udyam-registered civil contractor in Nagercoil, Tamil Nadu, specialising in coastal works, overhead tanks, municipal infrastructure, and site execution across Kanniyakumari district and South Tamil Nadu.",
+    "og_image": "uploads/m-groups-logo.jpeg",
+    "business_area": "Kanyakumari, Nagercoil and Tamil Nadu",
+    "service_areas": "Kanyakumari\nNagercoil\nKanniyakumari District\nTamil Nadu\nDindigul\nTirunelveli\nThoothukudi",
+    "homepage_section_order": "trust_strip\ncredentials\nservice_areas\nabout\nservices\nstats\nprojects\nwhy\ncta",
+    "google_business_url": "",
+    "notification_email": "mgroupsinfraprojects@gmail.com",
+    "smtp_from_name": "M-GROUPS Website",
+    "udyam_registration": "UDYAM-TN-09-0060986",
+    "gstin": "33DDOPK4939J1Z2",
+    "enterprise_type": "Micro Enterprise",
+    "business_commencement": "02/12/2020",
+    "major_activity": "Services; civil engineering and infrastructure-related activities",
+    "credential_note": "Udyam, GST, experience certificate and contractor registration documents are available for verification. Sensitive personal, tax, invoice and legal documents are not displayed publicly.",
+    "experience_documents": "5+",
+    "contractor_registrations": "2",
+
+    # Visibility controls. Admin can decide what appears publicly.
+    "show_phone_public": "0",
+    "show_whatsapp_public": "0",
+    "show_email_public": "1",
+    "show_address_public": "1",
+    "show_registered_name_public": "1",
+    "show_udyam_public": "1",
+    "show_gstin_public": "1",
+    "show_enterprise_type_public": "1",
+    "show_business_commencement_public": "0",
+    "show_major_activity_public": "1",
+    "show_credentials_section": "1",
+    "show_trust_strip": "1",
+    "show_service_areas_section": "1",
+    "show_about_section": "1",
+    "show_services_section": "1",
+    "show_stats_section": "0",
+    "show_projects_section": "1",
+    "show_why_section": "1",
+    "show_cta_section": "1",
+    "show_gallery_nav": "1",
+    "show_service_area_nav": "1",
+    "show_contact_nav": "1",
+    "show_footer_contact": "1",
+    "show_footer_credentials": "1",
+    "show_whatsapp_float": "0",
+    "show_hero_logo_panel": "1",
+    "show_hero_metrics": "0",
+    "show_project_placeholder_images": "0",
+
+    # Editable labels and section text.
+    "hero_badge_label": "Registered Civil Contractor — Tamil Nadu",
+    "hero_cta_primary": "Get a Free Quote",
+    "hero_cta_secondary": "See Our Work",
+    "trust_item_1": "Udyam Registered",
+    "trust_item_2": "GST Compliant",
+    "trust_item_3": "Coastal Works Experience",
+    "trust_item_4": "Municipal Project Records",
+    "trust_item_5": "On-Time Site Execution",
+    "credentials_eyebrow": "Verified Business Identity",
+    "credentials_title": "Registered, compliant, and document-ready.",
+    "credentials_link_text": "View full credentials →",
+    "service_areas_eyebrow": "Where We Work",
+    "service_areas_title": "Serving Kanniyakumari, Nagercoil & across Tamil Nadu.",
+    "service_areas_all_label": "All Service Areas →",
+    "about_eyebrow": "About Us",
+    "about_title": "Dependable civil contractor with proven South Tamil Nadu experience.",
+    "about_link_text": "Read our company profile →",
+    "services_eyebrow": "Our Services",
+    "services_title": "What We Build & Deliver",
+    "services_link_text": "All services →",
+    "projects_eyebrow": "Our Work",
+    "projects_title": "Recent Projects",
+    "projects_link_text": "View all projects →",
+    "image_pending_text": "Image will be added soon",
+    "stats_years_label": "Years Since Business Commencement",
+    "stats_experience_label": "Experience / Work Records",
+    "stats_contractor_label": "Contractor Registration Records",
+    "stats_gst_label": "Registered Enterprise",
+    "why_eyebrow": "Why Choose M-GROUPS",
+    "why_title": "The contractor clients in South Tamil Nadu trust for results.",
+    "why_card_1_title": "On-Time Site Execution",
+    "why_card_1_text": "We plan before we dig. Labour, materials, and timelines are coordinated before work begins so delays don't become your problem.",
+    "why_card_2_title": "Verified & Compliant",
+    "why_card_2_text": "Udyam registered, GST compliant, with experience certificates and contractor records ready for government and private tender submissions.",
+    "why_card_3_title": "Coastal & Municipal Experience",
+    "why_card_3_text": "Documented work in Nagercoil Municipal Corporation, 79 Coastal Works, Gopalasamuthiram, Kadukkarai, Thenthiruparai, and Dindigul.",
+    "why_card_4_title": "Clear Communication",
+    "why_card_4_text": "You'll know the project status before you have to ask. We flag issues early and give practical updates throughout execution.",
+    "cta_title": "Need a civil contractor in Tamil Nadu?",
+    "cta_text": "Share your project details — we'll review the requirement and get back to you within 24 hours.",
+    "cta_button_text": "Send Enquiry",
+    "contact_page_title": "Contact Us",
+    "contact_page_intro": "Send your project requirement with location, scope, and timeline. The enquiry will be stored in admin and can trigger email notification when SMTP is configured.",
+    "contact_card_title": "Business Contact",
+    "contact_form_title": "Send Enquiry",
+    "footer_company_heading": "Company",
+    "footer_contact_heading": "Contact",
+
+    # Appearance controls.
+    "heading_font": "Montserrat",
+    "body_font": "Manrope",
+    "nav_font": "Manrope",
+    "primary_color": "#0D1F35",
+    "secondary_color": "#C4822A",
+    "accent_color": "#E8A046",
+    "header_bg_color": "#0D1F35",
+    "footer_bg_color": "#07121F",
+    "body_bg_color": "#FFFFFF",
+    "soft_bg_color": "#F5F8FC",
+    "card_bg_color": "#FFFFFF",
+    "text_color": "#1C2E3F",
+    "muted_text_color": "#5A7089",
+    "line_color": "#D8E6F0",
+    "button_text_color": "#FFFFFF",
+    "container_width": "1160px",
+    "card_radius": "20px",
+    "button_radius": "11px",
+    "hero_title_size": "clamp(2.6rem,5.2vw,4.8rem)",
+    "section_title_size": "clamp(1.8rem,3vw,2.6rem)",
+    "body_text_size": "16px",
+    "custom_css": "",
+    "privacy_policy": "This website collects enquiry details submitted through the contact form only for business communication. Sensitive registration, GST, tax, invoice and legal documents are used only for internal verification and are not published in full on the public website.",
+    "terms_text": "Information on this website is based on available company registration and project documentation. Project pricing, timelines, and commitments are confirmed only through formal quotation, work order, invoice, or agreement.",
+}
+DEFAULT_SERVICES = [
+    ("Civil Engineering Works", "Structural civil works including foundations, concrete works, masonry, retaining walls, and site development. Executed with supervision, material checks, and proper documentation for government or private requirements.", "building", 1),
+    ("Municipal Infrastructure Support", "Construction and support works for municipal bodies — overhead tanks, drainage improvements, public utility structures, and allied infrastructure. Documented experience with Nagercoil Municipal Corporation.", "road", 2),
+    ("Coastal & Waterway Works", "Civil works for coastal infrastructure, harbour, and river-related construction. Experience certificates available for coastal project categories under Tamil Nadu government work.", "water", 3),
+    ("Site Execution & Coordination", "Full site management — labour deployment, material procurement, sub-contractor coordination, safety compliance, and day-to-day progress tracking so the project moves without bottlenecks.", "clipboard", 4),
+    ("Contractor Documentation & Compliance", "Complete contractor records maintained: registration documents, GST filings, experience certificates, work order history, and invoice documentation — ready for government tenders and pre-qualification submissions.", "file", 5),
+    ("Renovation & Maintenance Work    team_members = db.Column(db.String(60), default="Add actual")
+
+
+class Service(db.Model):
+    __tablename__ = "services"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=False, default="")
+    image_path = db.Column(db.Text, nullable=False, default="")
+    icon = db.Column(db.String(80), nullable=False, default="building")
+    sort_order = db.Column(db.Integer, nullable=False, default=0)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    is_published = db.Column(db.Boolean, nullable=False, default=True)
+    visible_fields = db.Column(db.Text, nullable=False, default="")
+    styles_json = db.Column(db.Text, nullable=False, default="{}")
+    published_at = db.Column(db.DateTime, nullable=True)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class Project(db.Model):
+    __tablename__ = "projects"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(220), nullable=False)
+    location = db.Column(db.String(220), nullable=False, default="")
+    category = db.Column(db.String(160), nullable=False, default="")
+    status = db.Column(db.String(80), nullable=False, default="Ongoing")
+    year = db.Column(db.String(20), nullable=False, default="")
+    client_type = db.Column(db.String(160), nullable=False, default="")
+    site_area = db.Column(db.String(160), nullable=False, default="")
+    duration = db.Column(db.String(160), nullable=False, default="")
+    project_value = db.Column(db.String(160), nullable=False, default="")
+    scope_of_work = db.Column(db.Text, nullable=False, default="")
+    challenge = db.Column(db.Text, nullable=False, default="")
+    solution = db.Column(db.Text, nullable=False, default="")
+    outcome = db.Column(db.Text, nullable=False, default="")
+    description = db.Column(db.Text, nullable=False, default="")
+    image_path = db.Column(db.Text, nullable=False, default="")
+    sort_order = db.Column(db.Integer, nullable=False, default=0)
+    is_featured = db.Column(db.Boolean, nullable=False, default=False)
+    is_published = db.Column(db.Boolean, nullable=False, default=True)
+    visible_fields = db.Column(db.Text, nullable=False, default="")
+    styles_json = db.Column(db.Text, nullable=False, default="{}")
+    published_at = db.Column(db.DateTime, nullable=True)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class GalleryItem(db.Model):
+    __tablename__ = "gallery"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(220), nullable=False)
+    caption = db.Column(db.Text, nullable=False, default="")
+    image_path = db.Column(db.Text, nullable=False)
+    sort_order = db.Column(db.Integer, nullable=False, default=0)
+    is_published = db.Column(db.Boolean, nullable=False, default=True)
+    visible_fields = db.Column(db.Text, nullable=False, default="")
+    styles_json = db.Column(db.Text, nullable=False, default="{}")
+    published_at = db.Column(db.DateTime, nullable=True)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class Enquiry(db.Model):
+    __tablename__ = "enquiries"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(160), nullable=False)
+    email = db.Column(db.String(220), nullable=False, default="")
+    phone = db.Column(db.String(80), nullable=False, default="")
+    project_type = db.Column(db.String(160), nullable=False, default="")
+    message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, nullable=False, default=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class Admin(db.Model):
+    __tablename__ = "admins"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(30), nullable=False, default="owner")  # owner / editor / viewer
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class AuditLog(db.Model):
+    __tablename__ = "audit_logs"
+    id = db.Column(db.Integer, primary_key=True)
+    admin_username = db.Column(db.String(80), nullable=False, default="system")
+    action = db.Column(db.String(180), nullable=False)
+    detail = db.Column(db.Text, nullable=False, default="")
+    ip_address = db.Column(db.String(80), nullable=False, default="")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class DraftContent(db.Model):
+    __tablename__ = "draft_content"
+    id = db.Column(db.Integer, primary_key=True)
+    draft_key = db.Column(db.String(160), unique=True, nullable=False)
+    payload_json = db.Column(db.Text, nullable=False, default="{}")
+    admin_username = db.Column(db.String(80), nullable=False, default="system")
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class ContentVersion(db.Model):
+    __tablename__ = "content_versions"
+    id = db.Column(db.Integer, primary_key=True)
+    content_type = db.Column(db.String(80), nullable=False)
+    object_id = db.Column(db.Integer, nullable=True)
+    title = db.Column(db.String(240), nullable=False, default="")
+    payload_json = db.Column(db.Text, nullable=False, default="{}")
+    version_note = db.Column(db.String(240), nullable=False, default="")
+    admin_username = db.Column(db.String(80), nullable=False, default="system")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class PageBlock(db.Model):
+    __tablename__ = "page_blocks"
+    id = db.Column(db.Integer, primary_key=True)
+    page = db.Column(db.String(80), nullable=False, default="home")
+    block_type = db.Column(db.String(80), nullable=False, default="text")
+    title = db.Column(db.String(240), nullable=False, default="")
+    body = db.Column(db.Text, nullable=False, default="")
+    image_path = db.Column(db.Text, nullable=False, default="")
+    button_text = db.Column(db.String(160), nullable=False, default="")
+    button_url = db.Column(db.Text, nullable=False, default="")
+    sort_order = db.Column(db.Integer, nullable=False, default=0)
+    is_published = db.Column(db.Boolean, nullable=False, default=False)
+    styles_json = db.Column(db.Text, nullable=False, default="{}")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+# ─────────────────────────────────────────────────────────────
+# Defaults
+# ─────────────────────────────────────────────────────────────
+DEFAULT_SETTINGS = {
+    "company_name": "M-GROUPS INFRA PROJECTS",
+    "registered_name": "MGROUPS INFRA PROJECTS",
+    "tagline": "Registered Civil Engineering & Infrastructure Services Enterprise",
     "hero_title": "Document-Backed Civil & Infrastructure Project Execution",
     "hero_subtitle": "Registered in Tamil Nadu with Udyam and GST credentials, M-GROUPS INFRA PROJECTS supports civil engineering, municipal infrastructure, site execution, and project coordination works.",
     "short_description": "Tamil Nadu-based registered infrastructure and civil works enterprise serving Kanyakumari, Nagercoil, and wider Tamil Nadu project requirements.",
