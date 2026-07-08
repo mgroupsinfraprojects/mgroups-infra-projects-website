@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+{% from "admin/_field_style.html" import field_controls with context %}
+{% block title %}Visibility & Appearance{% endblock %}
+{% block content %}
+<h1>Visibility & Appearance</h1>
+<section class="admin-panel compact-panel"><p class="admin-note">Simple Mode keeps this page focused on visibility and public labels. Advanced Mode adds typography, colors, and custom CSS.</p></section>
+<form method="post" class="admin-form two-col settings-admin clean-settings">
+    {{ csrf_field()|safe }}
+    <nav class="admin-tabs full"><a href="#visibility">Visibility</a><a href="#home-sections">Homepage Sections</a><a href="#labels">Public Labels</a>{% if is_advanced_mode() %}<a href="#typography">Typography</a><a href="#colors">Colors</a><a href="#css">Advanced CSS</a>{% endif %}</nav>
+
+    <details id="visibility" class="settings-section full" open><summary>Visibility</summary><div class="settings-section-grid">
+    <label class="check"><input type="checkbox" name="show_phone_public" {% if is_on('show_phone_public') %}checked{% endif %}> Show phone number publicly</label>
+    <label class="check"><input type="checkbox" name="show_whatsapp_public" {% if is_on('show_whatsapp_public') %}checked{% endif %}> Show WhatsApp button/link publicly</label>
+    <label class="check"><input type="checkbox" name="show_email_public" {% if is_on('show_email_public', true) %}checked{% endif %}> Show email publicly</label>
+    <label class="check"><input type="checkbox" name="show_address_public" {% if is_on('show_address_public', true) %}checked{% endif %}> Show address publicly</label>
+    <label class="check"><input type="checkbox" name="show_registered_name_public" {% if is_on('show_registered_name_public', true) %}checked{% endif %}> Show registered name</label>
+    <label class="check"><input type="checkbox" name="show_udyam_public" {% if is_on('show_udyam_public', true) %}checked{% endif %}> Show Udyam number</label>
+    <label class="check"><input type="checkbox" name="show_gstin_public" {% if is_on('show_gstin_public', true) %}checked{% endif %}> Show GSTIN</label>
+    <label class="check"><input type="checkbox" name="show_enterprise_type_public" {% if is_on('show_enterprise_type_public', true) %}checked{% endif %}> Show enterprise type</label>
+    <label class="check"><input type="checkbox" name="show_business_commencement_public" {% if is_on('show_business_commencement_public') %}checked{% endif %}> Show business commencement date</label>
+    <label class="check"><input type="checkbox" name="show_major_activity_public" {% if is_on('show_major_activity_public', true) %}checked{% endif %}> Show major activity</label>
+    <label class="check"><input type="checkbox" name="show_gallery_nav" {% if is_on('show_gallery_nav', true) %}checked{% endif %}> Allow Gallery menu when published images exist</label>
+    <label class="check"><input type="checkbox" name="show_service_area_nav" {% if is_on('show_service_area_nav', true) %}checked{% endif %}> Show Service Areas menu</label>
+    <label class="check"><input type="checkbox" name="show_contact_nav" {% if is_on('show_contact_nav', true) %}checked{% endif %}> Show Contact menu/button</label>
+    <label class="check"><input type="checkbox" name="show_footer_contact" {% if is_on('show_footer_contact', true) %}checked{% endif %}> Show footer contact block</label>
+    <label class="check"><input type="checkbox" name="show_footer_credentials" {% if is_on('show_footer_credentials', true) %}checked{% endif %}> Show footer credentials</label>
+    <label class="check"><input type="checkbox" name="show_whatsapp_float" {% if is_on('show_whatsapp_float') %}checked{% endif %}> Show floating WhatsApp button</label>
+    </div></details>
+
+    <details id="home-sections" class="settings-section full"><summary>Homepage Sections</summary><div class="settings-section-grid">
+    {% for key,label,default in [
+        ('show_trust_strip','Trust strip', true),('show_credentials_section','Credentials section', true),('show_service_areas_section','Service areas section', true),('show_about_section','About section', true),('show_services_section','Services section', true),('show_stats_section','Stats band', false),('show_projects_section','Projects section', true),('show_why_section','Why choose us section', true),('show_cta_section','Bottom CTA section', true),('show_hero_logo_panel','Hero logo panel', true),('show_hero_metrics','Hero metrics', false),('show_project_placeholder_images','Project image placeholder blocks', false)
+    ] %}
+    <label class="check"><input type="checkbox" name="{{ key }}" {% if is_on(key, default) %}checked{% endif %}> {{ label }}</label>
+    {% endfor %}
+    </div></details>
+
+    <details id="labels" class="settings-section full" open><summary>Public Labels</summary><div class="settings-section-grid">
+    {% for field,label in [
+        ('hero_badge_label','Hero Badge'),('hero_cta_primary','Hero Primary Button'),('hero_cta_secondary','Hero Secondary Button'),
+        ('trust_item_1','Trust Item 1'),('trust_item_2','Trust Item 2'),('trust_item_3','Trust Item 3'),('trust_item_4','Trust Item 4'),('trust_item_5','Trust Item 5'),
+        ('credentials_eyebrow','Credentials Eyebrow'),('credentials_title','Credentials Title'),('credentials_link_text','Credentials Link Text'),
+        ('service_areas_eyebrow','Service Areas Eyebrow'),('service_areas_title','Service Areas Title'),('service_areas_all_label','Service Areas All Label'),
+        ('about_eyebrow','About Eyebrow'),('about_title','About Title'),('about_link_text','About Link Text'),
+        ('services_eyebrow','Services Eyebrow'),('services_title','Services Title'),('services_link_text','Services Link Text'),
+        ('projects_eyebrow','Projects Eyebrow'),('projects_title','Projects Title'),('projects_link_text','Projects Link Text'),('image_pending_text','Image Pending Text'),
+        ('stats_years_label','Stats Years Label'),('stats_experience_label','Stats Experience Label'),('stats_contractor_label','Stats Contractor Label'),('stats_gst_label','Stats GST Label'),
+        ('why_eyebrow','Why Eyebrow'),('why_title','Why Title'),('why_card_1_title','Why Card 1 Title'),('why_card_1_text','Why Card 1 Text'),('why_card_2_title','Why Card 2 Title'),('why_card_2_text','Why Card 2 Text'),('why_card_3_title','Why Card 3 Title'),('why_card_3_text','Why Card 3 Text'),('why_card_4_title','Why Card 4 Title'),('why_card_4_text','Why Card 4 Text'),
+        ('cta_title','CTA Title'),('cta_text','CTA Text'),('cta_button_text','CTA Button Text'),('contact_page_title','Contact Page Title'),('contact_page_intro','Contact Page Intro'),('contact_card_title','Contact Card Title'),('contact_form_title','Contact Form Title'),('footer_company_heading','Footer Company Heading'),('footer_contact_heading','Footer Contact Heading')
+    ] %}
+    <label class="{% if 'Title' in label or 'Intro' in label or 'Text' in label %}full{% endif %}">{{ label }}{% if 'Title' in label or 'Intro' in label or 'Text' in label %}<textarea name="{{ field }}" rows="2">{{ site.get(field,'') }}</textarea>{% else %}<input name="{{ field }}" value="{{ site.get(field,'') }}">{% endif %}{{ field_controls('appearance', field, true, 'Use custom style') }}</label>
+    {% endfor %}
+    </div></details>
+
+    {% set advanced_fields = ['heading_font','body_font','nav_font','primary_color','secondary_color','accent_color','header_bg_color','footer_bg_color','body_bg_color','soft_bg_color','card_bg_color','text_color','muted_text_color','line_color','button_text_color','container_width','card_radius','button_radius','hero_title_size','section_title_size','body_text_size','custom_css'] %}
+    {% if is_advanced_mode() %}
+    <details id="typography" class="settings-section full"><summary>Typography</summary><div class="settings-section-grid">
+      <label>Heading Font<select name="heading_font">{% for f in ['Poppins','Inter','Montserrat','Manrope','Roboto Slab'] %}<option {% if site.heading_font==f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></label>
+      <label>Body Font<select name="body_font">{% for f in ['Inter','Manrope','Poppins','Montserrat','Roboto Slab'] %}<option {% if site.body_font==f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></label>
+      <label>Navigation Font<select name="nav_font">{% for f in ['Inter','Manrope','Poppins','Montserrat'] %}<option {% if site.nav_font==f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></label>
+      <label>Body Text Size<input name="body_text_size" value="{{ site.body_text_size }}" placeholder="16px"></label>
+      <label>Hero Title Size<input name="hero_title_size" value="{{ site.hero_title_size }}" placeholder="clamp(2.35rem,4.7vw,4.1rem)"></label>
+      <label>Section Title Size<input name="section_title_size" value="{{ site.section_title_size }}" placeholder="clamp(1.8rem,3vw,2.6rem)"></label>
+      <label>Container Width<input name="container_width" value="{{ site.container_width }}" placeholder="1160px"></label>
+      <label>Card Radius<input name="card_radius" value="{{ site.card_radius }}" placeholder="20px"></label>
+      <label>Button Radius<input name="button_radius" value="{{ site.button_radius }}" placeholder="11px"></label>
+    </div></details>
+    <details id="colors" class="settings-section full"><summary>Colors</summary><div class="settings-section-grid">
+      {% for field,label,default in [('primary_color','Primary Color','#0D1F35'),('secondary_color','Secondary Color','#C4822A'),('accent_color','Accent Color','#E8A046'),('header_bg_color','Header Background','#0D1F35'),('footer_bg_color','Footer Background','#07121F'),('body_bg_color','Body Background','#FFFFFF'),('soft_bg_color','Soft Section Background','#F5F8FC'),('card_bg_color','Card Background','#FFFFFF'),('text_color','Text Color','#1C2E3F'),('muted_text_color','Muted Text Color','#5A7089'),('line_color','Border Color','#D8E6F0'),('button_text_color','Button Text Color','#FFFFFF')] %}
+      <label>{{ label }}<input type="color" name="{{ field }}" value="{{ site.get(field) or default }}"></label>
+      {% endfor %}
+    </div></details>
+    <details id="css" class="settings-section full"><summary>Advanced CSS</summary><label class="full">Custom CSS<textarea name="custom_css" rows="8" placeholder="Use only when necessary. Invalid CSS can break layout.">{{ site.custom_css }}</textarea></label></details>
+    {% else %}
+      {% for field in advanced_fields %}<input type="hidden" name="{{ field }}" value="{{ site.get(field,'') }}">{% endfor %}
+    {% endif %}
+
+    <div class="full admin-actions sticky-actions"><button class="btn" type="submit">Save Visibility & Appearance</button></div>
+</form>
+{% endblock %}

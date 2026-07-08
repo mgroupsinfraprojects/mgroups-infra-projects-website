@@ -1,0 +1,8 @@
+{% extends "admin/base.html" %}
+{% block title %}Enquiries{% endblock %}
+{% block content %}
+<h1>Contact Enquiries</h1>
+<table class="admin-table"><tr><th>Name</th><th>Email</th><th>Phone</th><th>Project Type</th><th>Message</th><th>Date</th><th>Status</th><th>Action</th></tr>
+{% for e in enquiries %}<tr><td>{{ e.name }}</td><td>{{ e.email }}</td><td>{{ e.phone }}</td><td>{{ e.project_type }}</td><td>{{ e.message }}</td><td>{{ e.created_at }}</td><td>{{ 'Read' if e.is_read else 'New' }}</td><td>{% if not e.is_read %}<form class="inline" method="post" action="{{ url_for('admin_enquiry_read', enquiry_id=e.id) }}">{{ csrf_field()|safe }}<button type="submit">Mark read</button></form>{% endif %}<form class="inline" method="post" action="{{ url_for('admin_enquiry_delete', enquiry_id=e.id) }}" onsubmit="return confirm('Delete enquiry?')">{{ csrf_field()|safe }}<button>Delete</button></form></td></tr>{% else %}<tr><td colspan="8">No enquiries yet.</td></tr>{% endfor %}
+</table>
+{% endblock %}

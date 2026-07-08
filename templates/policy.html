@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% if field_visible('settings','company_name') %} | {{ site.company_name }}{% endif %}{% endblock %}
+{% block content %}<section class="page-hero"><div class="container"><p class="eyebrow">Website Policy</p><h1>{{ title }}</h1></div></section><section class="section"><div class="container"><article class="content-card wide"><p class="preline">{{ body }}</p></article></div></section>{% endblock %}

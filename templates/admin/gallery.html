@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% from "admin/_field_style.html" import item_controls with context %}
+{% block title %}Gallery{% endblock %}
+{% block content %}
+<div class="admin-title-row"><h1>Gallery</h1><div><a class="btn secondary" href="{{ url_for('admin_ordering') }}#gallery-order">Drag Order</a><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='gallery') }}">Preview</a></div></div>
+<section class="admin-panel"><p class="admin-note">Upload real work photos only. Avoid test color blocks, screenshots, or placeholder images on the public website.</p></section>
+<form method="post" enctype="multipart/form-data" class="admin-form two-col">
+    {{ csrf_field()|safe }}
+    <label>Publish State<select name="publish_state"><option value="draft">Draft / private</option><option value="published" selected>Published / public</option></select></label>
+    <label>Sort Order<input type="number" name="sort_order" value="0"></label>
+    <label>Title<input name="title" placeholder="e.g. Water tank work - Nagercoil">{{ item_controls('gallery','title',true) }}</label>
+    <label class="full">Caption<textarea name="caption" rows="3" placeholder="Short factual caption. Do not include private client or GST details."></textarea>{{ item_controls('gallery','caption',true) }}</label>
+    <label class="full">Image<input type="file" name="image" accept="image/*" required>{{ item_controls('gallery','image_path',true,'Show image publicly') }}</label>
+    <div class="full"><button class="btn" type="submit">Add Image</button></div>
+</form>
+{% if items %}
+<div class="admin-card-grid sortable-cards" data-reorder-kind="gallery">
+{% for item in items %}
+<div class="mini-card" data-id="{{ item.id }}" draggable="true">
+    <div class="drag-handle">☰ Drag</div>
+    <span class="pill {{ 'ok' if item.is_published else 'warn' }}">{{ 'Published' if item.is_published else 'Draft' }}</span>
+    {% if item.image_path and item_field_visible(item,'gallery','image_path') %}<img src="{{ media_url(item.image_path) }}" alt="{{ item.title }}">{% endif %}
+    {% if item_field_visible(item,'gallery','title') %}<strong>{{ item.title }}</strong>{% endif %}
+    {% if item_field_visible(item,'gallery','caption') and item.caption %}<p>{{ item.caption }}</p>{% endif %}
+    <form method="post" action="{{ url_for('admin_gallery_delete', item_id=item.id) }}" onsubmit="return confirm('Delete this gallery image?')">{{ csrf_field()|safe }}<button class="danger-link" type="submit">Delete</button></form>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<section class="admin-panel empty-state"><h2>No gallery images yet</h2><p>Add real work photos before showing Gallery publicly. Until published images exist, the public navbar hides Gallery automatically.</p></section>
+{% endif %}
+{% endblock %}

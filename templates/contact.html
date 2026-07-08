@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Contact{% if field_visible('settings','company_name') %} | {{ site.company_name }}{% endif %}{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><p class="eyebrow">Contact</p><h1 style="{{ style_inline('appearance','contact_page_title') }}">{{ site.contact_page_title or 'Contact Us' }}</h1><p style="{{ style_inline('appearance','contact_page_intro') }}">{{ site.contact_page_intro }}</p></div></section>
+<section class="section soft"><div class="container contact-grid">
+  <aside class="content-card"><h2 style="{{ style_inline('appearance','contact_card_title') }}">{{ site.contact_card_title or 'Business Contact' }}</h2>
+    {% if field_visible('settings','phone') and is_on('show_phone_public') and site.phone %}<p style="{{ style_inline('settings','phone') }}"><strong>Phone:</strong> {{ site.phone }}</p>{% endif %}
+    {% if field_visible('settings','public_phone_label') and not is_on('show_phone_public') and site.public_phone_label %}<p style="{{ style_inline('settings','public_phone_label') }}">{{ site.public_phone_label }}</p>{% endif %}
+    {% if field_visible('settings','email') and is_on('show_email_public', true) and site.email %}<p style="{{ style_inline('settings','email') }}"><strong>Email:</strong> {{ site.email }}</p>{% endif %}
+    {% if field_visible('settings','address') and is_on('show_address_public', true) and site.address %}<p style="{{ style_inline('settings','address') }}"><strong>Address:</strong><br>{{ site.address }}</p>{% endif %}
+    {% if field_visible('settings','business_area') %}<p style="{{ style_inline('settings','business_area') }}"><strong>Service Area:</strong><br>{{ site.business_area }}</p>{% endif %}
+    {% if field_visible('settings','map_embed') and site.map_embed %}<div class="map-embed">{{ site.map_embed|safe }}</div>{% endif %}
+  </aside>
+  <form method="post" class="form-card"><h2 style="{{ style_inline('appearance','contact_form_title') }}">{{ site.contact_form_title or 'Send Enquiry' }}</h2>{{ csrf_field()|safe }}<label>Name<input name="name" required></label><label>Email<input name="email" type="email"></label><label>Phone<input name="phone"></label><label>Project Type<input name="project_type"></label><label>Message<textarea name="message" rows="5" required></textarea></label><button class="btn btn-primary" type="submit">Submit Enquiry</button></form>
+</div></section>
+{% endblock %}

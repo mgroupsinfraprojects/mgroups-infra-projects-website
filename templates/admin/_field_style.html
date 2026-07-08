@@ -1,0 +1,64 @@
+{% macro field_controls(section, field, checked=False, label='Show publicly') -%}
+{% set style_source = form_site if form_site is defined else site %}
+<div class="field-control-box compact">
+  <label class="field-vis"><input type="checkbox" name="vis_{{ field }}" {% if checked %}checked{% endif %}> {{ label }}</label>
+  {% if is_advanced_mode() %}
+  <details class="style-details"><summary>Advanced text style</summary>
+    <div class="style-grid">
+      <label>Font
+        <select name="{{ style_key(section, field, 'font') }}">
+          {% set cur = style_source.get(style_key(section, field, 'font'), '') %}
+          <option value="" {% if not cur %}selected{% endif %}>Default</option>
+          {% for f in ['Inter','Manrope','Montserrat','Poppins','Roboto','Lato','Arial','Georgia','Times New Roman'] %}<option value="{{ f }}" {% if cur==f %}selected{% endif %}>{{ f }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Size <input name="{{ style_key(section, field, 'size') }}" value="{{ style_source.get(style_key(section, field, 'size'), '') }}" placeholder="18 or 18px"></label>
+      <label>Weight
+        {% set w = style_source.get(style_key(section, field, 'weight'), '') %}
+        <select name="{{ style_key(section, field, 'weight') }}"><option value="" {% if not w %}selected{% endif %}>Default</option>{% for val,label2 in [('400','Normal'),('500','Medium'),('600','Semi-bold'),('700','Bold'),('800','Extra-bold'),('900','Black')] %}<option value="{{ val }}" {% if w==val %}selected{% endif %}>{{ label2 }}</option>{% endfor %}</select>
+      </label>
+      <label>Color <input name="{{ style_key(section, field, 'color') }}" value="{{ style_source.get(style_key(section, field, 'color'), '') }}" placeholder="#0D1F35"></label>
+      <label>Align
+        {% set a = style_source.get(style_key(section, field, 'align'), '') %}
+        <select name="{{ style_key(section, field, 'align') }}"><option value="">Default</option>{% for val in ['left','center','right','justify'] %}<option value="{{ val }}" {% if a==val %}selected{% endif %}>{{ val }}</option>{% endfor %}</select>
+      </label>
+      <label>Letter spacing <input name="{{ style_key(section, field, 'letter_spacing') }}" value="{{ style_source.get(style_key(section, field, 'letter_spacing'), '') }}" placeholder="0.02em"></label>
+      <label>Line height <input name="{{ style_key(section, field, 'line_height') }}" value="{{ style_source.get(style_key(section, field, 'line_height'), '') }}" placeholder="1.5"></label>
+      <label class="check"><input type="checkbox" name="{{ style_key(section, field, 'italic') }}" {% if is_on(style_key(section, field, 'italic')) %}checked{% endif %}> Italic</label>
+      <label class="check"><input type="checkbox" name="{{ style_key(section, field, 'uppercase') }}" {% if is_on(style_key(section, field, 'uppercase')) %}checked{% endif %}> Uppercase</label>
+    </div>
+  </details>
+  {% endif %}
+</div>
+{%- endmacro %}
+
+{% macro item_controls(section, field, checked=False, label='Show publicly') -%}
+{% set obj = service if service is defined and service else project if project is defined and project else gallery_item if gallery_item is defined and gallery_item else none %}
+<div class="field-control-box compact">
+  <label class="field-vis"><input type="checkbox" name="vis_{{ field }}" {% if checked %}checked{% endif %}> {{ label }}</label>
+  {% if is_advanced_mode() %}
+  <details class="style-details"><summary>Advanced text style</summary>
+    <div class="style-grid">
+      <label>Font
+        {% set cur = item_style_value(obj, field, 'font') if obj else '' %}
+        <select name="{{ item_style_key(section, field, 'font') }}"><option value="" {% if not cur %}selected{% endif %}>Default</option>{% for f in ['Inter','Manrope','Montserrat','Poppins','Roboto','Lato','Arial','Georgia','Times New Roman'] %}<option value="{{ f }}" {% if cur==f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select>
+      </label>
+      <label>Size <input name="{{ item_style_key(section, field, 'size') }}" value="{{ item_style_value(obj, field, 'size') if obj else '' }}" placeholder="18 or 18px"></label>
+      <label>Weight
+        {% set w = item_style_value(obj, field, 'weight') if obj else '' %}
+        <select name="{{ item_style_key(section, field, 'weight') }}"><option value="" {% if not w %}selected{% endif %}>Default</option>{% for val,label2 in [('400','Normal'),('500','Medium'),('600','Semi-bold'),('700','Bold'),('800','Extra-bold'),('900','Black')] %}<option value="{{ val }}" {% if w==val %}selected{% endif %}>{{ label2 }}</option>{% endfor %}</select>
+      </label>
+      <label>Color <input name="{{ item_style_key(section, field, 'color') }}" value="{{ item_style_value(obj, field, 'color') if obj else '' }}" placeholder="#0D1F35"></label>
+      <label>Align
+        {% set a = item_style_value(obj, field, 'align') if obj else '' %}
+        <select name="{{ item_style_key(section, field, 'align') }}"><option value="">Default</option>{% for val in ['left','center','right','justify'] %}<option value="{{ val }}" {% if a==val %}selected{% endif %}>{{ val }}</option>{% endfor %}</select>
+      </label>
+      <label>Letter spacing <input name="{{ item_style_key(section, field, 'letter_spacing') }}" value="{{ item_style_value(obj, field, 'letter_spacing') if obj else '' }}" placeholder="0.02em"></label>
+      <label>Line height <input name="{{ item_style_key(section, field, 'line_height') }}" value="{{ item_style_value(obj, field, 'line_height') if obj else '' }}" placeholder="1.5"></label>
+      <label class="check"><input type="checkbox" name="{{ item_style_key(section, field, 'italic') }}" {% if obj and item_style_flag(obj, field, 'italic') %}checked{% endif %}> Italic</label>
+      <label class="check"><input type="checkbox" name="{{ item_style_key(section, field, 'uppercase') }}" {% if obj and item_style_flag(obj, field, 'uppercase') %}checked{% endif %}> Uppercase</label>
+    </div>
+  </details>
+  {% endif %}
+</div>
+{%- endmacro %}

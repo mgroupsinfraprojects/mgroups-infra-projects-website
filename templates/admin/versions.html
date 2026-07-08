@@ -1,0 +1,13 @@
+{% extends "admin/base.html" %}
+{% block title %}Version History{% endblock %}
+{% block content %}
+<section class="admin-panel"><h2>Compare two versions</h2><form class="admin-form two-col" method="get" action="{{ url_for('admin_versions_compare') }}"><label>Left version ID<input name="left" required></label><label>Right version ID<input name="right" required></label><div class="full"><button class="btn" type="submit">Compare Side-by-Side</button></div></form></section>
+<div class="admin-title-row"><h1>Version History</h1><div><a class="btn secondary" href="{{ url_for('admin_versions') }}">All</a><a class="btn secondary" href="{{ url_for('admin_versions', type='settings') }}">Settings</a><a class="btn secondary" href="{{ url_for('admin_versions', type='about') }}">About</a><a class="btn secondary" href="{{ url_for('admin_versions', type='project') }}">Projects</a></div></div>
+<section class="admin-panel"><p class="admin-note">Every publish/save operation creates a restore point. Restore carefully, then use Live Preview before sharing the public website.</p></section>
+<table class="admin-table"><tr><th>ID</th><th>Type</th><th>Title</th><th>Note</th><th>Admin</th><th>Date</th><th>Action</th></tr>
+{% for v in versions %}
+<tr><td>{{ v.id }}</td><td>{{ v.content_type }}</td><td>{{ v.title }}</td><td>{{ v.version_note }}</td><td>{{ v.admin_username }}</td><td>{{ v.created_at }}</td><td><form method="post" action="{{ url_for('admin_version_restore', version_id=v.id) }}" onsubmit="return confirm('Restore this version? Current values will be overwritten.')">{{ csrf_field()|safe }}<button class="btn-small" type="submit">Restore</button></form></td></tr>
+{% endfor %}
+</table>
+{% if not versions %}<p>No versions yet.</p>{% endif %}
+{% endblock %}

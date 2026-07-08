@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% block title %}Drag & Drop Ordering{% endblock %}
+{% block content %}
+<h1>Drag & Drop Ordering</h1>
+<section class="admin-panel"><p class="admin-note">Drag items, then the order is saved automatically. Homepage section ordering changes the public homepage sequence below the hero.</p></section>
+
+<h2>Homepage Section Order</h2>
+<div class="order-list" data-reorder-kind="sections">
+{% for sec in sections %}<div class="order-row" data-id="{{ sec }}" draggable="true"><span class="drag-handle">☰</span><strong>{{ sec.replace('_',' ')|title }}</strong></div>{% endfor %}
+</div>
+
+<h2 id="services-order">Services Order</h2>
+<div class="order-list" data-reorder-kind="services">
+{% for s in services %}<div class="order-row" data-id="{{ s.id }}" draggable="true"><span class="drag-handle">☰</span><strong>{{ s.title }}</strong><span>{{ 'Published' if s.is_published else 'Draft' }}</span></div>{% endfor %}
+</div>
+
+<h2 id="projects-order">Projects Order</h2>
+<div class="order-list" data-reorder-kind="projects">
+{% for p in projects %}<div class="order-row" data-id="{{ p.id }}" draggable="true"><span class="drag-handle">☰</span><strong>{{ p.title }}</strong><span>{{ p.location }}</span><span>{{ 'Published' if p.is_published else 'Draft' }}</span></div>{% endfor %}
+</div>
+
+<h2 id="gallery-order">Gallery Order</h2>
+<div class="order-list" data-reorder-kind="gallery">
+{% for g in gallery %}<div class="order-row" data-id="{{ g.id }}" draggable="true"><span class="drag-handle">☰</span><strong>{{ g.title }}</strong><span>{{ 'Published' if g.is_published else 'Draft' }}</span></div>{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>{% block title %}Admin{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body class="admin-body">
+{% if session.admin_id %}
+{% set adm = current_admin() %}
+<aside class="admin-sidebar">
+    <h2>M-GROUPS Admin</h2>
+    <div class="mode-box">
+        <span>Mode: <strong>{{ admin_mode().title() }}</strong></span>
+        {% if admin_mode() == 'advanced' %}<a href="{{ url_for('admin_set_mode', mode='simple') }}">Switch to Simple</a>{% else %}<a href="{{ url_for('admin_set_mode', mode='advanced') }}">Advanced Mode</a>{% endif %}
+    </div>
+    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('admin_preview') }}" target="_blank">Live Preview</a>
+    {% if adm and adm.role == 'owner' %}
+    <a href="{{ url_for('admin_settings') }}">Website Settings</a>
+    <a href="{{ url_for('admin_appearance') }}">Visibility & Appearance</a>
+    <a href="{{ url_for('admin_permissions') }}">Role Permissions</a>
+    <a href="{{ url_for('admin_users') }}">Admin Users & Roles</a>
+    <a href="{{ url_for('restore_backup') }}">Restore Backup</a>
+    <a href="{{ url_for('backup_json') }}">Download Backup</a>
+    {% endif %}
+    <a href="{{ url_for('admin_about') }}">About & Experience</a>
+    <a href="{{ url_for('admin_services') }}">Services</a>
+    <a href="{{ url_for('admin_projects') }}">Projects / Works</a>
+    <a href="{{ url_for('admin_gallery') }}">Gallery</a>
+    <a href="{{ url_for('admin_media') }}">Media Library</a>
+    {% if adm and adm.role == 'owner' %}
+    <a href="{{ url_for('admin_ordering') }}">Drag & Drop Ordering</a>
+    <a href="{{ url_for('admin_page_builder') }}">Custom Homepage Block Builder</a>
+    <a href="{{ url_for('admin_versions') }}">Version History</a>
+    {% endif %}
+    <a href="{{ url_for('admin_enquiries') }}">Enquiries</a>
+    <a href="{{ url_for('export_enquiries_csv') }}">Export Enquiries</a>
+    <a href="{{ url_for('admin_password') }}">Change Password</a>
+    <a href="{{ url_for('home') }}" target="_blank">View Website</a>
+    <a href="{{ url_for('admin_logout') }}">Logout</a>
+</aside>
+{% endif %}
+<main class="admin-main {% if not session.admin_id %}login-main{% endif %}">
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-wrap">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+{% block content %}{% endblock %}
+</main>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body></html>

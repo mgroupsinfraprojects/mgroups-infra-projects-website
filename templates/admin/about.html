@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% from "admin/_field_style.html" import field_controls with context %}
+{% block title %}About & Experience{% endblock %}
+{% block content %}
+<div class="admin-title-row"><h1>About & Experience</h1><div><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='about') }}">Live Preview</a>{% if draft_about %}<a class="btn secondary" href="{{ url_for('admin_about', draft=1) }}">Load Draft</a>{% endif %}</div></div>
+<section class="admin-panel"><p class="admin-note">Use draft mode to test text privately. Simple Mode keeps this page focused on writing and public visibility; Advanced Mode adds per-field styling.</p></section>
+<form method="post" class="admin-form two-col">
+    {{ csrf_field()|safe }}
+    {% for field,label,rows in [
+        ('short_description','Short Description',3),('full_description','Full Company Description',8),('mission','Mission',3),('vision','Vision',3),('core_values','Core Values',6),('experience_summary','Experience Summary',6)
+    ] %}
+    <label class="full">{{ label }}<textarea name="{{ field }}" rows="{{ rows }}">{{ about|attr(field) }}</textarea>{{ field_controls('about', field, form_visible('about', field)) }}</label>
+    {% endfor %}
+    {% for field,label in [('years_experience','Years Experience'),('completed_projects','Completed Projects'),('active_projects','Active Projects'),('team_members','Team Members')] %}
+    <label>{{ label }}<input name="{{ field }}" value="{{ about|attr(field) }}">{{ field_controls('about', field, form_visible('about', field)) }}</label>
+    {% endfor %}
+    <div class="full admin-actions"><button class="btn" type="submit" name="action" value="publish">Publish About Content</button><button class="btn secondary" type="submit" name="action" value="draft">Save Draft</button><button class="btn secondary" type="submit" name="action" value="preview">Save Draft & Preview</button></div>
+</form>
+{% endblock %}

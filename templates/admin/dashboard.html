@@ -1,0 +1,34 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Admin Dashboard</h1>
+<div class="admin-stats">
+    <div><strong>{{ counts.services }}</strong><span>Services</span></div>
+    <div><strong>{{ counts.projects }}</strong><span>Projects</span></div>
+    <div><strong>{{ counts.published_gallery }}</strong><span>Published Gallery Images</span></div>
+    <div><strong>{{ counts.unread }}</strong><span>Unread Enquiries</span></div>
+</div>
+
+{% if counts.published_gallery == 0 or counts.projects_without_images > 0 %}
+<section class="admin-panel warning-panel">
+    <h2>Content Warnings</h2>
+    {% if counts.published_gallery == 0 %}<p class="admin-note">Gallery has no published images. Add real work photos or hide Gallery from Visibility & Appearance.</p>{% endif %}
+    {% if counts.projects_without_images > 0 %}<p class="admin-note">{{ counts.projects_without_images }} project(s) have no image. Add one real image per project for trust.</p>{% endif %}
+</section>
+{% endif %}
+
+<section class="admin-panel"><h2>Production Setup Status</h2><p class="admin-note">Required items are needed before this becomes a reliable public deployment. Recommended items improve email and recovery behaviour.</p>
+<div class="check-columns">
+  <div><h3>Required</h3>{% for key, ok, note in production_checks_grouped.required %}<div class="check-row {{ 'done' if ok else 'missing' }}"><strong>{{ key }}</strong><span>{{ 'Completed' if ok else 'Missing' }}</span><small>{{ note }}</small></div>{% endfor %}</div>
+  <div><h3>Recommended</h3>{% for key, ok, note in production_checks_grouped.recommended %}<div class="check-row {{ 'done' if ok else 'missing' }}"><strong>{{ key }}</strong><span>{{ 'Completed' if ok else 'Missing' }}</span><small>{{ note }}</small></div>{% endfor %}</div>
+</div>
+<div class="admin-summary-grid"><div><strong>{{ production_checks_grouped.completed|length }}</strong><span>Completed</span></div><div><strong>{{ production_checks_grouped.missing|length }}</strong><span>Missing</span></div></div></section>
+
+<section class="admin-panel"><h2>Quick Actions</h2><p class="admin-note">Use backup before major updates. Use PostgreSQL and Cloudinary environment variables on Render for stable production data.</p><p>{% if current_admin() and current_admin().role == 'owner' %}<a class="btn" href="{{ url_for('backup_json') }}">Download Full Backup</a> <a class="btn secondary" href="{{ url_for('restore_backup') }}">Restore Backup</a>{% endif %} <a class="btn secondary" href="{{ url_for('export_enquiries_csv') }}">Export Enquiries CSV</a></p></section>
+<section class="admin-panel"><h2>Recent Enquiries</h2>
+<table class="admin-table"><tr><th>Name</th><th>Phone</th><th>Message</th><th>Date</th></tr>{% for e in enquiries %}<tr><td>{{ e.name }}</td><td>{{ e.phone }}</td><td>{{ e.message[:80] }}</td><td>{{ e.created_at }}</td></tr>{% else %}<tr><td colspan="4">No enquiries yet.</td></tr>{% endfor %}</table>
+</section>
+<section class="admin-panel"><h2>Recent Admin Activity</h2>
+<table class="admin-table"><tr><th>Action</th><th>Admin</th><th>Detail</th><th>Date</th></tr>{% for log in logs %}<tr><td>{{ log.action }}</td><td>{{ log.admin_username }}</td><td>{{ log.detail }}</td><td>{{ log.created_at }}</td></tr>{% else %}<tr><td colspan="4">No activity yet.</td></tr>{% endfor %}</table>
+</section>
+{% endblock %}

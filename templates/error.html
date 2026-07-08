@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} | {{ site.company_name }}{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><p class="eyebrow">Website Notice</p><h1>{{ code }}</h1><p>{{ message }}</p><p><a class="btn btn-primary" href="{{ url_for('home') }}">Return Home</a></p></div></section>
+{% endblock %}

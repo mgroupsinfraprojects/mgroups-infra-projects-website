@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{% if field_visible('settings','company_name') %}{{ site.company_name }} | {% endif %}Infrastructure & Civil Works{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <p class="hero-tag" style="{{ style_inline('appearance','hero_badge_label') }}">{{ site.hero_badge_label or 'Civil & Infrastructure Project Execution' }}</p>
+      {% if field_visible('settings','hero_title') %}<h1 style="{{ style_inline('settings','hero_title') }}">{{ site.hero_title or 'Professional Infrastructure & Civil Project Execution' }}</h1>{% endif %}
+      {% if field_visible('settings','hero_subtitle') %}<p class="lead" style="{{ style_inline('settings','hero_subtitle') }}">{{ site.hero_subtitle or 'Reliable execution of civil construction, infrastructure development, project coordination, and site works.' }}</p>{% endif %}
+      <div class="hero-actions">
+        {% if is_on('show_contact_nav', true) %}<a class="btn btn-primary" style="{{ style_inline('appearance','hero_cta_primary') }}" href="{{ url_for('contact') }}">{{ site.hero_cta_primary or 'Request Consultation' }}</a>{% endif %}
+        {% if is_on('show_projects_section', true) %}<a class="btn btn-outline-light" style="{{ style_inline('appearance','hero_cta_secondary') }}" href="{{ url_for('projects') }}">{{ site.hero_cta_secondary or 'View Projects' }}</a>{% endif %}
+      </div>
+    </div>
+    {% if is_on('show_hero_logo_panel', true) %}
+    <aside class="hero-panel">
+      {% if field_visible('settings','logo_path') and site.logo_path %}<img src="{{ media_url(site.logo_path) }}" alt="logo">{% endif %}
+      {% if is_on('show_hero_metrics') %}
+      <div class="hero-metrics">
+        {% if field_visible('about','years_experience') %}<div><strong style="{{ style_inline('about','years_experience') }}">{{ about.years_experience }}</strong><span style="{{ style_inline('appearance','stats_years_label') }}">{{ site.stats_years_label or 'Years' }}</span></div>{% endif %}
+        {% if field_visible('about','completed_projects') %}<div><strong style="{{ style_inline('about','completed_projects') }}">{{ about.completed_projects }}</strong><span style="{{ style_inline('appearance','projects_title') }}">{{ site.projects_title or 'Projects' }}</span></div>{% endif %}
+      </div>
+      {% endif %}
+    </aside>
+    {% endif %}
+  </div>
+</section>
+
+{% set default_order = 'trust_strip\ncredentials\nservice_areas\nabout\nservices\nstats\nprojects\nwhy\ncta' %}
+{% set section_order = (site.homepage_section_order or default_order).splitlines() %}
+{% for sec in section_order %}
+  {% if sec == 'trust_strip' and is_on('show_trust_strip', true) %}
+  <section class="trust-strip"><div class="container trust-grid">
+    {% for item, key in [(site.trust_item_1,'trust_item_1'), (site.trust_item_2,'trust_item_2'), (site.trust_item_3,'trust_item_3'), (site.trust_item_4,'trust_item_4'), (site.trust_item_5,'trust_item_5')] if item %}<span style="{{ style_inline('appearance', key) }}">{{ item }}</span>{% endfor %}
+  </div></section>
+  {% endif %}
+
+  {% if sec == 'credentials' and is_on('show_credentials_section', true) %}
+  <section class="section credentials-section"><div class="container">
+    <div class="section-head row-between"><div><p class="eyebrow" style="{{ style_inline('appearance','credentials_eyebrow') }}">{{ site.credentials_eyebrow or 'Verified Business Details' }}</p><h2 style="{{ style_inline('appearance','credentials_title') }}">{{ site.credentials_title or 'Registered company profile.' }}</h2></div><a class="text-link" style="{{ style_inline('appearance','credentials_link_text') }}" href="{{ url_for('about') }}">{{ site.credentials_link_text or 'View credentials →' }}</a></div>
+    <div class="credential-grid">
+      {% if field_visible('settings','registered_name') and is_on('show_registered_name_public', true) %}<article class="credential-card"><span>Registered Name</span><strong style="{{ style_inline('settings','registered_name') }}">{{ site.registered_name or site.company_name }}</strong></article>{% endif %}
+      {% if field_visible('settings','udyam_registration') and is_on('show_udyam_public', true) %}<article class="credential-card"><span>Udyam</span><strong style="{{ style_inline('settings','udyam_registration') }}">{{ site.udyam_registration or 'Available' }}</strong></article>{% endif %}
+      {% if field_visible('settings','gstin') and is_on('show_gstin_public', true) %}<article class="credential-card"><span>GSTIN</span><strong style="{{ style_inline('settings','gstin') }}">{{ site.gstin or 'Available' }}</strong></article>{% endif %}
+      {% if field_visible('settings','enterprise_type') and is_on('show_enterprise_type_public', true) %}<article class="credential-card"><span>Enterprise Type</span><strong style="{{ style_inline('settings','enterprise_type') }}">{{ site.enterprise_type or 'Registered Enterprise' }}</strong></article>{% endif %}
+    </div>
+    {% if field_visible('settings','credential_note') %}<p class="credential-note" style="{{ style_inline('settings','credential_note') }}">{{ site.credential_note }}</p>{% endif %}
+  </div></section>
+  {% endif %}
+
+  {% if sec == 'service_areas' and is_on('show_service_areas_section', true) and field_visible('settings','service_areas') %}
+  <section class="section service-area-strip"><div class="container row-between"><div><p class="eyebrow" style="{{ style_inline('appearance','service_areas_eyebrow') }}">{{ site.service_areas_eyebrow or 'Service Areas' }}</p><h2 style="{{ style_inline('appearance','service_areas_title') }}">{{ site.service_areas_title or 'Local service pages for better client discovery.' }}</h2></div><div class="area-chips">{% for area in service_areas[:6] %}<a href="{{ url_for('service_area_detail', slug=area.slug) }}">{{ area.name }}</a>{% endfor %}<a style="{{ style_inline('appearance','service_areas_all_label') }}" href="{{ url_for('service_areas_page') }}">{{ site.service_areas_all_label or 'All Areas →' }}</a></div></div></section>
+  {% endif %}
+
+  {% if sec == 'about' and is_on('show_about_section', true) %}
+  <section class="section"><div class="container split about-intro"><div><p class="eyebrow" style="{{ style_inline('appearance','about_eyebrow') }}">{{ site.about_eyebrow or 'About Company' }}</p><h2 style="{{ style_inline('appearance','about_title') }}">{{ site.about_title or 'Reliable execution for civil and infrastructure works.' }}</h2></div><div>{% if field_visible('about','short_description') %}<p style="{{ style_inline('about','short_description') }}">{{ about.short_description }}</p>{% endif %}<a class="text-link" style="{{ style_inline('appearance','about_link_text') }}" href="{{ url_for('about') }}">{{ site.about_link_text or 'Read company profile →' }}</a></div></div></section>
+  {% endif %}
+
+  {% if sec == 'services' and is_on('show_services_section', true) %}
+  <section class="section soft"><div class="container"><div class="section-head row-between"><div><p class="eyebrow" style="{{ style_inline('appearance','services_eyebrow') }}">{{ site.services_eyebrow or 'Services' }}</p><h2 style="{{ style_inline('appearance','services_title') }}">{{ site.services_title or 'What We Do' }}</h2></div><a class="text-link" style="{{ style_inline('appearance','services_link_text') }}" href="{{ url_for('services') }}">{{ site.services_link_text or 'All services →' }}</a></div><div class="card-grid">{% for service in services %}<article class="service-card {% if not service.is_published %}draft-outline{% endif %}">{% if item_field_visible(service,'service','image_path') and service.image_path %}<img src="{{ media_url(service.image_path) }}" alt="{{ service.title }}">{% endif %}{% if not service.is_published and preview_mode %}<span class="status">Draft preview</span>{% endif %}{% if item_field_visible(service,'service','icon') %}<span class="icon-chip" style="{{ item_style_inline(service,'service','icon') }}">{{ service.icon }}</span>{% endif %}{% if item_field_visible(service,'service','title') %}<h3 style="{{ item_style_inline(service,'service','title') }}">{{ service.title }}</h3>{% endif %}{% if item_field_visible(service,'service','description') %}<p style="{{ item_style_inline(service,'service','description') }}">{{ service.description }}</p>{% endif %}</article>{% endfor %}</div></div></section>
+  {% endif %}
+
+  {% if sec == 'stats' and is_on('show_stats_section') %}
+  <section class="stats-band"><div class="container stats-grid">{% if field_visible('about','years_experience') %}<div><strong style="{{ style_inline('about','years_experience') }}">{{ about.years_experience }}</strong><span style="{{ style_inline('appearance','stats_years_label') }}">{{ site.stats_years_label or 'Years Since Business Commencement' }}</span></div>{% endif %}{% if field_visible('settings','experience_documents') %}<div><strong style="{{ style_inline('settings','experience_documents') }}">{{ site.experience_documents or about.completed_projects }}</strong><span style="{{ style_inline('appearance','stats_experience_label') }}">{{ site.stats_experience_label or 'Experience / Work Records' }}</span></div>{% endif %}{% if field_visible('settings','contractor_registrations') %}<div><strong style="{{ style_inline('settings','contractor_registrations') }}">{{ site.contractor_registrations or '2' }}</strong><span style="{{ style_inline('appearance','stats_contractor_label') }}">{{ site.stats_contractor_label or 'Contractor Registration Records' }}</span></div>{% endif %}{% if field_visible('settings','gstin') %}<div><strong style="{{ style_inline('settings','gstin') }}">GST</strong><span style="{{ style_inline('appearance','stats_gst_label') }}">{{ site.stats_gst_label or 'Registered Enterprise' }}</span></div>{% endif %}</div></section>
+  {% endif %}
+
+  {% if sec == 'projects' and is_on('show_projects_section', true) %}
+  <section class="section soft"><div class="container"><div class="section-head row-between"><div><p class="eyebrow" style="{{ style_inline('appearance','projects_eyebrow') }}">{{ site.projects_eyebrow or 'Works' }}</p><h2 style="{{ style_inline('appearance','projects_title') }}">{{ site.projects_title or 'Recent Projects' }}</h2></div><a class="text-link" style="{{ style_inline('appearance','projects_link_text') }}" href="{{ url_for('projects') }}">{{ site.projects_link_text or 'View all →' }}</a></div><div class="project-grid">{% for project in projects %}<article class="project-card {% if not project.image_path and not is_on('show_project_placeholder_images') %}no-image-card{% endif %} {% if not project.is_published %}draft-outline{% endif %}">{% if item_field_visible(project,'project','image_path') and (project.image_path or is_on('show_project_placeholder_images')) %}<div class="project-image">{% if project.image_path %}<img src="{{ media_url(project.image_path) }}" alt="{{ project.title }}">{% else %}<span style="{{ style_inline('appearance','image_pending_text') }}">{{ site.image_pending_text or 'Image will be added soon' }}</span>{% endif %}</div>{% endif %}<div class="project-body">{% if not project.is_published and preview_mode %}<span class="status">Draft preview</span>{% endif %}{% if item_field_visible(project,'project','status') %}<span class="status" style="{{ item_style_inline(project,'project','status') }}">{{ project.status }}</span>{% endif %}{% if item_field_visible(project,'project','title') %}<h3 style="{{ item_style_inline(project,'project','title') }}"><a href="{{ url_for('project_detail', project_id=project.id) }}">{{ project.title }}</a></h3>{% endif %}<p class="project-meta" style="{{ item_style_inline(project,'project','location') }}">{% if item_field_visible(project,'project','location') %}{{ project.location }}{% endif %}{% if item_field_visible(project,'project','year') and project.year %} · <span style="{{ item_style_inline(project,'project','year') }}">{{ project.year }}</span>{% endif %}</p>{% if item_field_visible(project,'project','description') %}<p style="{{ item_style_inline(project,'project','description') }}">{{ project.description[:120] }}{% if project.description|length > 120 %}...{% endif %}</p>{% endif %}</div></article>{% endfor %}</div></div></section>
+  {% endif %}
+
+  {% if sec == 'why' and is_on('show_why_section', true) %}
+  <section class="section dark"><div class="container why-grid"><div><p class="eyebrow" style="{{ style_inline('appearance','why_eyebrow') }}">{{ site.why_eyebrow or 'Why Choose Us' }}</p><h2 style="{{ style_inline('appearance','why_title') }}">{{ site.why_title or 'Disciplined site work, clear coordination, dependable delivery.' }}</h2></div><div class="why-cards">{% for i in [1,2,3,4] %}<article><h3 style="{{ style_inline('appearance','why_card_' ~ i ~ '_title') }}">{{ site.get('why_card_' ~ i ~ '_title') }}</h3><p style="{{ style_inline('appearance','why_card_' ~ i ~ '_text') }}">{{ site.get('why_card_' ~ i ~ '_text') }}</p></article>{% endfor %}</div></div></section>
+  {% endif %}
+
+  {% if sec == 'cta' and is_on('show_cta_section', true) and is_on('show_contact_nav', true) %}
+  <section class="cta"><div class="container cta-box"><h2 style="{{ style_inline('appearance','cta_title') }}">{{ site.cta_title or 'Need civil or infrastructure project support?' }}</h2><p style="{{ style_inline('appearance','cta_text') }}">{{ site.cta_text or 'Send your work details. The team can review the requirement and contact you.' }}</p><a class="btn btn-primary" style="{{ style_inline('appearance','cta_button_text') }}" href="{{ url_for('contact') }}">{{ site.cta_button_text or 'Contact Now' }}</a></div></section>
+  {% endif %}
+{% endfor %}
+
+{% if page_blocks %}
+<section class="section page-builder-section"><div class="container">
+  {% for block in page_blocks %}
+  <article class="page-block {{ block.block_type }}">
+    {% if block.image_path %}<img src="{{ media_url(block.image_path) }}" alt="{{ block.title }}">{% endif %}
+    {% if block.title %}<h2>{{ block.title }}</h2>{% endif %}
+    {% if block.body %}<div class="wysiwyg-content">{{ block.body|safe }}</div>{% endif %}
+    {% if block.button_text and block.button_url %}<a class="btn btn-primary" href="{{ block.button_url }}">{{ block.button_text }}</a>{% endif %}
+  </article>
+  {% endfor %}
+</div></section>
+{% endif %}
+{% endblock %}

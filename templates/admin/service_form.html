@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% from "admin/_field_style.html" import item_controls with context %}
+{% block title %}{{ 'Edit' if service else 'Add' }} Service{% endblock %}
+{% block content %}
+<h1>{{ 'Edit' if service else 'Add' }} Service</h1>
+<section class="admin-panel"><p class="admin-note">Save as Draft to keep this service private. Published services appear publicly when Active is enabled.</p></section>
+<form method="post" enctype="multipart/form-data" class="admin-form two-col">
+    {{ csrf_field()|safe }}
+    <label>Publish State<select name="publish_state"><option value="draft" {% if service and not service.is_published %}selected{% endif %}>Draft / private</option><option value="published" {% if not service or service.is_published %}selected{% endif %}>Published / public</option></select></label>
+    <label>Sort Order<input type="number" name="sort_order" value="{{ service.sort_order if service else 0 }}"></label>
+    <label>Title<input name="title" value="{{ service.title if service else '' }}" required>{{ item_controls('service','title',item_field_visible(service,'service','title')) }}</label>
+    <label>Icon / Category Label<input name="icon" value="{{ service.icon if service else 'building' }}">{{ item_controls('service','icon',item_field_visible(service,'service','icon')) }}</label>
+    <label>Image<input type="file" name="image" accept="image/*">{{ item_controls('service','image_path',item_field_visible(service,'service','image_path'),'Show image publicly') }}</label>
+    <label class="check"><input type="checkbox" name="is_active" {% if not service or service.is_active %}checked{% endif %}> Active service</label>
+    <label class="full">Description<textarea name="description" rows="6" required>{{ service.description if service else '' }}</textarea>{{ item_controls('service','description',item_field_visible(service,'service','description')) }}</label>
+    <div class="full admin-actions"><button class="btn" type="submit" name="action" value="publish">Save</button><button class="btn secondary" type="submit" name="action" value="preview">Save & Preview</button><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='services') }}">Preview Current</a></div>
+</form>
+{% endblock %}

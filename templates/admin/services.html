@@ -1,0 +1,9 @@
+{% extends "admin/base.html" %}
+{% block title %}Services{% endblock %}
+{% block content %}
+<div class="admin-title-row"><h1>Services</h1><div><a class="btn secondary" href="{{ url_for('admin_ordering') }}#services-order">Drag Order</a><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='services') }}">Preview</a><a class="btn" href="{{ url_for('admin_service_new') }}">Add Service</a></div></div>
+<table class="admin-table sortable-table" data-reorder-kind="services"><tr><th>Drag</th><th>Order</th><th>Title</th><th>Public State</th><th>Status</th><th>Action</th></tr>
+{% for service in services %}<tr data-id="{{ service.id }}" draggable="true"><td class="drag-handle">☰</td><td>{{ service.sort_order }}</td><td>{{ service.title }}</td><td><span class="pill {{ 'ok' if service.is_published else 'warn' }}">{{ 'Published' if service.is_published else 'Draft' }}</span></td><td>{{ 'Active' if service.is_active else 'Hidden' }}</td><td><a href="{{ url_for('admin_service_edit', service_id=service.id) }}">Edit</a><form method="post" action="{{ url_for('admin_service_delete', service_id=service.id) }}" class="inline" onsubmit="return confirm('Delete service?')">{{ csrf_field()|safe }}<button>Delete</button></form></td></tr>{% endfor %}
+</table>
+<p class="admin-note">Drag rows to reorder. Order saves automatically.</p>
+{% endblock %}
