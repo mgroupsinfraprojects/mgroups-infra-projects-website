@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% block title %}Media Library{% endblock %}
+{% block content %}
+<div class="admin-title-row"><h1>Media Library</h1><div><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='home') }}">Preview Site</a></div></div>
+<section class="admin-panel"><p class="admin-note">Use this for reusable images. Do not keep red/green test images, screenshots, or sample blocks as professional media.</p>{% if cloudinary_ready %}<p class="pill ok">Cloudinary active: new uploads are stored permanently. Cloudinary files are managed in Cloudinary Media Library.</p>{% else %}<p class="pill warn">Cloudinary is not active: uploaded images are local only and may break after Render redeploy.</p>{% endif %}</section>
+<form method="post" enctype="multipart/form-data" class="admin-form two-col">
+  {{ csrf_field()|safe }}
+  <label>Upload image<input type="file" name="image" accept="image/*" required></label>
+  <label>File prefix<input name="prefix" value="media"></label>
+  <div class="full"><button class="btn" type="submit">Upload Image</button></div>
+</form>
+{% if images %}
+<section class="admin-panel"><h2>Images</h2><div class="admin-card-grid media-grid">
+{% for img in images %}
+<div class="mini-card">
+  <img src="{{ img.url }}" alt="{{ img.name }}" style="max-height:180px;object-fit:cover;width:100%;border-radius:12px">
+  <strong>{{ img.name }}</strong><small>{{ img.size_kb }} KB</small>
+  {% if 'test' in img.name|lower or 'red' in img.name|lower or 'green' in img.name|lower %}<p class="pill warn">Looks like test media</p>{% endif %}
+  <form method="post" action="{{ url_for('admin_media_crop', filename=img.name) }}" class="crop-form">
+    {{ csrf_field()|safe }}
+    <div class="style-grid">
+      <label>X<input type="number" name="x" value="0" min="0"></label>
+      <label>Y<input type="number" name="y" value="0" min="0"></label>
+      <label>Width<input type="number" name="w" value="600" min="1"></label>
+      <label>Height<input type="number" name="h" value="400" min="1"></label>
+    </div>
+    <button class="btn secondary" type="submit">Create Cropped Copy</button>
+  </form>
+</div>
+{% endfor %}
+</div></section>
+{% else %}<section class="admin-panel empty-state"><p>No local uploaded images yet.{% if cloudinary_ready %} This is normal when Cloudinary is active; check Cloudinary Media Library for uploaded files.{% endif %}</p></section>{% endif %}
+{% endblock %}
