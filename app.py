@@ -1830,8 +1830,9 @@ def admin_forgot_password():
                     audit("password_reset_email_sent", username)
                     flash("Password reset link sent to the registered recovery email.", "success")
                     return redirect(url_for("admin_login"))
-            except Exception:
+            except Exception as exc:
                 db.session.rollback()
+                app.logger.exception("SMTP reset email failed for user %s: %s", username, exc)
             audit("password_reset_email_failed", username)
             flash("Reset email could not be sent. Check SMTP settings and recovery email, then try again.", "danger")
             return redirect(url_for("admin_forgot_password"))
