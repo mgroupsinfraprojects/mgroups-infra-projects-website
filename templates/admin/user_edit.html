@@ -3,7 +3,8 @@
 {% block content %}
 <h1>Edit Admin User</h1>
 <section class="admin-panel">
-  <p class="admin-note">Change email, recovery email, role, status, or password. Leave password blank to keep the current password.</p>
+  <p class="admin-note"><strong>Manual password reset:</strong> Owner can set a new password here without SMTP/email. Give the new password to that user privately. Leave password blank to keep the current password.</p>
+  <p class="admin-note"><strong>Recovery email:</strong> This is still used for forgot-password email if SMTP is available. On Render Free, SMTP may be blocked, so use manual reset from this page.</p>
 </section>
 <form method="post" class="admin-form two-col">
   {{ csrf_field()|safe }}
@@ -17,10 +18,10 @@
       <option value="owner" {% if user.role == 'owner' %}selected{% endif %}>Owner</option>
     </select>
   </label>
-  <label>New Password <span class="muted">optional</span><input name="password" type="password" minlength="10" placeholder="Leave blank to keep old password"></label>
+  <label>Set New Password <span class="muted">optional, no email required</span><input name="password" type="password" minlength="10" placeholder="Enter new password to manually reset"></label>
   <label class="checkline"><input type="checkbox" name="is_active" value="1" {% if user.is_active %}checked{% endif %}> Active account</label>
   <div class="full admin-inline-actions">
-    <button class="btn" type="submit">Save Changes</button>
+    <button class="btn" type="submit">Save / Reset Password</button>
     <a class="btn secondary" href="{{ url_for('admin_users') }}">Back</a>
   </div>
 </form>

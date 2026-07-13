@@ -1830,9 +1830,8 @@ def admin_forgot_password():
                     audit("password_reset_email_sent", username)
                     flash("Password reset link sent to the registered recovery email.", "success")
                     return redirect(url_for("admin_login"))
-            except Exception as exc:
+            except Exception:
                 db.session.rollback()
-                app.logger.exception("SMTP reset email failed for user %s: %s", username, exc)
             audit("password_reset_email_failed", username)
             flash("Reset email could not be sent. Check SMTP settings and recovery email, then try again.", "danger")
             return redirect(url_for("admin_forgot_password"))
@@ -2656,8 +2655,8 @@ def admin_users():
         role = request.form.get("role", "viewer")
         if role not in {"owner", "editor", "viewer"}:
             role = "viewer"
-        if not username or len(password) < 8:
-            flash("Username and password of at least 8 characters are required.", "danger")
+        if not username or len(password) < 10:
+            flash("Username and password of at least 10 characters are required.", "danger")
             return redirect(url_for("admin_users"))
         if Admin.query.filter_by(username=username).first():
             flash("Username already exists.", "danger")
@@ -2722,8 +2721,10 @@ def admin_user_edit(user_id):
         if new_password:
             user.password_hash = generate_password_hash(new_password)
         db.session.commit()
+        if new_password:
+            audit("admin_user_manual_password_reset", f"{old_username} password updated by owner")
         audit("admin_user_edit", f"{old_username} -> {username}")
-        flash("Admin user updated.", "success")
+        flash("Admin user updated. If a new password was entered, the user can login with that password immediately. No email is required for this manual reset.", "success")
         return redirect(url_for("admin_users"))
     return render_template("admin/user_edit.html", user=user)
 

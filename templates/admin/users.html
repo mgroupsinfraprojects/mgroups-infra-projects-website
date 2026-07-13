@@ -5,6 +5,7 @@
 <section class="admin-panel">
   <p class="admin-note">Owner can manage users. Editor can edit selected content. Viewer can inspect admin content without publishing changes. Use a separate account for each person; do not share the owner password.</p>
   <p class="admin-note"><strong>Safety:</strong> disable a user first if you are unsure. Delete only duplicate/test accounts. You cannot delete your own account or remove the last active owner.</p>
+  <p class="admin-note"><strong>Password recovery on Free Render:</strong> If email reset fails because SMTP is blocked, click <strong>Edit</strong> for that user and set a new password manually. This works without email.</p>
 </section>
 
 <form method="post" class="admin-form two-col">
@@ -12,7 +13,7 @@
   <label>Username<input name="username" required></label>
   <label>Email<input name="email" type="email" placeholder="person@example.com"></label>
   <label>Recovery Email<input name="recovery_email" type="email" placeholder="backup@example.com"></label>
-  <label>Password<input name="password" type="password" minlength="10" required></label>
+  <label>Password<input name="password" type="password" minlength="10" required placeholder="Minimum 10 characters"></label>
   <label>Role<select name="role"><option value="viewer">Viewer</option><option value="editor">Editor</option><option value="owner">Owner</option></select></label>
   <div class="full"><button class="btn" type="submit">Create User</button></div>
 </form>
@@ -29,7 +30,7 @@
       <td>{{ 'Active' if user.is_active else 'Disabled' }}</td>
       <td>
         <div class="admin-inline-actions">
-          <a class="btn small" href="{{ url_for('admin_user_edit', user_id=user.id) }}">Edit</a>
+          <a class="btn small" href="{{ url_for('admin_user_edit', user_id=user.id) }}">Edit / Reset Password</a>
           {% if user.id != session.admin_id %}
           <form method="post" action="{{ url_for('admin_user_toggle', user_id=user.id) }}">
             {{ csrf_field()|safe }}
