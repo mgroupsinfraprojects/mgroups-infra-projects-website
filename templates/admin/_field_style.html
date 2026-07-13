@@ -1,9 +1,12 @@
 {% macro field_controls(section, field, checked=False, label='Show publicly') -%}
 {% set style_source = form_site if form_site is defined else site %}
-<div class="field-control-box compact">
+{% set style_only = (label == 'Use custom style') %}
+<div class="field-control-box compact {% if style_only %}style-only{% endif %}">
+  {% if not style_only %}
   <label class="field-vis"><input type="checkbox" name="vis_{{ field }}" {% if checked %}checked{% endif %}> {{ label }}</label>
+  {% endif %}
   {% if is_advanced_mode() %}
-  <details class="style-details"><summary>Advanced text style</summary>
+  <details class="style-details"><summary>{% if style_only %}Custom style (optional){% else %}Advanced text style{% endif %}</summary>
     <div class="style-grid">
       <label>Font
         <select name="{{ style_key(section, field, 'font') }}">
@@ -34,10 +37,13 @@
 
 {% macro item_controls(section, field, checked=False, label='Show publicly') -%}
 {% set obj = service if service is defined and service else project if project is defined and project else gallery_item if gallery_item is defined and gallery_item else none %}
-<div class="field-control-box compact">
+{% set style_only = (label == 'Use custom style') %}
+<div class="field-control-box compact {% if style_only %}style-only{% endif %}">
+  {% if not style_only %}
   <label class="field-vis"><input type="checkbox" name="vis_{{ field }}" {% if checked %}checked{% endif %}> {{ label }}</label>
+  {% endif %}
   {% if is_advanced_mode() %}
-  <details class="style-details"><summary>Advanced text style</summary>
+  <details class="style-details"><summary>{% if style_only %}Custom style (optional){% else %}Advanced text style{% endif %}</summary>
     <div class="style-grid">
       <label>Font
         {% set cur = item_style_value(obj, field, 'font') if obj else '' %}

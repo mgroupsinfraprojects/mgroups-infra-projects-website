@@ -28,7 +28,7 @@
     <nav class="admin-nav-pro" aria-label="Admin navigation">
         <details class="nav-section" open>
             <summary>Daily Work</summary>
-            <a class="{{ 'active' if ep == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}">Overview</a>
+            <a class="{{ 'active' if ep == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
             <a class="{{ 'active' if ep == 'admin_preview' else '' }}" href="{{ url_for('admin_preview') }}" target="_blank">Live Preview</a>
             <a class="{{ 'active' if ep == 'admin_enquiries' else '' }}" href="{{ url_for('admin_enquiries') }}">Enquiries</a>
         </details>
@@ -53,11 +53,11 @@
         {% if not simple %}
         <details class="nav-section">
             <summary>Advanced Tools</summary>
-            <a class="{{ 'active' if ep == 'admin_appearance' else '' }}" href="{{ url_for('admin_appearance') }}">Visibility & Appearance</a>
+            <a class="{{ 'active' if ep == 'admin_appearance' else '' }}" href="{{ url_for('admin_appearance') }}">Appearance</a>
             <a class="{{ 'active' if ep == 'admin_permissions' else '' }}" href="{{ url_for('admin_permissions') }}">Role Permissions</a>
             <a class="{{ 'active' if ep == 'restore_backup' else '' }}" href="{{ url_for('restore_backup') }}">Restore Backup</a>
-            <a class="{{ 'active' if ep == 'admin_ordering' else '' }}" href="{{ url_for('admin_ordering') }}">Drag & Drop Ordering</a>
-            <a class="{{ 'active' if ep == 'admin_page_builder' else '' }}" href="{{ url_for('admin_page_builder') }}">Homepage Block Builder</a>
+            <a class="{{ 'active' if ep == 'admin_ordering' else '' }}" href="{{ url_for('admin_ordering') }}">Ordering</a>
+            <a class="{{ 'active' if ep == 'admin_page_builder' else '' }}" href="{{ url_for('admin_page_builder') }}">Home Blocks</a>
             <a class="{{ 'active' if ep == 'admin_versions' else '' }}" href="{{ url_for('admin_versions') }}">Version History</a>
             <a href="{{ url_for('export_enquiries_csv') }}">Export Enquiries</a>
         </details>

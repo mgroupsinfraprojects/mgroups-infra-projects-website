@@ -1,8 +1,8 @@
 {% extends "admin/base.html" %}
-{% block title %}Custom Homepage Block Builder{% endblock %}
+{% block title %}Home Blocks{% endblock %}
 {% block content %}
-<div class="admin-title-row"><h1>Custom Homepage Block Builder</h1><div><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='home', draft=1) }}">Preview</a></div></div>
-<section class="admin-panel"><p class="admin-note">This is not a full WYSIWYG website editor. It creates optional homepage blocks with title, body, image, and button. Use only for custom sections that cannot be handled by the normal pages.</p></section>
+<div class="admin-title-row"><h1>Home Blocks</h1><div><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='home', draft=1) }}">Preview</a></div></div>
+<section class="admin-panel compact-panel ux-guide"><p class="admin-note"><strong>Optional tool.</strong> Do not use this for normal About, Services, Projects, or Gallery updates. Use Home Blocks only when you need one extra custom homepage section.</p></section>
 <div class="builder-layout"><form method="post" enctype="multipart/form-data" class="admin-form two-col builder-form">
   {{ csrf_field()|safe }}
   <label>Publish State<select name="publish_state"><option value="draft">Draft / private</option><option value="published">Published / public</option></select></label>
@@ -15,13 +15,14 @@
   <label>Button Text<input name="button_text" placeholder="Optional button"></label>
   <label class="full">Button URL<input name="button_url" placeholder="/contact or https://..."></label>
   {% if is_advanced_mode() %}
-  <h2 class="full admin-section-title">Block Style</h2>
+  <details class="settings-section full"><summary>Block Style</summary><div class="settings-section-grid">
   <label>Title Font<input name="title_font" placeholder="Montserrat"></label>
   <label>Title Size<input name="title_size" placeholder="32px"></label>
   <label>Title Weight<select name="title_weight"><option></option><option>400</option><option>600</option><option>700</option><option>800</option><option>900</option></select></label>
   <label>Body Font<input name="body_font" placeholder="Manrope"></label>
   <label>Body Size<input name="body_size" placeholder="16px"></label>
   <label>Body Weight<select name="body_weight"><option></option><option>400</option><option>500</option><option>600</option><option>700</option></select></label>
+  </div></details>
   {% endif %}
   <div class="full admin-actions"><button class="btn" type="submit">Save Block</button></div>
 </form>

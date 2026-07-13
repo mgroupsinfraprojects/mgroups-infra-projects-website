@@ -1,56 +1,70 @@
 {% extends "admin/base.html" %}
 {% from "admin/_field_style.html" import field_controls with context %}
-{% block title %}Visibility & Appearance{% endblock %}
+{% block title %}Appearance{% endblock %}
 {% block content %}
-<h1>Visibility & Appearance</h1>
-<section class="admin-panel compact-panel"><p class="admin-note">Simple Mode keeps this page focused on visibility and public labels. Advanced Mode adds typography, colors, and custom CSS.</p></section>
-<form method="post" class="admin-form two-col settings-admin clean-settings">
+<h1>Appearance</h1>
+<section class="admin-panel compact-panel ux-guide">
+  <p class="admin-note"><strong>Use this page only for public visibility and public labels.</strong> Keep Simple Mode for normal work. Use typography, colors, and custom CSS only when the public website design must change.</p>
+</section>
+<form method="post" class="admin-form two-col settings-admin clean-settings ux-clean-form">
     {{ csrf_field()|safe }}
     <nav class="admin-tabs full"><a href="#visibility">Visibility</a><a href="#home-sections">Homepage Sections</a><a href="#labels">Public Labels</a>{% if is_advanced_mode() %}<a href="#typography">Typography</a><a href="#colors">Colors</a><a href="#css">Advanced CSS</a>{% endif %}</nav>
 
-    <details id="visibility" class="settings-section full" open><summary>Visibility</summary><div class="settings-section-grid">
-    <label class="check"><input type="checkbox" name="show_phone_public" {% if is_on('show_phone_public') %}checked{% endif %}> Show phone number publicly</label>
-    <label class="check"><input type="checkbox" name="show_whatsapp_public" {% if is_on('show_whatsapp_public') %}checked{% endif %}> Show WhatsApp button/link publicly</label>
-    <label class="check"><input type="checkbox" name="show_email_public" {% if is_on('show_email_public', true) %}checked{% endif %}> Show email publicly</label>
-    <label class="check"><input type="checkbox" name="show_address_public" {% if is_on('show_address_public', true) %}checked{% endif %}> Show address publicly</label>
-    <label class="check"><input type="checkbox" name="show_registered_name_public" {% if is_on('show_registered_name_public', true) %}checked{% endif %}> Show registered name</label>
-    <label class="check"><input type="checkbox" name="show_udyam_public" {% if is_on('show_udyam_public', true) %}checked{% endif %}> Show Udyam number</label>
-    <label class="check"><input type="checkbox" name="show_gstin_public" {% if is_on('show_gstin_public', true) %}checked{% endif %}> Show GSTIN</label>
-    <label class="check"><input type="checkbox" name="show_enterprise_type_public" {% if is_on('show_enterprise_type_public', true) %}checked{% endif %}> Show enterprise type</label>
-    <label class="check"><input type="checkbox" name="show_business_commencement_public" {% if is_on('show_business_commencement_public') %}checked{% endif %}> Show business commencement date</label>
-    <label class="check"><input type="checkbox" name="show_major_activity_public" {% if is_on('show_major_activity_public', true) %}checked{% endif %}> Show major activity</label>
-    <label class="check"><input type="checkbox" name="show_gallery_nav" {% if is_on('show_gallery_nav', true) %}checked{% endif %}> Allow Gallery menu when published images exist</label>
-    <label class="check"><input type="checkbox" name="show_service_area_nav" {% if is_on('show_service_area_nav', true) %}checked{% endif %}> Show Service Areas menu</label>
-    <label class="check"><input type="checkbox" name="show_contact_nav" {% if is_on('show_contact_nav', true) %}checked{% endif %}> Show Contact menu/button</label>
-    <label class="check"><input type="checkbox" name="show_footer_contact" {% if is_on('show_footer_contact', true) %}checked{% endif %}> Show footer contact block</label>
-    <label class="check"><input type="checkbox" name="show_footer_credentials" {% if is_on('show_footer_credentials', true) %}checked{% endif %}> Show footer credentials</label>
-    <label class="check"><input type="checkbox" name="show_whatsapp_float" {% if is_on('show_whatsapp_float') %}checked{% endif %}> Show floating WhatsApp button</label>
-    </div></details>
+    <details id="visibility" class="settings-section full" open><summary>Visibility</summary>
+      <div class="ux-subnote">Recommended: keep phone/WhatsApp hidden unless you intentionally want public calls. Keep GST/Udyam hidden unless you deliberately want those numbers displayed.</div>
+      <div class="settings-subgroup"><h3>Contact Visibility</h3><div class="settings-section-grid compact-checks">
+        <label class="check"><input type="checkbox" name="show_phone_public" {% if is_on('show_phone_public') %}checked{% endif %}> Show phone number publicly</label>
+        <label class="check"><input type="checkbox" name="show_whatsapp_public" {% if is_on('show_whatsapp_public') %}checked{% endif %}> Show WhatsApp button/link publicly</label>
+        <label class="check"><input type="checkbox" name="show_email_public" {% if is_on('show_email_public', true) %}checked{% endif %}> Show email publicly</label>
+        <label class="check"><input type="checkbox" name="show_address_public" {% if is_on('show_address_public', true) %}checked{% endif %}> Show address publicly</label>
+        <label class="check"><input type="checkbox" name="show_contact_nav" {% if is_on('show_contact_nav', true) %}checked{% endif %}> Show Contact menu/button</label>
+        <label class="check"><input type="checkbox" name="show_whatsapp_float" {% if is_on('show_whatsapp_float') %}checked{% endif %}> Show floating WhatsApp button</label>
+      </div></div>
+      <div class="settings-subgroup"><h3>Business Credentials</h3><div class="settings-section-grid compact-checks">
+        <label class="check"><input type="checkbox" name="show_registered_name_public" {% if is_on('show_registered_name_public', true) %}checked{% endif %}> Show registered name</label>
+        <label class="check"><input type="checkbox" name="show_enterprise_type_public" {% if is_on('show_enterprise_type_public', true) %}checked{% endif %}> Show enterprise type</label>
+        <label class="check"><input type="checkbox" name="show_udyam_public" {% if is_on('show_udyam_public', true) %}checked{% endif %}> Show Udyam number</label>
+        <label class="check"><input type="checkbox" name="show_gstin_public" {% if is_on('show_gstin_public', true) %}checked{% endif %}> Show GSTIN</label>
+        <label class="check"><input type="checkbox" name="show_business_commencement_public" {% if is_on('show_business_commencement_public') %}checked{% endif %}> Show business commencement date</label>
+        <label class="check"><input type="checkbox" name="show_major_activity_public" {% if is_on('show_major_activity_public', true) %}checked{% endif %}> Show major activity</label>
+      </div></div>
+      <div class="settings-subgroup"><h3>Navigation & Footer</h3><div class="settings-section-grid compact-checks">
+        <label class="check"><input type="checkbox" name="show_gallery_nav" {% if is_on('show_gallery_nav', true) %}checked{% endif %}> Allow Gallery menu when published images exist</label>
+        <label class="check"><input type="checkbox" name="show_service_area_nav" {% if is_on('show_service_area_nav', true) %}checked{% endif %}> Show Service Areas menu</label>
+        <label class="check"><input type="checkbox" name="show_footer_contact" {% if is_on('show_footer_contact', true) %}checked{% endif %}> Show footer contact block</label>
+        <label class="check"><input type="checkbox" name="show_footer_credentials" {% if is_on('show_footer_credentials', true) %}checked{% endif %}> Show footer credentials</label>
+      </div></div>
+    </details>
 
-    <details id="home-sections" class="settings-section full"><summary>Homepage Sections</summary><div class="settings-section-grid">
+    <details id="home-sections" class="settings-section full"><summary>Homepage Sections</summary><div class="settings-section-grid compact-checks">
     {% for key,label,default in [
-        ('show_trust_strip','Trust strip', true),('show_credentials_section','Credentials section', true),('show_service_areas_section','Service areas section', true),('show_about_section','About section', true),('show_services_section','Services section', true),('show_stats_section','Stats band', false),('show_projects_section','Projects section', true),('show_why_section','Why choose us section', true),('show_cta_section','Bottom CTA section', true),('show_hero_logo_panel','Hero logo panel', true),('show_hero_metrics','Hero metrics', false),('show_project_placeholder_images','Project image placeholder blocks', false)
+        ('show_trust_strip','Trust strip', true),('show_services_section','Services section', true),('show_projects_section','Projects section', true),('show_about_section','About section', true),('show_service_areas_section','Service areas section', true),('show_credentials_section','Credentials section', true),('show_why_section','Why choose us section', true),('show_cta_section','Bottom CTA section', true),('show_hero_logo_panel','Hero logo panel', true),('show_stats_section','Stats band', false),('show_hero_metrics','Hero metrics', false),('show_project_placeholder_images','Project image placeholder blocks', false)
     ] %}
     <label class="check"><input type="checkbox" name="{{ key }}" {% if is_on(key, default) %}checked{% endif %}> {{ label }}</label>
     {% endfor %}
     </div></details>
 
-    <details id="labels" class="settings-section full" open><summary>Public Labels</summary><div class="settings-section-grid">
-    {% for field,label in [
-        ('hero_badge_label','Hero Badge'),('hero_cta_primary','Hero Primary Button'),('hero_cta_secondary','Hero Secondary Button'),
-        ('trust_item_1','Trust Item 1'),('trust_item_2','Trust Item 2'),('trust_item_3','Trust Item 3'),('trust_item_4','Trust Item 4'),('trust_item_5','Trust Item 5'),
-        ('credentials_eyebrow','Credentials Eyebrow'),('credentials_title','Credentials Title'),('credentials_link_text','Credentials Link Text'),
-        ('service_areas_eyebrow','Service Areas Eyebrow'),('service_areas_title','Service Areas Title'),('service_areas_all_label','Service Areas All Label'),
-        ('about_eyebrow','About Eyebrow'),('about_title','About Title'),('about_link_text','About Link Text'),
-        ('services_eyebrow','Services Eyebrow'),('services_title','Services Title'),('services_link_text','Services Link Text'),
-        ('projects_eyebrow','Projects Eyebrow'),('projects_title','Projects Title'),('projects_link_text','Projects Link Text'),('image_pending_text','Image Pending Text'),
-        ('stats_years_label','Stats Years Label'),('stats_experience_label','Stats Experience Label'),('stats_contractor_label','Stats Contractor Label'),('stats_gst_label','Stats GST Label'),
-        ('why_eyebrow','Why Eyebrow'),('why_title','Why Title'),('why_card_1_title','Why Card 1 Title'),('why_card_1_text','Why Card 1 Text'),('why_card_2_title','Why Card 2 Title'),('why_card_2_text','Why Card 2 Text'),('why_card_3_title','Why Card 3 Title'),('why_card_3_text','Why Card 3 Text'),('why_card_4_title','Why Card 4 Title'),('why_card_4_text','Why Card 4 Text'),
-        ('cta_title','CTA Title'),('cta_text','CTA Text'),('cta_button_text','CTA Button Text'),('contact_page_title','Contact Page Title'),('contact_page_intro','Contact Page Intro'),('contact_card_title','Contact Card Title'),('contact_form_title','Contact Form Title'),('footer_company_heading','Footer Company Heading'),('footer_contact_heading','Footer Contact Heading')
+    <details id="labels" class="settings-section full"><summary>Public Labels</summary>
+    {% set label_groups = [
+      ('Hero & Buttons', [('hero_badge_label','Hero Badge','input'),('hero_cta_primary','Hero Primary Button','input'),('hero_cta_secondary','Hero Secondary Button','input'),('cta_title','CTA Title','textarea'),('cta_text','CTA Text','textarea'),('cta_button_text','CTA Button Text','input')]),
+      ('Trust & Credentials', [('trust_item_1','Trust Item 1','input'),('trust_item_2','Trust Item 2','input'),('trust_item_3','Trust Item 3','input'),('trust_item_4','Trust Item 4','input'),('trust_item_5','Trust Item 5','input'),('credentials_eyebrow','Credentials Eyebrow','input'),('credentials_title','Credentials Title','textarea'),('credentials_link_text','Credentials Link Text','input')]),
+      ('Homepage Section Labels', [('service_areas_eyebrow','Service Areas Eyebrow','input'),('service_areas_title','Service Areas Title','textarea'),('service_areas_all_label','Service Areas All Label','input'),('about_eyebrow','About Eyebrow','input'),('about_title','About Title','textarea'),('about_link_text','About Link Text','input'),('services_eyebrow','Services Eyebrow','input'),('services_title','Services Title','input'),('services_link_text','Services Link Text','input'),('projects_eyebrow','Projects Eyebrow','input'),('projects_title','Projects Title','input'),('projects_link_text','Projects Link Text','input'),('image_pending_text','Image Pending Text','input')]),
+      ('Why Choose Us', [('why_eyebrow','Why Eyebrow','input'),('why_title','Why Title','textarea'),('why_card_1_title','Why Card 1 Title','input'),('why_card_1_text','Why Card 1 Text','textarea'),('why_card_2_title','Why Card 2 Title','input'),('why_card_2_text','Why Card 2 Text','textarea'),('why_card_3_title','Why Card 3 Title','input'),('why_card_3_text','Why Card 3 Text','textarea'),('why_card_4_title','Why Card 4 Title','input'),('why_card_4_text','Why Card 4 Text','textarea')]),
+      ('Contact & Footer', [('contact_page_title','Contact Page Title','input'),('contact_page_intro','Contact Page Intro','textarea'),('contact_card_title','Contact Card Title','input'),('contact_form_title','Contact Form Title','input'),('footer_company_heading','Footer Company Heading','input'),('footer_contact_heading','Footer Contact Heading','input')]),
+      ('Stats Labels', [('stats_years_label','Stats Years Label','input'),('stats_experience_label','Stats Experience Label','input'),('stats_contractor_label','Stats Contractor Label','input'),('stats_gst_label','Stats GST Label','input')])
     ] %}
-    <label class="{% if 'Title' in label or 'Intro' in label or 'Text' in label %}full{% endif %}">{{ label }}{% if 'Title' in label or 'Intro' in label or 'Text' in label %}<textarea name="{{ field }}" rows="2">{{ site.get(field,'') }}</textarea>{% else %}<input name="{{ field }}" value="{{ site.get(field,'') }}">{% endif %}{{ field_controls('appearance', field, true, 'Use custom style') }}</label>
+    <div class="nested-groups">
+    {% for group_title, fields in label_groups %}
+      <details class="inner-section" {% if loop.first %}open{% endif %}><summary>{{ group_title }}</summary>
+        <div class="settings-section-grid">
+        {% for field,label,kind in fields %}
+          <label class="{% if kind == 'textarea' %}full{% endif %}">{{ label }}{% if kind == 'textarea' %}<textarea name="{{ field }}" rows="2">{{ site.get(field,'') }}</textarea>{% else %}<input name="{{ field }}" value="{{ site.get(field,'') }}">{% endif %}{{ field_controls('appearance', field, true, 'Use custom style') }}</label>
+        {% endfor %}
+        </div>
+      </details>
     {% endfor %}
-    </div></details>
+    </div>
+    </details>
 
     {% set advanced_fields = ['heading_font','body_font','nav_font','primary_color','secondary_color','accent_color','header_bg_color','footer_bg_color','body_bg_color','soft_bg_color','card_bg_color','text_color','muted_text_color','line_color','button_text_color','container_width','card_radius','button_radius','hero_title_size','section_title_size','body_text_size','custom_css'] %}
     {% if is_advanced_mode() %}
@@ -75,6 +89,6 @@
       {% for field in advanced_fields %}<input type="hidden" name="{{ field }}" value="{{ site.get(field,'') }}">{% endfor %}
     {% endif %}
 
-    <div class="full admin-actions sticky-actions"><button class="btn" type="submit">Save Visibility & Appearance</button></div>
+    <div class="full admin-actions sticky-actions"><button class="btn" type="submit">Save Appearance</button></div>
 </form>
 {% endblock %}
