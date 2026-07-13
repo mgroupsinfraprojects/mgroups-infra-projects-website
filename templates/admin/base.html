@@ -3,37 +3,78 @@
 <body class="admin-body">
 {% if session.admin_id %}
 {% set adm = current_admin() %}
-<aside class="admin-sidebar">
-    <h2>M-GROUPS Admin</h2>
-    <div class="mode-box">
-        <span>Mode: <strong>{{ admin_mode().title() }}</strong></span>
-        {% if admin_mode() == 'advanced' %}<a href="{{ url_for('admin_set_mode', mode='simple') }}">Switch to Simple</a>{% else %}<a href="{{ url_for('admin_set_mode', mode='advanced') }}">Advanced Mode</a>{% endif %}
+{% set ep = request.endpoint or '' %}
+{% set simple = admin_mode() == 'simple' %}
+<aside class="admin-sidebar pro-sidebar">
+    <div class="admin-brand-block">
+        <h2>M-GROUPS Admin</h2>
+        <span class="admin-role-chip">{{ (adm.role if adm else 'user')|title }}</span>
     </div>
-    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('admin_preview') }}" target="_blank">Live Preview</a>
-    {% if adm and adm.role == 'owner' %}
-    <a href="{{ url_for('admin_settings') }}">Website Settings</a>
-    <a href="{{ url_for('admin_appearance') }}">Visibility & Appearance</a>
-    <a href="{{ url_for('admin_permissions') }}">Role Permissions</a>
-    <a href="{{ url_for('admin_users') }}">Admin Users & Roles</a>
-    <a href="{{ url_for('restore_backup') }}">Restore Backup</a>
-    <a href="{{ url_for('backup_json') }}">Download Backup</a>
-    {% endif %}
-    <a href="{{ url_for('admin_about') }}">About & Experience</a>
-    <a href="{{ url_for('admin_services') }}">Services</a>
-    <a href="{{ url_for('admin_projects') }}">Projects / Works</a>
-    <a href="{{ url_for('admin_gallery') }}">Gallery</a>
-    <a href="{{ url_for('admin_media') }}">Media Library</a>
-    {% if adm and adm.role == 'owner' %}
-    <a href="{{ url_for('admin_ordering') }}">Drag & Drop Ordering</a>
-    <a href="{{ url_for('admin_page_builder') }}">Custom Homepage Block Builder</a>
-    <a href="{{ url_for('admin_versions') }}">Version History</a>
-    {% endif %}
-    <a href="{{ url_for('admin_enquiries') }}">Enquiries</a>
-    <a href="{{ url_for('export_enquiries_csv') }}">Export Enquiries</a>
-    <a href="{{ url_for('admin_password') }}">Change Password</a>
-    <a href="{{ url_for('home') }}" target="_blank">View Website</a>
-    <a href="{{ url_for('admin_logout') }}">Logout</a>
+
+    <div class="mode-box pro-mode-box">
+        <span>Mode: <strong>{{ admin_mode().title() }}</strong></span>
+        {% if admin_mode() == 'advanced' %}
+            <a href="{{ url_for('admin_set_mode', mode='simple') }}">Use Simple Mode</a>
+        {% else %}
+            <a href="{{ url_for('admin_set_mode', mode='advanced') }}">Advanced Mode</a>
+        {% endif %}
+    </div>
+
+    <div class="sidebar-actions">
+        <a class="primary" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('home') }}" target="_blank">View Site</a>
+    </div>
+
+    <nav class="admin-nav-pro" aria-label="Admin navigation">
+        <details class="nav-section" open>
+            <summary>Daily Work</summary>
+            <a class="{{ 'active' if ep == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}">Overview</a>
+            <a class="{{ 'active' if ep == 'admin_preview' else '' }}" href="{{ url_for('admin_preview') }}" target="_blank">Live Preview</a>
+            <a class="{{ 'active' if ep == 'admin_enquiries' else '' }}" href="{{ url_for('admin_enquiries') }}">Enquiries</a>
+        </details>
+
+        <details class="nav-section" open>
+            <summary>Website Content</summary>
+            <a class="{{ 'active' if ep == 'admin_about' else '' }}" href="{{ url_for('admin_about') }}">About</a>
+            <a class="{{ 'active' if ep in ['admin_services','admin_service_form'] else '' }}" href="{{ url_for('admin_services') }}">Services</a>
+            <a class="{{ 'active' if ep in ['admin_projects','admin_project_form'] else '' }}" href="{{ url_for('admin_projects') }}">Projects</a>
+            <a class="{{ 'active' if ep == 'admin_gallery' else '' }}" href="{{ url_for('admin_gallery') }}">Gallery</a>
+            <a class="{{ 'active' if ep == 'admin_media' else '' }}" href="{{ url_for('admin_media') }}">Media Library</a>
+        </details>
+
+        {% if adm and adm.role == 'owner' %}
+        <details class="nav-section" {% if simple %}open{% endif %}>
+            <summary>Owner Controls</summary>
+            <a class="{{ 'active' if ep == 'admin_settings' else '' }}" href="{{ url_for('admin_settings') }}">Website Settings</a>
+            <a class="{{ 'active' if ep in ['admin_users','admin_user_edit'] else '' }}" href="{{ url_for('admin_users') }}">Users & Roles</a>
+            <a href="{{ url_for('backup_json') }}">Download Backup</a>
+        </details>
+
+        {% if not simple %}
+        <details class="nav-section">
+            <summary>Advanced Tools</summary>
+            <a class="{{ 'active' if ep == 'admin_appearance' else '' }}" href="{{ url_for('admin_appearance') }}">Visibility & Appearance</a>
+            <a class="{{ 'active' if ep == 'admin_permissions' else '' }}" href="{{ url_for('admin_permissions') }}">Role Permissions</a>
+            <a class="{{ 'active' if ep == 'restore_backup' else '' }}" href="{{ url_for('restore_backup') }}">Restore Backup</a>
+            <a class="{{ 'active' if ep == 'admin_ordering' else '' }}" href="{{ url_for('admin_ordering') }}">Drag & Drop Ordering</a>
+            <a class="{{ 'active' if ep == 'admin_page_builder' else '' }}" href="{{ url_for('admin_page_builder') }}">Homepage Block Builder</a>
+            <a class="{{ 'active' if ep == 'admin_versions' else '' }}" href="{{ url_for('admin_versions') }}">Version History</a>
+            <a href="{{ url_for('export_enquiries_csv') }}">Export Enquiries</a>
+        </details>
+        {% else %}
+        <div class="nav-muted-box">
+            Advanced tools are hidden in Simple Mode.
+            <a href="{{ url_for('admin_set_mode', mode='advanced') }}">Show advanced tools</a>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <details class="nav-section" open>
+            <summary>Account</summary>
+            <a class="{{ 'active' if ep == 'admin_password' else '' }}" href="{{ url_for('admin_password') }}">Change Password</a>
+            <a href="{{ url_for('admin_logout') }}">Logout</a>
+        </details>
+    </nav>
 </aside>
 {% endif %}
 <main class="admin-main {% if not session.admin_id %}login-main{% endif %}">
