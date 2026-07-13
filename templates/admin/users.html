@@ -2,7 +2,11 @@
 {% block title %}Admin Users & Roles{% endblock %}
 {% block content %}
 <h1>Admin Users & Roles</h1>
-<section class="admin-panel"><p class="admin-note">Owner can manage users. Editor can edit selected content. Viewer can inspect admin content without publishing changes. Use a separate account for each person; do not share the owner password.</p></section>
+<section class="admin-panel">
+  <p class="admin-note">Owner can manage users. Editor can edit selected content. Viewer can inspect admin content without publishing changes. Use a separate account for each person; do not share the owner password.</p>
+  <p class="admin-note"><strong>Safety:</strong> disable a user first if you are unsure. Delete only duplicate/test accounts. You cannot delete your own account or remove the last active owner.</p>
+</section>
+
 <form method="post" class="admin-form two-col">
   {{ csrf_field()|safe }}
   <label>Username<input name="username" required></label>
@@ -12,5 +16,36 @@
   <label>Role<select name="role"><option value="viewer">Viewer</option><option value="editor">Editor</option><option value="owner">Owner</option></select></label>
   <div class="full"><button class="btn" type="submit">Create User</button></div>
 </form>
-<table class="admin-table"><thead><tr><th>User</th><th>Email</th><th>Recovery</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody>{% for user in users %}<tr><td>{{ user.username }}</td><td>{{ user.email or '-' }}</td><td>{{ user.recovery_email or '-' }}</td><td>{{ user.role }}</td><td>{{ 'Active' if user.is_active else 'Disabled' }}</td><td>{% if user.id != session.admin_id %}<form method="post" action="{{ url_for('admin_user_toggle', user_id=user.id) }}">{{ csrf_field()|safe }}<button>{{ 'Disable' if user.is_active else 'Enable' }}</button></form>{% endif %}</td></tr>{% endfor %}</tbody></table>
+
+<table class="admin-table">
+  <thead><tr><th>User</th><th>Email</th><th>Recovery</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.username }}</td>
+      <td>{{ user.email or '-' }}</td>
+      <td>{{ user.recovery_email or '-' }}</td>
+      <td>{{ user.role }}</td>
+      <td>{{ 'Active' if user.is_active else 'Disabled' }}</td>
+      <td>
+        <div class="admin-inline-actions">
+          <a class="btn small" href="{{ url_for('admin_user_edit', user_id=user.id) }}">Edit</a>
+          {% if user.id != session.admin_id %}
+          <form method="post" action="{{ url_for('admin_user_toggle', user_id=user.id) }}">
+            {{ csrf_field()|safe }}
+            <button class="small">{{ 'Disable' if user.is_active else 'Enable' }}</button>
+          </form>
+          <form method="post" action="{{ url_for('admin_user_delete', user_id=user.id) }}" onsubmit="return confirm('Delete this admin user permanently? Use Disable instead if you are not sure.');">
+            {{ csrf_field()|safe }}
+            <button class="small danger">Delete</button>
+          </form>
+          {% else %}
+          <span class="muted">Current user</span>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

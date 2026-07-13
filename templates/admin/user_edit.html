@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+{% block title %}Edit Admin User{% endblock %}
+{% block content %}
+<h1>Edit Admin User</h1>
+<section class="admin-panel">
+  <p class="admin-note">Change email, recovery email, role, status, or password. Leave password blank to keep the current password.</p>
+</section>
+<form method="post" class="admin-form two-col">
+  {{ csrf_field()|safe }}
+  <label>Username<input name="username" value="{{ user.username }}" required></label>
+  <label>Email<input name="email" type="email" value="{{ user.email or '' }}" placeholder="person@example.com"></label>
+  <label>Recovery Email<input name="recovery_email" type="email" value="{{ user.recovery_email or '' }}" placeholder="backup@example.com"></label>
+  <label>Role
+    <select name="role">
+      <option value="viewer" {% if user.role == 'viewer' %}selected{% endif %}>Viewer</option>
+      <option value="editor" {% if user.role == 'editor' %}selected{% endif %}>Editor</option>
+      <option value="owner" {% if user.role == 'owner' %}selected{% endif %}>Owner</option>
+    </select>
+  </label>
+  <label>New Password <span class="muted">optional</span><input name="password" type="password" minlength="10" placeholder="Leave blank to keep old password"></label>
+  <label class="checkline"><input type="checkbox" name="is_active" value="1" {% if user.is_active %}checked{% endif %}> Active account</label>
+  <div class="full admin-inline-actions">
+    <button class="btn" type="submit">Save Changes</button>
+    <a class="btn secondary" href="{{ url_for('admin_users') }}">Back</a>
+  </div>
+</form>
+{% endblock %}
