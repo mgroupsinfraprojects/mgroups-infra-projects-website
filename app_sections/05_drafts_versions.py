@@ -221,6 +221,7 @@ def inject_globals():
         "css_dimension": css_dimension,
         "style_props": STYLE_PROPS,
         "current_admin": current_admin,
+        "live_edit_attrs": live_edit_attrs,
     }
 
 

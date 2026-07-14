@@ -361,6 +361,25 @@ def audit(action, detail=""):
         db.session.rollback()
 
 
+
+def live_edit_attrs(target_type, field, target_id=""):
+    """Return safe data attributes only inside the owner live-edit route."""
+    try:
+        if request.endpoint != "admin_live_edit":
+            return ""
+        from markupsafe import Markup, escape
+        attrs = (
+            'data-live-edit="1" '
+            f'data-live-target="{escape(str(target_type))}" '
+            f'data-live-field="{escape(str(field))}" '
+            f'data-live-id="{escape(str(target_id or ""))}" '
+            'title="Click to edit. Changes save on blur."'
+        )
+        return Markup(attrs)
+    except Exception:
+        return ""
+
+
 def csrf_token():
     token = session.get("csrf_token")
     if not token:

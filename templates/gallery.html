@@ -13,8 +13,8 @@
     <span class="gallery-open-label">Open full image</span>
   </a>
   {% endif %}
-  {% if item_field_visible(item,'gallery','title') %}<h3 style="{{ item_style_inline(item,'gallery','title') }}">{{ item.title }}</h3>{% endif %}
-  {% if item_field_visible(item,'gallery','caption') and item.caption %}<p style="{{ item_style_inline(item,'gallery','caption') }}">{{ item.caption }}</p>{% endif %}
+  {% if item_field_visible(item,'gallery','title') %}<h3 {{ live_edit_attrs('gallery','title', item.id)|safe }} style="{{ item_style_inline(item,'gallery','title') }}">{{ item.title }}</h3>{% endif %}
+  {% if item_field_visible(item,'gallery','caption') and item.caption %}<p {{ live_edit_attrs('gallery','caption', item.id)|safe }} style="{{ item_style_inline(item,'gallery','caption') }}">{{ item.caption }}</p>{% endif %}
 </article>
 {% endfor %}
 </div>

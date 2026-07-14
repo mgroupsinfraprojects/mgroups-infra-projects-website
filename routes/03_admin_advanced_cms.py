@@ -34,6 +34,119 @@ def admin_preview():
     return render_template(template, **overrides, **extra)
 
 
+@app.route("/admin/live-edit")
+@login_required
+@require_role("owner")
+def admin_live_edit():
+    """Render the real public pages with inline-edit controls for owner users."""
+    page = request.args.get("page", "home")
+    use_draft = request.args.get("draft", "0") == "1"
+    preview_site = site_with_drafts(use_draft=use_draft)
+    preview_about = simple_namespace_from_model(AboutContent.query.get(1), get_draft("about") if use_draft else None)
+    services_rows = public_services(include_drafts=True).all()
+    projects_rows = public_projects(include_drafts=True).all()
+    gallery_rows = public_gallery(include_drafts=True).all()
+    page_blocks_rows = PageBlock.query.order_by(PageBlock.sort_order.asc(), PageBlock.id.asc()).all()
+    overrides = {
+        "site": preview_site,
+        "about": preview_about,
+        "service_areas": service_area_list(preview_site),
+        "field_visible": field_visible_for_site(preview_site),
+        "is_on": lambda key, default=False: flag_value(preview_site.get(key), default),
+        "preview_mode": True,
+        "live_edit_mode": True,
+        "live_edit_page": page,
+    }
+    template_map = {
+        "home": ("home.html", {"services": services_rows[:6], "projects": projects_rows[:6], "page_blocks": page_blocks_rows}),
+        "about": ("about.html", {}),
+        "services": ("services.html", {"services": services_rows}),
+        "projects": ("projects.html", {"projects": projects_rows}),
+        "gallery": ("gallery.html", {"items": gallery_rows}),
+        "contact": ("contact.html", {}),
+    }
+    template, extra = template_map.get(page, template_map["home"])
+    return render_template(template, **overrides, **extra)
+
+
+@app.route("/admin/live-edit/save", methods=["POST"])
+@login_required
+@require_role("owner")
+def admin_live_edit_save():
+    """Save one inline-edit field from the live-edit overlay."""
+    data = request.get_json(silent=True) or {}
+    target = (data.get("target") or "").strip()
+    field = (data.get("field") or "").strip()
+    target_id = data.get("id") or ""
+    value = (data.get("value") or "").strip()
+
+    if not target or not field:
+        return jsonify({"ok": False, "error": "Missing edit target."}), 400
+
+    setting_fields = {name for name, _label, _default in SETTINGS_FIELD_LABELS}
+    appearance_fields = set(APPEARANCE_FIELDS)
+    about_fields = {name for name, _label, _default in ABOUT_FIELD_LABELS}
+    service_fields = {"title", "description", "icon"}
+    project_fields = {"title", "location", "category", "status", "year", "client_type", "site_area", "duration", "project_value", "scope_of_work", "challenge", "solution", "outcome", "description"}
+    gallery_fields = {"title", "caption"}
+    required_title_targets = {"service", "project", "gallery"}
+
+    try:
+        if target == "setting":
+            if field not in setting_fields:
+                return jsonify({"ok": False, "error": "This settings field cannot be edited inline."}), 400
+            set_setting(field, value[:5000])
+        elif target == "appearance":
+            if field not in appearance_fields:
+                return jsonify({"ok": False, "error": "This appearance label cannot be edited inline."}), 400
+            set_setting(field, value[:5000])
+        elif target == "about":
+            if field not in about_fields:
+                return jsonify({"ok": False, "error": "This about field cannot be edited inline."}), 400
+            about = AboutContent.query.get(1)
+            setattr(about, field, value[:12000])
+        elif target == "service":
+            if field not in service_fields:
+                return jsonify({"ok": False, "error": "This service field cannot be edited inline."}), 400
+            obj = Service.query.get(int(target_id))
+            if not obj:
+                return jsonify({"ok": False, "error": "Service not found."}), 404
+            if field == "title" and not value:
+                return jsonify({"ok": False, "error": "Service title cannot be blank."}), 400
+            setattr(obj, field, value[:5000])
+            obj.updated_at = datetime.utcnow()
+        elif target == "project":
+            if field not in project_fields:
+                return jsonify({"ok": False, "error": "This project field cannot be edited inline."}), 400
+            obj = Project.query.get(int(target_id))
+            if not obj:
+                return jsonify({"ok": False, "error": "Project not found."}), 404
+            if field == "title" and not value:
+                return jsonify({"ok": False, "error": "Project title cannot be blank."}), 400
+            setattr(obj, field, value[:12000])
+            obj.updated_at = datetime.utcnow()
+        elif target == "gallery":
+            if field not in gallery_fields:
+                return jsonify({"ok": False, "error": "This gallery field cannot be edited inline."}), 400
+            obj = GalleryItem.query.get(int(target_id))
+            if not obj:
+                return jsonify({"ok": False, "error": "Gallery item not found."}), 404
+            if field == "title" and not value:
+                return jsonify({"ok": False, "error": "Gallery title cannot be blank."}), 400
+            setattr(obj, field, value[:5000])
+            obj.updated_at = datetime.utcnow()
+        else:
+            return jsonify({"ok": False, "error": "Unsupported edit target."}), 400
+
+        db.session.commit()
+        audit("live_edit_save", f"{target}.{field}{':' + str(target_id) if target_id else ''}")
+        return jsonify({"ok": True, "value": value})
+    except Exception as exc:
+        db.session.rollback()
+        app.logger.exception("Live edit save failed: %s", exc)
+        return jsonify({"ok": False, "error": "Save failed. Refresh and try again."}), 500
+
+
 @app.route("/admin/versions")
 @login_required
 def admin_versions():

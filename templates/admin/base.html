@@ -30,6 +30,7 @@
             <summary>Daily Work</summary>
             <a class="{{ 'active' if ep == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
             <a class="{{ 'active' if ep == 'admin_preview' else '' }}" href="{{ url_for('admin_preview') }}" target="_blank">Live Preview</a>
+            {% if adm and adm.role == 'owner' %}<a class="{{ 'active' if ep == 'admin_live_edit' else '' }}" href="{{ url_for('admin_live_edit', page='home') }}" target="_blank">Live Edit</a>{% endif %}
             <a class="{{ 'active' if ep == 'admin_enquiries' else '' }}" href="{{ url_for('admin_enquiries') }}">Enquiries</a>
         </details>
 
