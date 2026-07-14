@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveEndpoint = '/admin/live-edit/save';
   const styleEndpoint = '/admin/live-edit/style';
   let activeEl = null;
+  let activeOriginal = '';
 
   function setStatus(text, state) {
     if (!status) return;
@@ -20,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function postJson(url, payload) {
-    if (!csrf) throw new Error('CSRF token missing. Hard refresh the page, then login again.');
+    if (!csrf) throw new Error('CSRF token missing. Hard refresh, login again, then retry.');
     const res = await fetch(url, {
       method: 'POST',
       credentials: 'same-origin',
@@ -31,23 +32,85 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       body: JSON.stringify(payload)
     });
+
     const contentType = res.headers.get('content-type') || '';
     let data = {};
     if (contentType.includes('application/json')) {
       data = await res.json();
     } else {
       const text = await res.text();
-      data = {error: text.slice(0, 180) || 'Server returned a non-JSON error.'};
+      data = { error: text.slice(0, 220) || `Server returned HTTP ${res.status}` };
     }
-    if (!res.ok || !data.ok) throw new Error(data.error || `Request failed (${res.status})`);
+
+    if (!res.ok || !data.ok) {
+      if (res.status === 401 || res.status === 403) throw new Error('Login/session/CSRF blocked the save. Login again and hard refresh.');
+      if (res.status === 429) throw new Error('Too many save attempts. Wait a few minutes and retry.');
+      throw new Error(data.error || `Request failed (${res.status})`);
+    }
     return data;
   }
 
-  async function saveElement(el) {
-    if (!el) return;
-    const next = (el.innerText || el.textContent || '').trim();
-    const original = el.dataset.liveOriginal || '';
-    if (next === original) return;
+  function buildEditorPanel() {
+    const panel = document.createElement('section');
+    panel.className = 'live-editor-sidepanel';
+    panel.hidden = true;
+    panel.innerHTML = `
+      <div class="live-editor-sidepanel-head">
+        <div>
+          <small>Selected field</small>
+          <strong data-panel-field>None</strong>
+        </div>
+        <button type="button" data-panel-close aria-label="Close editor">×</button>
+      </div>
+      <label class="live-editor-panel-label">Content</label>
+      <textarea data-panel-value rows="7" spellcheck="true"></textarea>
+      <div class="live-editor-panel-actions">
+        <button type="button" data-panel-save>Save Text</button>
+        <button type="button" data-panel-cancel>Cancel</button>
+      </div>
+      <p class="live-editor-panel-help">Click text on the page, edit here, then save. This avoids browser inline-edit glitches.</p>
+    `;
+    document.body.appendChild(panel);
+    return panel;
+  }
+
+  const panel = buildEditorPanel();
+  const panelField = panel.querySelector('[data-panel-field]');
+  const panelValue = panel.querySelector('[data-panel-value]');
+
+  function openPanelFor(el) {
+    activeEl = el;
+    activeOriginal = (el.innerText || el.textContent || '').trim();
+    panelField.textContent = editableLabel(el);
+    panelValue.value = activeOriginal;
+    panel.hidden = false;
+    setTimeout(() => panelValue.focus(), 0);
+  }
+
+  function closePanel() {
+    panel.hidden = true;
+  }
+
+  function activate(el) {
+    document.querySelectorAll('.live-edit-field.live-edit-active').forEach(x => x.classList.remove('live-edit-active'));
+    activeEl = el;
+    el.classList.add('live-edit-active');
+    setStatus('Selected ' + editableLabel(el) + '. Edit in the side panel.', 'editing');
+    openPanelFor(el);
+  }
+
+  async function saveValue(el, value) {
+    if (!el) {
+      setStatus('Select editable text first.', 'error');
+      return;
+    }
+    const next = (value ?? '').trim();
+    const original = (el.dataset.liveOriginal || activeOriginal || '').trim();
+    if (next === original) {
+      setStatus('No change to save.', 'ready');
+      return;
+    }
+
     setStatus('Saving ' + editableLabel(el) + '...', 'saving');
     el.classList.add('live-edit-saving');
     try {
@@ -57,7 +120,10 @@ document.addEventListener('DOMContentLoaded', () => {
         id: el.dataset.liveId || '',
         value: next
       });
+      el.textContent = next;
       el.dataset.liveOriginal = next;
+      activeOriginal = next;
+      panelValue.value = next;
       el.classList.remove('live-edit-error');
       el.classList.add('live-edit-saved');
       setStatus('Saved. Public website updated.', 'saved');
@@ -69,6 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
     } finally {
       el.classList.remove('live-edit-saving');
     }
+  }
+
+  async function savePanel() {
+    await saveValue(activeEl, panelValue.value);
   }
 
   function applyPreviewStyle(el, prop, value) {
@@ -103,45 +173,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function activate(el) {
-    activeEl = el;
-    document.querySelectorAll('.live-edit-field.live-edit-active').forEach(x => x.classList.remove('live-edit-active'));
-    el.classList.add('live-edit-active');
-    setStatus('Editing ' + editableLabel(el) + '. Click outside or press Ctrl+S to save.', 'editing');
-  }
-
   document.querySelectorAll('[data-live-edit="1"]').forEach(el => {
-    el.setAttribute('contenteditable', 'true');
-    el.setAttribute('spellcheck', 'true');
+    // Stable mode: no contenteditable. Editing happens in a controlled side panel.
+    el.removeAttribute('contenteditable');
     el.setAttribute('tabindex', '0');
     el.classList.add('live-edit-field');
     el.dataset.liveOriginal = (el.innerText || el.textContent || '').trim();
 
     el.addEventListener('click', event => {
-      if (el.tagName === 'A' || el.closest('a')) event.preventDefault();
+      event.preventDefault();
       event.stopPropagation();
       activate(el);
-      el.focus();
-    });
-    el.addEventListener('focus', () => activate(el));
-    el.addEventListener('blur', () => {
-      el.classList.remove('live-edit-active');
-      saveElement(el);
     });
     el.addEventListener('keydown', event => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+      if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        saveElement(el);
-      }
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        el.innerText = el.dataset.liveOriginal || '';
-        el.blur();
+        activate(el);
       }
     });
   });
 
-  document.querySelector('[data-live-save]')?.addEventListener('click', () => saveElement(activeEl));
+  panel.querySelector('[data-panel-close]')?.addEventListener('click', closePanel);
+  panel.querySelector('[data-panel-save]')?.addEventListener('click', savePanel);
+  panel.querySelector('[data-panel-cancel]')?.addEventListener('click', () => {
+    if (activeEl) panelValue.value = activeOriginal || activeEl.dataset.liveOriginal || '';
+    closePanel();
+    setStatus('Edit cancelled.', 'ready');
+  });
+
+  document.querySelector('[data-live-save]')?.addEventListener('click', savePanel);
   document.querySelector('[data-style-font]')?.addEventListener('change', e => saveStyle({font: e.target.value}));
   document.querySelector('[data-style-size]')?.addEventListener('change', e => saveStyle({size: e.target.value.trim()}));
   document.querySelector('[data-style-color]')?.addEventListener('input', e => saveStyle({color: e.target.value}));
@@ -155,9 +215,18 @@ document.addEventListener('DOMContentLoaded', () => {
     saveStyle({italic: current ? '0' : '1'});
   });
 
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      savePanel();
+    }
+    if (e.key === 'Escape' && !panel.hidden) closePanel();
+  });
+
   const backdrop = document.querySelector('[data-live-modal-backdrop]');
   function openModal(name) {
     if (!backdrop) return;
+    closePanel();
     backdrop.hidden = false;
     backdrop.querySelectorAll('[data-live-modal-panel]').forEach(p => p.hidden = p.dataset.liveModalPanel !== name);
   }
@@ -167,7 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-modal-open]').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.modalOpen)));
   document.querySelectorAll('[data-modal-close]').forEach(btn => btn.addEventListener('click', closeModal));
   backdrop?.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-  setStatus('Live Editor ready. Click highlighted text to edit.', 'ready');
+  setStatus('Live Editor ready. Click highlighted text to edit in the side panel.', 'ready');
 });

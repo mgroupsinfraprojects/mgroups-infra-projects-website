@@ -151,3 +151,49 @@ body:has(.live-edit-toolbar){padding-bottom:84px}
 .live-modal-backdrop{position:fixed;inset:0;background:rgba(5,12,22,.66);z-index:10000;display:grid;place-items:center;padding:20px}.live-modal{width:min(680px,94vw);max-height:86vh;overflow:auto;background:#fff;color:#0d1f35;border-radius:20px;border:1px solid #d8e6f0;box-shadow:0 30px 100px rgba(0,0,0,.38);padding:22px;position:relative}.live-modal h2{margin:0 0 14px}.live-modal form{display:grid;gap:12px}.live-modal label{display:grid;gap:6px;font-weight:800}.live-modal input,.live-modal textarea{width:100%;border:1px solid #d8e6f0;border-radius:10px;padding:11px 12px}.live-modal-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:1px solid #d8e6f0;background:#f5f8fc;font-size:20px;cursor:pointer}
 body:has(.live-edit-toolbar){padding-bottom:96px}.preview-banner{padding-left:230px}
 @media(max-width:900px){.live-page-panel{display:none}.live-edit-toolbar{left:8px!important;right:8px!important;bottom:8px!important}.live-edit-toolbar strong{display:none}.live-edit-status{display:none}.preview-banner{padding-left:12px}}
+
+/* V15.2.1 stable side-panel live editor fix */
+.live-edit-toolbar input[type="text"],
+.live-edit-toolbar select,
+.live-edit-toolbar button,
+.live-edit-toolbar a{
+  position:static!important;
+  max-width:180px!important;
+  box-shadow:none!important;
+  appearance:none;
+}
+.live-edit-toolbar input[type="text"]{
+  width:118px!important;
+  background:rgba(255,255,255,.08)!important;
+  color:#fff!important;
+}
+.live-editor-sidepanel{
+  position:fixed;
+  right:18px;
+  top:92px;
+  width:min(420px,calc(100vw - 260px));
+  z-index:10001;
+  pointer-events:auto;
+  background:#ffffff;
+  color:#0d1f35;
+  border:1px solid #d8e6f0;
+  border-radius:18px;
+  box-shadow:0 24px 80px rgba(0,0,0,.35);
+  padding:16px;
+  font-family:var(--body-font,system-ui,sans-serif);
+}
+.live-editor-sidepanel[hidden]{display:none!important}
+.live-editor-sidepanel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;border-bottom:1px solid #d8e6f0;padding-bottom:10px}
+.live-editor-sidepanel-head small{display:block;text-transform:uppercase;letter-spacing:.08em;color:#5a7089;font-weight:900;font-size:.7rem;margin-bottom:2px}
+.live-editor-sidepanel-head strong{display:block;font-size:.92rem;color:#0d1f35;overflow:hidden;text-overflow:ellipsis;max-width:310px;white-space:nowrap}
+.live-editor-sidepanel-head button{width:34px;height:34px;border-radius:999px;border:1px solid #d8e6f0;background:#f5f8fc;color:#0d1f35;font-size:20px;line-height:1;cursor:pointer}
+.live-editor-panel-label{display:block;font-weight:900;margin-bottom:7px;color:#0d1f35}
+.live-editor-sidepanel textarea{width:100%;min-height:150px;resize:vertical;border:1px solid #d8e6f0;border-radius:12px;padding:12px;color:#0d1f35;background:#fff;font:inherit;line-height:1.5;outline:none}
+.live-editor-sidepanel textarea:focus{border-color:#e8a046;box-shadow:0 0 0 4px rgba(232,160,70,.16)}
+.live-editor-panel-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.live-editor-panel-actions button{border:0;border-radius:10px;padding:10px 14px;font-weight:900;cursor:pointer}
+.live-editor-panel-actions [data-panel-save]{background:#e8a046;color:#07121f}
+.live-editor-panel-actions [data-panel-cancel]{background:#eef4fb;color:#0d1f35}
+.live-editor-panel-help{margin:12px 0 0;color:#5a7089;font-size:.82rem;line-height:1.45}
+.live-edit-field{cursor:pointer!important;user-select:none}.live-edit-field.live-edit-active{user-select:auto}
+@media(max-width:900px){.live-editor-sidepanel{left:8px;right:8px;top:76px;width:auto}.live-edit-toolbar input[type="text"]{width:96px!important}}
