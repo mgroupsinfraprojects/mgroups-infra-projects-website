@@ -54,7 +54,7 @@
         {% if not simple %}
         <details class="nav-section">
             <summary>Advanced Tools</summary>
-            <a class="{{ 'active' if ep == 'admin_appearance' else '' }}" href="{{ url_for('admin_appearance') }}">Appearance</a>
+            <a class="{{ 'active' if ep == 'admin_appearance' else '' }}" href="{{ url_for('admin_appearance') }}">Design Center</a>
             <a class="{{ 'active' if ep == 'admin_permissions' else '' }}" href="{{ url_for('admin_permissions') }}">Role Permissions</a>
             <a class="{{ 'active' if ep == 'restore_backup' else '' }}" href="{{ url_for('restore_backup') }}">Restore Backup</a>
             <a class="{{ 'active' if ep == 'admin_ordering' else '' }}" href="{{ url_for('admin_ordering') }}">Ordering</a>

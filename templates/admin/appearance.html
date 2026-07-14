@@ -1,94 +1,206 @@
 {% extends "admin/base.html" %}
-{% from "admin/_field_style.html" import field_controls with context %}
-{% block title %}Appearance{% endblock %}
+{% block title %}Design Center{% endblock %}
 {% block content %}
-<h1>Appearance</h1>
-<section class="admin-panel compact-panel ux-guide">
-  <p class="admin-note"><strong>Use this page only for public visibility and public labels.</strong> Keep Simple Mode for normal work. Use typography, colors, and custom CSS only when the public website design must change.</p>
+<h1>Design Center</h1>
+<section class="admin-panel design-intro">
+  <div>
+    <strong>Use this page for brand design only.</strong>
+    <p>Change theme, colors, fonts, homepage sections, and public labels from one cleaner screen. Use Live Edit for normal text changes.</p>
+  </div>
+  <div class="design-intro-actions">
+    <a class="btn ghost" href="{{ url_for('admin_live_edit', page='home') if current_admin() and current_admin().role == 'owner' else url_for('admin_preview') }}" target="_blank">Open Live Edit</a>
+    <a class="btn ghost" href="{{ url_for('admin_preview', page='home') }}" target="_blank">Preview Site</a>
+  </div>
 </section>
-<form method="post" class="admin-form two-col settings-admin clean-settings ux-clean-form">
-    {{ csrf_field()|safe }}
-    <nav class="admin-tabs full"><a href="#visibility">Visibility</a><a href="#home-sections">Homepage Sections</a><a href="#labels">Public Labels</a>{% if is_advanced_mode() %}<a href="#typography">Typography</a><a href="#colors">Colors</a><a href="#css">Advanced CSS</a>{% endif %}</nav>
 
-    <details id="visibility" class="settings-section full" open><summary>Visibility</summary>
-      <div class="ux-subnote">Recommended: keep phone/WhatsApp hidden unless you intentionally want public calls. Keep GST/Udyam hidden unless you deliberately want those numbers displayed.</div>
-      <div class="settings-subgroup"><h3>Contact Visibility</h3><div class="settings-section-grid compact-checks">
-        <label class="check"><input type="checkbox" name="show_phone_public" {% if is_on('show_phone_public') %}checked{% endif %}> Show phone number publicly</label>
-        <label class="check"><input type="checkbox" name="show_whatsapp_public" {% if is_on('show_whatsapp_public') %}checked{% endif %}> Show WhatsApp button/link publicly</label>
-        <label class="check"><input type="checkbox" name="show_email_public" {% if is_on('show_email_public', true) %}checked{% endif %}> Show email publicly</label>
-        <label class="check"><input type="checkbox" name="show_address_public" {% if is_on('show_address_public', true) %}checked{% endif %}> Show address publicly</label>
-        <label class="check"><input type="checkbox" name="show_contact_nav" {% if is_on('show_contact_nav', true) %}checked{% endif %}> Show Contact menu/button</label>
-        <label class="check"><input type="checkbox" name="show_whatsapp_float" {% if is_on('show_whatsapp_float') %}checked{% endif %}> Show floating WhatsApp button</label>
-      </div></div>
-      <div class="settings-subgroup"><h3>Business Credentials</h3><div class="settings-section-grid compact-checks">
-        <label class="check"><input type="checkbox" name="show_registered_name_public" {% if is_on('show_registered_name_public', true) %}checked{% endif %}> Show registered name</label>
-        <label class="check"><input type="checkbox" name="show_enterprise_type_public" {% if is_on('show_enterprise_type_public', true) %}checked{% endif %}> Show enterprise type</label>
-        <label class="check"><input type="checkbox" name="show_udyam_public" {% if is_on('show_udyam_public', true) %}checked{% endif %}> Show Udyam number</label>
-        <label class="check"><input type="checkbox" name="show_gstin_public" {% if is_on('show_gstin_public', true) %}checked{% endif %}> Show GSTIN</label>
-        <label class="check"><input type="checkbox" name="show_business_commencement_public" {% if is_on('show_business_commencement_public') %}checked{% endif %}> Show business commencement date</label>
-        <label class="check"><input type="checkbox" name="show_major_activity_public" {% if is_on('show_major_activity_public', true) %}checked{% endif %}> Show major activity</label>
-      </div></div>
-      <div class="settings-subgroup"><h3>Navigation & Footer</h3><div class="settings-section-grid compact-checks">
-        <label class="check"><input type="checkbox" name="show_gallery_nav" {% if is_on('show_gallery_nav', true) %}checked{% endif %}> Allow Gallery menu when published images exist</label>
-        <label class="check"><input type="checkbox" name="show_service_area_nav" {% if is_on('show_service_area_nav', true) %}checked{% endif %}> Show Service Areas menu</label>
-        <label class="check"><input type="checkbox" name="show_footer_contact" {% if is_on('show_footer_contact', true) %}checked{% endif %}> Show footer contact block</label>
-        <label class="check"><input type="checkbox" name="show_footer_credentials" {% if is_on('show_footer_credentials', true) %}checked{% endif %}> Show footer credentials</label>
-      </div></div>
-    </details>
+<form method="post" id="designCenterForm" class="admin-form design-center-form">
+  {{ csrf_field()|safe }}
 
-    <details id="home-sections" class="settings-section full"><summary>Homepage Sections</summary><div class="settings-section-grid compact-checks">
-    {% for key,label,default in [
-        ('show_trust_strip','Trust strip', true),('show_services_section','Services section', true),('show_projects_section','Projects section', true),('show_about_section','About section', true),('show_service_areas_section','Service areas section', true),('show_credentials_section','Credentials section', true),('show_why_section','Why choose us section', true),('show_cta_section','Bottom CTA section', true),('show_hero_logo_panel','Hero logo panel', true),('show_stats_section','Stats band', false),('show_hero_metrics','Hero metrics', false),('show_project_placeholder_images','Project image placeholder blocks', false)
-    ] %}
-    <label class="check"><input type="checkbox" name="{{ key }}" {% if is_on(key, default) %}checked{% endif %}> {{ label }}</label>
-    {% endfor %}
-    </div></details>
+  <div class="design-layout">
+    <aside class="design-side-panel">
+      <nav class="design-jump">
+        <a href="#theme">Theme</a>
+        <a href="#header-design">Header & Buttons</a>
+        <a href="#home-layout">Home Page</a>
+        <a href="#labels">Public Labels</a>
+        <a href="#visibility">Visibility</a>
+        <a href="#advanced-design">Advanced</a>
+      </nav>
 
-    <details id="labels" class="settings-section full"><summary>Public Labels</summary>
-    {% set label_groups = [
-      ('Hero & Buttons', [('hero_badge_label','Hero Badge','input'),('hero_cta_primary','Hero Primary Button','input'),('hero_cta_secondary','Hero Secondary Button','input'),('cta_title','CTA Title','textarea'),('cta_text','CTA Text','textarea'),('cta_button_text','CTA Button Text','input')]),
-      ('Trust & Credentials', [('trust_item_1','Trust Item 1','input'),('trust_item_2','Trust Item 2','input'),('trust_item_3','Trust Item 3','input'),('trust_item_4','Trust Item 4','input'),('trust_item_5','Trust Item 5','input'),('credentials_eyebrow','Credentials Eyebrow','input'),('credentials_title','Credentials Title','textarea'),('credentials_link_text','Credentials Link Text','input')]),
-      ('Homepage Section Labels', [('service_areas_eyebrow','Service Areas Eyebrow','input'),('service_areas_title','Service Areas Title','textarea'),('service_areas_all_label','Service Areas All Label','input'),('about_eyebrow','About Eyebrow','input'),('about_title','About Title','textarea'),('about_link_text','About Link Text','input'),('services_eyebrow','Services Eyebrow','input'),('services_title','Services Title','input'),('services_link_text','Services Link Text','input'),('projects_eyebrow','Projects Eyebrow','input'),('projects_title','Projects Title','input'),('projects_link_text','Projects Link Text','input'),('image_pending_text','Image Pending Text','input')]),
-      ('Why Choose Us', [('why_eyebrow','Why Eyebrow','input'),('why_title','Why Title','textarea'),('why_card_1_title','Why Card 1 Title','input'),('why_card_1_text','Why Card 1 Text','textarea'),('why_card_2_title','Why Card 2 Title','input'),('why_card_2_text','Why Card 2 Text','textarea'),('why_card_3_title','Why Card 3 Title','input'),('why_card_3_text','Why Card 3 Text','textarea'),('why_card_4_title','Why Card 4 Title','input'),('why_card_4_text','Why Card 4 Text','textarea')]),
-      ('Contact & Footer', [('contact_page_title','Contact Page Title','input'),('contact_page_intro','Contact Page Intro','textarea'),('contact_card_title','Contact Card Title','input'),('contact_form_title','Contact Form Title','input'),('footer_company_heading','Footer Company Heading','input'),('footer_contact_heading','Footer Contact Heading','input')]),
-      ('Stats Labels', [('stats_years_label','Stats Years Label','input'),('stats_experience_label','Stats Experience Label','input'),('stats_contractor_label','Stats Contractor Label','input'),('stats_gst_label','Stats GST Label','input')])
-    ] %}
-    <div class="nested-groups">
-    {% for group_title, fields in label_groups %}
-      <details class="inner-section" {% if loop.first %}open{% endif %}><summary>{{ group_title }}</summary>
-        <div class="settings-section-grid">
-        {% for field,label,kind in fields %}
-          <label class="{% if kind == 'textarea' %}full{% endif %}">{{ label }}{% if kind == 'textarea' %}<textarea name="{{ field }}" rows="2">{{ site.get(field,'') }}</textarea>{% else %}<input name="{{ field }}" value="{{ site.get(field,'') }}">{% endif %}{{ field_controls('appearance', field, true, 'Use custom style') }}</label>
+      <div class="design-preview-box" id="designPreviewBox">
+        <span class="design-preview-label">Live design preview</span>
+        <div class="mini-site-preview">
+          <div class="mini-header"><span class="mini-logo">MG</span><span>Menu</span><span class="mini-contact">Contact</span></div>
+          <div class="mini-hero">
+            <span class="mini-badge">{{ site.get('hero_badge_label') or 'Civil & Infrastructure Project Execution' }}</span>
+            <h2>{{ site.get('hero_badge_label') or 'Civil & Infrastructure' }}</h2>
+            <p>Preview of heading, body text, card, and button style.</p>
+            <button type="button">{{ site.get('hero_cta_primary') or 'Request Consultation' }}</button>
+          </div>
+          <div class="mini-card"><strong>Service Card</strong><p>Card background, border, text, and radius preview.</p></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="design-main-panel">
+      <section id="theme" class="design-card" open>
+        <div class="design-card-head">
+          <div><span class="design-kicker">Step 1</span><h2>Theme Presets</h2></div>
+          <p>Pick one stable palette first. Fine-tune only after previewing.</p>
+        </div>
+        <div class="theme-preset-grid">
+          <button type="button" class="theme-preset active" data-primary="#0D1F35" data-secondary="#C4822A" data-accent="#E8A046" data-header="#0D1F35" data-footer="#07121F" data-body="#FFFFFF" data-soft="#F5F8FC" data-card="#FFFFFF" data-text="#1C2E3F" data-muted="#5A7089" data-line="#D8E6F0" data-button="#FFFFFF"><span class="preset-swatch navy"></span><strong>Classic Navy</strong><small>Best for current site</small></button>
+          <button type="button" class="theme-preset" data-primary="#08233A" data-secondary="#155E8A" data-accent="#26A9E0" data-header="#08233A" data-footer="#061A2B" data-body="#F4F9FD" data-soft="#EAF4FA" data-card="#FFFFFF" data-text="#102A43" data-muted="#627D98" data-line="#D7E7F2" data-button="#FFFFFF"><span class="preset-swatch blue"></span><strong>Corporate Blue</strong><small>Clean infrastructure look</small></button>
+          <button type="button" class="theme-preset" data-primary="#111827" data-secondary="#B7791F" data-accent="#F2B84B" data-header="#111827" data-footer="#0B1120" data-body="#FAFAF8" data-soft="#F4EFE6" data-card="#FFFFFF" data-text="#1F2937" data-muted="#6B7280" data-line="#E5E0D8" data-button="#111827"><span class="preset-swatch gold"></span><strong>White & Gold</strong><small>Premium light style</small></button>
+          <button type="button" class="theme-preset" data-primary="#07111F" data-secondary="#2F5D7C" data-accent="#E59A2F" data-header="#07111F" data-footer="#050B13" data-body="#F6F8FB" data-soft="#EDF2F7" data-card="#FFFFFF" data-text="#122034" data-muted="#66788A" data-line="#D7E1EB" data-button="#FFFFFF"><span class="preset-swatch dark"></span><strong>Dark Premium</strong><small>Strong header focus</small></button>
+        </div>
+      </section>
+
+      <section class="design-card" id="colors">
+        <div class="design-card-head"><div><span class="design-kicker">Step 2</span><h2>Global Colors</h2></div><p>These affect the full website. Keep 1 navy + 1 accent color for professional consistency.</p></div>
+        {% set color_fields = [
+          ('primary_color','Primary / Hero','#0D1F35'),('secondary_color','Secondary','#C4822A'),('accent_color','Accent / Button','#E8A046'),('header_bg_color','Header Background','#0D1F35'),('footer_bg_color','Footer Background','#07121F'),('body_bg_color','Body Background','#FFFFFF'),('soft_bg_color','Soft Section Background','#F5F8FC'),('card_bg_color','Card Background','#FFFFFF'),('text_color','Main Text','#1C2E3F'),('muted_text_color','Muted Text','#5A7089'),('line_color','Border','#D8E6F0'),('button_text_color','Button Text','#FFFFFF')
+        ] %}
+        <div class="design-grid color-grid">
+          {% for field,label,default in color_fields %}
+          <label class="color-control"><span>{{ label }}</span><div><input type="color" name="{{ field }}" value="{{ site.get(field) or default }}" data-preview-color="{{ field }}"><input type="text" class="hex-code" value="{{ site.get(field) or default }}" data-hex-for="{{ field }}" aria-label="{{ label }} hex value"></div></label>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="design-card" id="header-design">
+        <div class="design-card-head"><div><span class="design-kicker">Step 3</span><h2>Fonts, Header & Buttons</h2></div><p>Use global fonts and sizes. Do not style every sentence separately.</p></div>
+        <div class="design-grid">
+          <label>Heading Font<select name="heading_font" data-preview-font="heading">{% for f in ['Montserrat','Manrope','Poppins','Inter','Roboto Slab'] %}<option {% if site.heading_font==f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></label>
+          <label>Body Font<select name="body_font" data-preview-font="body">{% for f in ['Manrope','Inter','Montserrat','Poppins','Roboto Slab'] %}<option {% if site.body_font==f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></label>
+          <label>Navigation Font<select name="nav_font">{% for f in ['Manrope','Inter','Montserrat','Poppins'] %}<option {% if site.nav_font==f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></label>
+          <label>Body Text Size<input name="body_text_size" value="{{ site.body_text_size or '16px' }}" placeholder="16px"></label>
+          <label>Hero Title Size<input name="hero_title_size" value="{{ site.hero_title_size or 'clamp(2.35rem,4.7vw,4.1rem)' }}" placeholder="clamp(2.35rem,4.7vw,4.1rem)"></label>
+          <label>Section Title Size<input name="section_title_size" value="{{ site.section_title_size or 'clamp(1.8rem,3vw,2.6rem)' }}" placeholder="clamp(1.8rem,3vw,2.6rem)"></label>
+          <label>Container Width<input name="container_width" value="{{ site.container_width or '1160px' }}" placeholder="1160px"></label>
+          <label>Card Radius<input name="card_radius" value="{{ site.card_radius or '20px' }}" placeholder="20px"></label>
+          <label>Button Radius<input name="button_radius" value="{{ site.button_radius or '11px' }}" placeholder="11px"></label>
+        </div>
+      </section>
+
+      <section class="design-card" id="home-layout">
+        <div class="design-card-head"><div><span class="design-kicker">Step 4</span><h2>Home Page Sections</h2></div><p>Show only sections that have useful content. Keep stats off until numbers are verified.</p></div>
+        {% set section_fields = [
+          ('show_trust_strip','Trust strip', true),('show_services_section','Services section', true),('show_projects_section','Projects section', true),('show_about_section','About section', true),('show_service_areas_section','Service areas section', true),('show_credentials_section','Credentials section', true),('show_why_section','Why choose us section', true),('show_cta_section','Bottom CTA section', true),('show_hero_logo_panel','Hero logo panel', true),('show_stats_section','Stats band', false),('show_hero_metrics','Hero metrics', false),('show_project_placeholder_images','Project image placeholders', false)
+        ] %}
+        <div class="toggle-grid">
+          {% for key,label,default in section_fields %}
+          <label class="switch-row"><input type="checkbox" name="{{ key }}" {% if is_on(key, default) %}checked{% endif %}><span>{{ label }}</span></label>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="design-card" id="labels">
+        <div class="design-card-head"><div><span class="design-kicker">Step 5</span><h2>Public Labels</h2></div><p>Edit common public labels. For normal paragraph editing, use Live Edit.</p></div>
+        {% set label_groups = [
+          ('Hero & CTA', [('hero_badge_label','Hero Badge','input'),('hero_cta_primary','Primary Button','input'),('hero_cta_secondary','Secondary Button','input'),('cta_title','CTA Title','textarea'),('cta_text','CTA Text','textarea'),('cta_button_text','CTA Button','input')]),
+          ('Trust & Credentials', [('trust_item_1','Trust Item 1','input'),('trust_item_2','Trust Item 2','input'),('trust_item_3','Trust Item 3','input'),('trust_item_4','Trust Item 4','input'),('trust_item_5','Trust Item 5','input'),('credentials_eyebrow','Credentials Eyebrow','input'),('credentials_title','Credentials Title','textarea'),('credentials_link_text','Credentials Link Text','input')]),
+          ('Homepage Section Headings', [('service_areas_eyebrow','Service Areas Eyebrow','input'),('service_areas_title','Service Areas Title','textarea'),('service_areas_all_label','Service Areas All Label','input'),('about_eyebrow','About Eyebrow','input'),('about_title','About Title','textarea'),('about_link_text','About Link Text','input'),('services_eyebrow','Services Eyebrow','input'),('services_title','Services Title','input'),('services_link_text','Services Link Text','input'),('projects_eyebrow','Projects Eyebrow','input'),('projects_title','Projects Title','input'),('projects_link_text','Projects Link Text','input'),('image_pending_text','Image Pending Text','input')]),
+          ('Why Choose Us', [('why_eyebrow','Why Eyebrow','input'),('why_title','Why Title','textarea'),('why_card_1_title','Card 1 Title','input'),('why_card_1_text','Card 1 Text','textarea'),('why_card_2_title','Card 2 Title','input'),('why_card_2_text','Card 2 Text','textarea'),('why_card_3_title','Card 3 Title','input'),('why_card_3_text','Card 3 Text','textarea'),('why_card_4_title','Card 4 Title','input'),('why_card_4_text','Card 4 Text','textarea')]),
+          ('Contact, Footer & Stats', [('contact_page_title','Contact Page Title','input'),('contact_page_intro','Contact Page Intro','textarea'),('contact_card_title','Contact Card Title','input'),('contact_form_title','Contact Form Title','input'),('footer_company_heading','Footer Company Heading','input'),('footer_contact_heading','Footer Contact Heading','input'),('stats_years_label','Stats Years Label','input'),('stats_experience_label','Stats Experience Label','input'),('stats_contractor_label','Stats Contractor Label','input'),('stats_gst_label','Stats GST Label','input')])
+        ] %}
+        <div class="design-accordion">
+          {% for group_title, fields in label_groups %}
+          <details class="design-subcard" {% if loop.first %}open{% endif %}><summary>{{ group_title }}</summary>
+            <div class="design-grid">
+            {% for field,label,kind in fields %}
+              <label class="{% if kind == 'textarea' %}wide{% endif %}">{{ label }}{% if kind == 'textarea' %}<textarea name="{{ field }}" rows="2">{{ site.get(field,'') }}</textarea>{% else %}<input name="{{ field }}" value="{{ site.get(field,'') }}">{% endif %}</label>
+            {% endfor %}
+            </div>
+          </details>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="design-card" id="visibility">
+        <div class="design-card-head"><div><span class="design-kicker">Step 6</span><h2>Privacy & Public Visibility</h2></div><p>Keep phone, WhatsApp, GSTIN, and Udyam hidden unless you intentionally want them shown publicly.</p></div>
+        {% set visibility_groups = [
+          ('Contact', [('show_phone_public','Show phone number publicly', false),('show_whatsapp_public','Show WhatsApp button/link publicly', false),('show_email_public','Show email publicly', true),('show_address_public','Show address publicly', true),('show_contact_nav','Show Contact menu/button', true),('show_whatsapp_float','Show floating WhatsApp button', false)]),
+          ('Business Credentials', [('show_registered_name_public','Show registered name', true),('show_enterprise_type_public','Show enterprise type', true),('show_udyam_public','Show Udyam number', false),('show_gstin_public','Show GSTIN', false),('show_business_commencement_public','Show business commencement date', false),('show_major_activity_public','Show major activity', true)]),
+          ('Navigation & Footer', [('show_gallery_nav','Allow Gallery menu when published images exist', true),('show_service_area_nav','Show Service Areas menu', true),('show_footer_contact','Show footer contact block', true),('show_footer_credentials','Show footer credentials', true)])
+        ] %}
+        <div class="design-accordion">
+        {% for group_title, fields in visibility_groups %}
+          <details class="design-subcard" open><summary>{{ group_title }}</summary><div class="toggle-grid">
+            {% for key,label,default in fields %}<label class="switch-row"><input type="checkbox" name="{{ key }}" {% if is_on(key, default) %}checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
+          </div></details>
         {% endfor %}
         </div>
-      </details>
-    {% endfor %}
-    </div>
-    </details>
+      </section>
 
-    {% set advanced_fields = ['heading_font','body_font','nav_font','primary_color','secondary_color','accent_color','header_bg_color','footer_bg_color','body_bg_color','soft_bg_color','card_bg_color','text_color','muted_text_color','line_color','button_text_color','container_width','card_radius','button_radius','hero_title_size','section_title_size','body_text_size','custom_css'] %}
-    {% if is_advanced_mode() %}
-    <details id="typography" class="settings-section full"><summary>Typography</summary><div class="settings-section-grid">
-      <label>Heading Font<select name="heading_font">{% for f in ['Poppins','Inter','Montserrat','Manrope','Roboto Slab'] %}<option {% if site.heading_font==f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></label>
-      <label>Body Font<select name="body_font">{% for f in ['Inter','Manrope','Poppins','Montserrat','Roboto Slab'] %}<option {% if site.body_font==f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></label>
-      <label>Navigation Font<select name="nav_font">{% for f in ['Inter','Manrope','Poppins','Montserrat'] %}<option {% if site.nav_font==f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></label>
-      <label>Body Text Size<input name="body_text_size" value="{{ site.body_text_size }}" placeholder="16px"></label>
-      <label>Hero Title Size<input name="hero_title_size" value="{{ site.hero_title_size }}" placeholder="clamp(2.35rem,4.7vw,4.1rem)"></label>
-      <label>Section Title Size<input name="section_title_size" value="{{ site.section_title_size }}" placeholder="clamp(1.8rem,3vw,2.6rem)"></label>
-      <label>Container Width<input name="container_width" value="{{ site.container_width }}" placeholder="1160px"></label>
-      <label>Card Radius<input name="card_radius" value="{{ site.card_radius }}" placeholder="20px"></label>
-      <label>Button Radius<input name="button_radius" value="{{ site.button_radius }}" placeholder="11px"></label>
-    </div></details>
-    <details id="colors" class="settings-section full"><summary>Colors</summary><div class="settings-section-grid">
-      {% for field,label,default in [('primary_color','Primary Color','#0D1F35'),('secondary_color','Secondary Color','#C4822A'),('accent_color','Accent Color','#E8A046'),('header_bg_color','Header Background','#0D1F35'),('footer_bg_color','Footer Background','#07121F'),('body_bg_color','Body Background','#FFFFFF'),('soft_bg_color','Soft Section Background','#F5F8FC'),('card_bg_color','Card Background','#FFFFFF'),('text_color','Text Color','#1C2E3F'),('muted_text_color','Muted Text Color','#5A7089'),('line_color','Border Color','#D8E6F0'),('button_text_color','Button Text Color','#FFFFFF')] %}
-      <label>{{ label }}<input type="color" name="{{ field }}" value="{{ site.get(field) or default }}"></label>
+      <section class="design-card" id="advanced-design">
+        <div class="design-card-head"><div><span class="design-kicker">Advanced</span><h2>Custom CSS</h2></div><p>Use only when required. Wrong CSS can break the public layout.</p></div>
+        <label class="wide">Custom CSS<textarea name="custom_css" rows="7" placeholder="Use only when necessary. Invalid CSS can break layout.">{{ site.custom_css }}</textarea></label>
+      </section>
+
+      {# Preserve hidden per-field custom typography/style overrides without showing them everywhere. #}
+      <div class="hidden-style-state" hidden>
+      {% for field in appearance_fields %}
+        {% for prop in style_props %}
+          <input type="hidden" name="{{ style_key('appearance', field, prop) }}" value="{{ site.get(style_key('appearance', field, prop), '') }}">
+        {% endfor %}
       {% endfor %}
-    </div></details>
-    <details id="css" class="settings-section full"><summary>Advanced CSS</summary><label class="full">Custom CSS<textarea name="custom_css" rows="8" placeholder="Use only when necessary. Invalid CSS can break layout.">{{ site.custom_css }}</textarea></label></details>
-    {% else %}
-      {% for field in advanced_fields %}<input type="hidden" name="{{ field }}" value="{{ site.get(field,'') }}">{% endfor %}
-    {% endif %}
+      </div>
 
-    <div class="full admin-actions sticky-actions"><button class="btn" type="submit">Save Appearance</button></div>
+      <div class="design-savebar"><button class="btn btn-primary" type="submit">Save Design Center</button><a class="btn ghost" href="{{ url_for('admin_preview', page='home') }}" target="_blank">Preview</a></div>
+    </div>
+  </div>
 </form>
+
+<script>
+(function(){
+  const form = document.getElementById('designCenterForm');
+  if(!form) return;
+  const preview = document.getElementById('designPreviewBox');
+  const map = {
+    primary_color:'--preview-primary', secondary_color:'--preview-secondary', accent_color:'--preview-accent', header_bg_color:'--preview-header', footer_bg_color:'--preview-footer', body_bg_color:'--preview-body', soft_bg_color:'--preview-soft', card_bg_color:'--preview-card', text_color:'--preview-text', muted_text_color:'--preview-muted', line_color:'--preview-line', button_text_color:'--preview-button-text'
+  };
+  function setColor(name, value){
+    const input = form.querySelector(`[name="${name}"]`);
+    if(input) input.value = value;
+    const hex = form.querySelector(`[data-hex-for="${name}"]`);
+    if(hex) hex.value = value;
+    if(preview && map[name]) preview.style.setProperty(map[name], value);
+  }
+  function syncPreview(){
+    Object.keys(map).forEach(name => {
+      const input = form.querySelector(`[name="${name}"]`);
+      if(input && preview) preview.style.setProperty(map[name], input.value || '#000000');
+    });
+  }
+  form.querySelectorAll('[data-preview-color]').forEach(input => {
+    input.addEventListener('input', () => setColor(input.name, input.value));
+  });
+  form.querySelectorAll('[data-hex-for]').forEach(input => {
+    input.addEventListener('change', () => {
+      const v = input.value.trim();
+      if(/^#[0-9a-fA-F]{6}$/.test(v)) setColor(input.dataset.hexFor, v);
+    });
+  });
+  document.querySelectorAll('.theme-preset').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.theme-preset').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setColor('primary_color', btn.dataset.primary);
+      setColor('secondary_color', btn.dataset.secondary);
+      setColor('accent_color', btn.dataset.accent);
+      setColor('header_bg_color', btn.dataset.header);
+      setColor('footer_bg_color', btn.dataset.footer);
+      setColor('body_bg_color', btn.dataset.body);
+      setColor('soft_bg_color', btn.dataset.soft);
+      setColor('card_bg_color', btn.dataset.card);
+      setColor('text_color', btn.dataset.text);
+      setColor('muted_text_color', btn.dataset.muted);
+      setColor('line_color', btn.dataset.line);
+      setColor('button_text_color', btn.dataset.button);
+    });
+  });
+  syncPreview();
+})();
+</script>
 {% endblock %}
