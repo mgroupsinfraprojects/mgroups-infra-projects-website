@@ -1,23 +1,84 @@
 {% extends "admin/base.html" %}
-{% from "admin/_field_style.html" import field_controls with context %}
 {% block title %}About{% endblock %}
+{% macro visible_toggle(field, checked=True, label='Show publicly') -%}
+  <label class="inline-toggle"><input type="checkbox" name="vis_{{ field }}" {% if checked %}checked{% endif %}> <span>{{ label }}</span></label>
+{%- endmacro %}
 {% block content %}
-<div class="admin-title-row"><h1>About</h1><div><a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='about') }}">Live Preview</a>{% if draft_about %}<a class="btn secondary" href="{{ url_for('admin_about', draft=1) }}">Load Draft</a>{% endif %}</div></div>
-<section class="admin-panel compact-panel ux-guide"><p class="admin-note">Write only verified company information. Keep optional numbers hidden unless they are accurate and safe to publish.</p></section>
-<form method="post" class="admin-form two-col clean-settings ux-clean-form">
-    {{ csrf_field()|safe }}
-    <details class="settings-section full" open><summary>Main Company Profile</summary><div class="settings-section-grid">
-    {% for field,label,rows in [
-        ('short_description','Short Description',3),('full_description','Full Company Description',7),('mission','Mission',3),('vision','Vision',3),('core_values','Core Values',5),('experience_summary','Experience Summary',4)
-    ] %}
-    <label class="full">{{ label }}<textarea name="{{ field }}" rows="{{ rows }}">{{ about|attr(field) }}</textarea>{{ field_controls('about', field, form_visible('about', field)) }}</label>
-    {% endfor %}
-    </div></details>
-    <details class="settings-section full"><summary>Optional Public Statistics</summary><div class="ux-subnote">Use these only when you have real, defendable numbers. Leave blank or hidden if unsure.</div><div class="settings-section-grid">
-    {% for field,label in [('years_experience','Years Experience'),('completed_projects','Completed Projects'),('active_projects','Active Projects'),('team_members','Team Members')] %}
-    <label>{{ label }}<input name="{{ field }}" value="{{ about|attr(field) }}">{{ field_controls('about', field, form_visible('about', field)) }}</label>
-    {% endfor %}
-    </div></details>
-    <div class="full admin-actions sticky-actions"><button class="btn" type="submit" name="action" value="publish">Publish About</button><button class="btn secondary" type="submit" name="action" value="draft">Save Draft</button><button class="btn secondary" type="submit" name="action" value="preview">Save Draft & Preview</button></div>
+{% set adm = current_admin() %}
+<div class="admin-title-row clean-title-row">
+  <div>
+    <p class="eyebrow">Website Content</p>
+    <h1>About Content</h1>
+    <p class="page-help">Use this page for verified company information only. Use <strong>Live Edit</strong> for quick text changes and <strong>Design Center</strong> for colors, fonts, buttons, and section styling.</p>
+  </div>
+  <div class="title-actions">
+    <a class="btn secondary" target="_blank" href="{{ url_for('admin_preview', page='about') }}">Live Preview</a>
+    {% if adm and adm.role == 'owner' %}<a class="btn secondary" target="_blank" href="{{ url_for('admin_live_edit', page='about') }}">Live Edit</a>{% endif %}
+    <a class="btn secondary" href="{{ url_for('admin_appearance') }}">Design Center</a>
+    {% if draft_about %}<a class="btn secondary" href="{{ url_for('admin_about', draft=1) }}">Load Draft</a>{% endif %}
+  </div>
+</div>
+
+<section class="admin-panel compact-panel ux-guide">
+  <p class="admin-note"><strong>Recommended workflow:</strong> edit text here, keep fake statistics hidden, then preview before publishing. Do not publish GST, client, invoice, or private document details inside this page.</p>
+</section>
+
+<form method="post" class="admin-form clean-content-form">
+  {{ csrf_field()|safe }}
+
+  <section class="content-editor-grid">
+    <aside class="content-help-card">
+      <h2>About page rule</h2>
+      <ul>
+        <li>Keep content factual.</li>
+        <li>Do not add fake numbers.</li>
+        <li>Keep legal/tax documents private unless intentionally published.</li>
+        <li>Style changes belong in Design Center.</li>
+      </ul>
+      <div class="mini-flow">
+        <span>Write</span><b>→</b><span>Save Draft</span><b>→</b><span>Preview</span><b>→</b><span>Publish</span>
+      </div>
+    </aside>
+
+    <div class="content-main-stack">
+      <details class="clean-section" open>
+        <summary><span>Main Company Profile</span><small>Public about-page content</small></summary>
+        <div class="clean-field-stack">
+          {% for field,label,rows,tip in [
+            ('short_description','Short Description',3,'One short paragraph shown near the top of the About page.'),
+            ('full_description','Full Company Description',7,'Detailed but factual company profile. Avoid private client or tax details.'),
+            ('mission','Mission',3,'What the company is trying to deliver.'),
+            ('vision','Vision',3,'Long-term positioning of the company.'),
+            ('core_values','Core Values',5,'One value per line is easiest to read.'),
+            ('experience_summary','Experience Summary',4,'General experience note. Do not expose confidential documents.')
+          ] %}
+          <div class="content-field-card">
+            <div class="field-head"><div><label for="{{ field }}">{{ label }}</label><p>{{ tip }}</p></div>{{ visible_toggle(field, form_visible('about', field)) }}</div>
+            <textarea id="{{ field }}" name="{{ field }}" rows="{{ rows }}">{{ about|attr(field) }}</textarea>
+          </div>
+          {% endfor %}
+        </div>
+      </details>
+
+      <details class="clean-section">
+        <summary><span>Optional Public Statistics</span><small>Keep hidden unless the numbers are verified</small></summary>
+        <div class="ux-subnote">Use these only when you have real, defendable numbers. Leave blank or hidden if unsure.</div>
+        <div class="stats-grid-clean">
+          {% for field,label in [('years_experience','Years Experience'),('completed_projects','Completed Projects'),('active_projects','Active Projects'),('team_members','Team Members')] %}
+          <div class="content-field-card compact-stat">
+            <div class="field-head"><label for="{{ field }}">{{ label }}</label>{{ visible_toggle(field, form_visible('about', field)) }}</div>
+            <input id="{{ field }}" name="{{ field }}" value="{{ about|attr(field) }}" placeholder="Leave blank if not verified">
+          </div>
+          {% endfor %}
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <div class="admin-actions sticky-actions clean-actions">
+    <button class="btn" type="submit" name="action" value="publish">Publish About</button>
+    <button class="btn secondary" type="submit" name="action" value="draft">Save Draft</button>
+    <button class="btn secondary" type="submit" name="action" value="preview">Save Draft & Preview</button>
+  </div>
 </form>
 {% endblock %}

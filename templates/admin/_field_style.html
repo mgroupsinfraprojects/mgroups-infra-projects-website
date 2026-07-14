@@ -5,7 +5,7 @@
   {% if not style_only %}
   <label class="field-vis"><input type="checkbox" name="vis_{{ field }}" {% if checked %}checked{% endif %}> {{ label }}</label>
   {% endif %}
-  {% if is_advanced_mode() %}
+  {% if is_advanced_mode() and show_per_field_style is defined and show_per_field_style %}
   <details class="style-details"><summary>{% if style_only %}Custom style (optional){% else %}Advanced text style{% endif %}</summary>
     <div class="style-grid">
       <label>Font
@@ -42,7 +42,7 @@
   {% if not style_only %}
   <label class="field-vis"><input type="checkbox" name="vis_{{ field }}" {% if checked %}checked{% endif %}> {{ label }}</label>
   {% endif %}
-  {% if is_advanced_mode() %}
+  {% if is_advanced_mode() and show_per_field_style is defined and show_per_field_style %}
   <details class="style-details"><summary>{% if style_only %}Custom style (optional){% else %}Advanced text style{% endif %}</summary>
     <div class="style-grid">
       <label>Font

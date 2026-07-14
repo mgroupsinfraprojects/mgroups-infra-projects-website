@@ -5,6 +5,11 @@
 {% set adm = current_admin() %}
 {% set ep = request.endpoint or '' %}
 {% set simple = admin_mode() == 'simple' %}
+{% set daily_eps = ['admin_dashboard','admin_preview','admin_live_edit','admin_enquiries'] %}
+{% set content_eps = ['admin_about','admin_services','admin_service_form','admin_service_new','admin_service_edit','admin_projects','admin_project_form','admin_project_new','admin_project_edit','admin_gallery','admin_media'] %}
+{% set owner_eps = ['admin_settings','admin_users','admin_user_edit','backup_json'] %}
+{% set advanced_eps = ['admin_appearance','admin_permissions','restore_backup','admin_ordering','admin_page_builder','admin_versions','admin_version_compare','export_enquiries_csv'] %}
+{% set account_eps = ['admin_password'] %}
 <aside class="admin-sidebar pro-sidebar">
     <div class="admin-brand-block">
         <h2>M-GROUPS Admin</h2>
@@ -26,7 +31,7 @@
     </div>
 
     <nav class="admin-nav-pro" aria-label="Admin navigation">
-        <details class="nav-section" open>
+        <details class="nav-section" {% if ep in daily_eps %}open{% endif %}>
             <summary>Daily Work</summary>
             <a class="{{ 'active' if ep == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
             <a class="{{ 'active' if ep == 'admin_preview' else '' }}" href="{{ url_for('admin_preview') }}" target="_blank">Live Preview</a>
@@ -34,17 +39,17 @@
             <a class="{{ 'active' if ep == 'admin_enquiries' else '' }}" href="{{ url_for('admin_enquiries') }}">Enquiries</a>
         </details>
 
-        <details class="nav-section" open>
+        <details class="nav-section" {% if ep in content_eps %}open{% endif %}>
             <summary>Website Content</summary>
             <a class="{{ 'active' if ep == 'admin_about' else '' }}" href="{{ url_for('admin_about') }}">About</a>
-            <a class="{{ 'active' if ep in ['admin_services','admin_service_form'] else '' }}" href="{{ url_for('admin_services') }}">Services</a>
-            <a class="{{ 'active' if ep in ['admin_projects','admin_project_form'] else '' }}" href="{{ url_for('admin_projects') }}">Projects</a>
+            <a class="{{ 'active' if ep in ['admin_services','admin_service_form','admin_service_new','admin_service_edit'] else '' }}" href="{{ url_for('admin_services') }}">Services</a>
+            <a class="{{ 'active' if ep in ['admin_projects','admin_project_form','admin_project_new','admin_project_edit'] else '' }}" href="{{ url_for('admin_projects') }}">Projects</a>
             <a class="{{ 'active' if ep == 'admin_gallery' else '' }}" href="{{ url_for('admin_gallery') }}">Gallery</a>
             <a class="{{ 'active' if ep == 'admin_media' else '' }}" href="{{ url_for('admin_media') }}">Media Library</a>
         </details>
 
         {% if adm and adm.role == 'owner' %}
-        <details class="nav-section" {% if simple %}open{% endif %}>
+        <details class="nav-section" {% if ep in owner_eps %}open{% endif %}>
             <summary>Owner Controls</summary>
             <a class="{{ 'active' if ep == 'admin_settings' else '' }}" href="{{ url_for('admin_settings') }}">Website Settings</a>
             <a class="{{ 'active' if ep in ['admin_users','admin_user_edit'] else '' }}" href="{{ url_for('admin_users') }}">Users & Roles</a>
@@ -52,7 +57,7 @@
         </details>
 
         {% if not simple %}
-        <details class="nav-section">
+        <details class="nav-section" {% if ep in advanced_eps %}open{% endif %}>
             <summary>Advanced Tools</summary>
             <a class="{{ 'active' if ep == 'admin_appearance' else '' }}" href="{{ url_for('admin_appearance') }}">Design Center</a>
             <a class="{{ 'active' if ep == 'admin_permissions' else '' }}" href="{{ url_for('admin_permissions') }}">Role Permissions</a>
@@ -70,7 +75,7 @@
         {% endif %}
         {% endif %}
 
-        <details class="nav-section" open>
+        <details class="nav-section" {% if ep in account_eps %}open{% endif %}>
             <summary>Account</summary>
             <a class="{{ 'active' if ep == 'admin_password' else '' }}" href="{{ url_for('admin_password') }}">Change Password</a>
             <a href="{{ url_for('admin_logout') }}">Logout</a>

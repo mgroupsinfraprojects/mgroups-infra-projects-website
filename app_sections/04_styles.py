@@ -14,6 +14,11 @@ def style_key(section, field, prop):
 def collect_field_styles(section, fields):
     if not advanced_mode_enabled():
         return {}
+    expected_keys = [style_key(section, field, prop) for field, _label, _default in fields for prop in STYLE_PROPS]
+    # V15.1: content pages no longer display per-field style controls by default.
+    # If those controls are not present in the submitted form, preserve existing styles instead of wiping them.
+    if not any(key in request.form for key in expected_keys):
+        return {}
     payload = {}
     for field, _label, _default in fields:
         for prop in STYLE_PROPS:
@@ -76,10 +81,16 @@ def item_style_key(section, field, prop):
 
 
 def collect_item_styles(section, obj=None):
+    current_styles = getattr(obj, "styles_json", "{}") or "{}"
     if not advanced_mode_enabled():
-        return getattr(obj, "styles_json", "{}") or "{}"
+        return current_styles
+    fields = FIELD_VISIBILITY_GROUPS.get(section, [])
+    expected_keys = [item_style_key(section, field, prop) for field, _label, _default in fields for prop in STYLE_PROPS]
+    # V15.1: when per-item style controls are hidden, do not erase existing item styles on save.
+    if not any(key in request.form for key in expected_keys):
+        return current_styles
     data = {}
-    for field, _label, _default in FIELD_VISIBILITY_GROUPS.get(section, []):
+    for field, _label, _default in fields:
         sub = {}
         for prop in STYLE_PROPS:
             value = request.form.get(item_style_key(section, field, prop), STYLE_DEFAULTS.get(prop, ""))
