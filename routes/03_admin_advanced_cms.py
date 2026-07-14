@@ -29,16 +29,35 @@ def admin_preview():
         "projects": ("projects.html", {"projects": projects_rows}),
         "gallery": ("gallery.html", {"items": gallery_rows}),
         "contact": ("contact.html", {}),
+        "service_areas": ("service_areas.html", {"areas": service_area_list(preview_site)}),
+        "privacy": ("policy.html", {"title": "Privacy Policy", "body": preview_site.get("privacy_policy", ""), "policy_field": "privacy_policy"}),
+        "terms": ("policy.html", {"title": "Terms & Conditions", "body": preview_site.get("terms_text", ""), "policy_field": "terms_text"}),
     }
     template, extra = template_map.get(page, template_map["home"])
     return render_template(template, **overrides, **extra)
+
+
+def live_editor_page_map(site=None):
+    return [
+        {"key": "home", "label": "Home", "url": url_for("admin_live_edit", page="home")},
+        {"key": "about", "label": "About", "url": url_for("admin_live_edit", page="about")},
+        {"key": "services", "label": "Services", "url": url_for("admin_live_edit", page="services")},
+        {"key": "projects", "label": "Projects", "url": url_for("admin_live_edit", page="projects")},
+        {"key": "gallery", "label": "Gallery", "url": url_for("admin_live_edit", page="gallery")},
+        {"key": "contact", "label": "Contact", "url": url_for("admin_live_edit", page="contact")},
+        {"key": "service_areas", "label": "Service Areas", "url": url_for("admin_live_edit", page="service_areas")},
+        {"key": "privacy", "label": "Privacy", "url": url_for("admin_live_edit", page="privacy")},
+        {"key": "terms", "label": "Terms", "url": url_for("admin_live_edit", page="terms")},
+    ]
 
 
 @app.route("/admin/live-edit")
 @login_required
 @require_role("owner")
 def admin_live_edit():
-    """Render the real public pages with inline-edit controls for owner users."""
+    """Render public pages with owner-only inline editing, toolbar and safe create controls."""
+    # Ensure the CSRF token is created before the public template renders.
+    csrf_token()
     page = request.args.get("page", "home")
     use_draft = request.args.get("draft", "0") == "1"
     preview_site = site_with_drafts(use_draft=use_draft)
@@ -56,6 +75,7 @@ def admin_live_edit():
         "preview_mode": True,
         "live_edit_mode": True,
         "live_edit_page": page,
+        "live_editor_pages": live_editor_page_map(preview_site),
     }
     template_map = {
         "home": ("home.html", {"services": services_rows[:6], "projects": projects_rows[:6], "page_blocks": page_blocks_rows}),
@@ -64,87 +84,209 @@ def admin_live_edit():
         "projects": ("projects.html", {"projects": projects_rows}),
         "gallery": ("gallery.html", {"items": gallery_rows}),
         "contact": ("contact.html", {}),
+        "service_areas": ("service_areas.html", {"areas": service_area_list(preview_site)}),
+        "privacy": ("policy.html", {"title": "Privacy Policy", "body": preview_site.get("privacy_policy", ""), "policy_field": "privacy_policy"}),
+        "terms": ("policy.html", {"title": "Terms & Conditions", "body": preview_site.get("terms_text", ""), "policy_field": "terms_text"}),
     }
     template, extra = template_map.get(page, template_map["home"])
     return render_template(template, **overrides, **extra)
+
+
+def live_edit_allowed_fields():
+    return {
+        "setting": {name for name, _label, _default in SETTINGS_FIELD_LABELS},
+        "appearance": set(APPEARANCE_FIELDS),
+        "about": {name for name, _label, _default in ABOUT_FIELD_LABELS},
+        "service": {"title", "description", "icon"},
+        "project": {"title", "location", "category", "status", "year", "client_type", "site_area", "duration", "project_value", "scope_of_work", "challenge", "solution", "outcome", "description"},
+        "gallery": {"title", "caption"},
+        "page_block": {"title", "body", "button_text", "button_url"},
+    }
+
+
+def live_edit_get_item(target, target_id):
+    if not target_id:
+        return None
+    try:
+        ident = int(target_id)
+    except Exception:
+        return None
+    if target == "service":
+        return Service.query.get(ident)
+    if target == "project":
+        return Project.query.get(ident)
+    if target == "gallery":
+        return GalleryItem.query.get(ident)
+    if target == "page_block":
+        return PageBlock.query.get(ident)
+    return None
 
 
 @app.route("/admin/live-edit/save", methods=["POST"])
 @login_required
 @require_role("owner")
 def admin_live_edit_save():
-    """Save one inline-edit field from the live-edit overlay."""
+    """Save one inline text field from the live editor. Returns JSON only."""
     data = request.get_json(silent=True) or {}
     target = (data.get("target") or "").strip()
     field = (data.get("field") or "").strip()
     target_id = data.get("id") or ""
     value = (data.get("value") or "").strip()
+    allowed = live_edit_allowed_fields()
 
     if not target or not field:
-        return jsonify({"ok": False, "error": "Missing edit target."}), 400
-
-    setting_fields = {name for name, _label, _default in SETTINGS_FIELD_LABELS}
-    appearance_fields = set(APPEARANCE_FIELDS)
-    about_fields = {name for name, _label, _default in ABOUT_FIELD_LABELS}
-    service_fields = {"title", "description", "icon"}
-    project_fields = {"title", "location", "category", "status", "year", "client_type", "site_area", "duration", "project_value", "scope_of_work", "challenge", "solution", "outcome", "description"}
-    gallery_fields = {"title", "caption"}
-    required_title_targets = {"service", "project", "gallery"}
+        return jsonify({"ok": False, "error": "Missing edit target. Refresh Live Editor and try again."}), 400
+    if target not in allowed or field not in allowed[target]:
+        return jsonify({"ok": False, "error": f"Inline edit is not enabled for {target}.{field}."}), 400
 
     try:
         if target == "setting":
-            if field not in setting_fields:
-                return jsonify({"ok": False, "error": "This settings field cannot be edited inline."}), 400
             set_setting(field, value[:5000])
         elif target == "appearance":
-            if field not in appearance_fields:
-                return jsonify({"ok": False, "error": "This appearance label cannot be edited inline."}), 400
             set_setting(field, value[:5000])
         elif target == "about":
-            if field not in about_fields:
-                return jsonify({"ok": False, "error": "This about field cannot be edited inline."}), 400
             about = AboutContent.query.get(1)
+            if not about:
+                about = AboutContent(id=1)
+                db.session.add(about)
             setattr(about, field, value[:12000])
-        elif target == "service":
-            if field not in service_fields:
-                return jsonify({"ok": False, "error": "This service field cannot be edited inline."}), 400
-            obj = Service.query.get(int(target_id))
+        elif target in {"service", "project", "gallery", "page_block"}:
+            obj = live_edit_get_item(target, target_id)
             if not obj:
-                return jsonify({"ok": False, "error": "Service not found."}), 404
-            if field == "title" and not value:
-                return jsonify({"ok": False, "error": "Service title cannot be blank."}), 400
-            setattr(obj, field, value[:5000])
-            obj.updated_at = datetime.utcnow()
-        elif target == "project":
-            if field not in project_fields:
-                return jsonify({"ok": False, "error": "This project field cannot be edited inline."}), 400
-            obj = Project.query.get(int(target_id))
-            if not obj:
-                return jsonify({"ok": False, "error": "Project not found."}), 404
-            if field == "title" and not value:
-                return jsonify({"ok": False, "error": "Project title cannot be blank."}), 400
-            setattr(obj, field, value[:12000])
-            obj.updated_at = datetime.utcnow()
-        elif target == "gallery":
-            if field not in gallery_fields:
-                return jsonify({"ok": False, "error": "This gallery field cannot be edited inline."}), 400
-            obj = GalleryItem.query.get(int(target_id))
-            if not obj:
-                return jsonify({"ok": False, "error": "Gallery item not found."}), 404
-            if field == "title" and not value:
-                return jsonify({"ok": False, "error": "Gallery title cannot be blank."}), 400
-            setattr(obj, field, value[:5000])
-            obj.updated_at = datetime.utcnow()
-        else:
-            return jsonify({"ok": False, "error": "Unsupported edit target."}), 400
-
+                return jsonify({"ok": False, "error": f"{target.replace('_', ' ').title()} not found. Refresh Live Editor."}), 404
+            if field == "title" and not value and target in {"service", "project", "gallery"}:
+                return jsonify({"ok": False, "error": "Title cannot be blank."}), 400
+            limit = 12000 if field in {"description", "scope_of_work", "challenge", "solution", "outcome", "body"} else 5000
+            setattr(obj, field, value[:limit])
+            if hasattr(obj, "updated_at"):
+                obj.updated_at = datetime.utcnow()
         db.session.commit()
         audit("live_edit_save", f"{target}.{field}{':' + str(target_id) if target_id else ''}")
         return jsonify({"ok": True, "value": value})
     except Exception as exc:
         db.session.rollback()
-        app.logger.exception("Live edit save failed: %s", exc)
-        return jsonify({"ok": False, "error": "Save failed. Refresh and try again."}), 500
+        app.logger.exception("Live edit save failed for %s.%s: %s", target, field, exc)
+        return jsonify({"ok": False, "error": f"Save failed on server: {exc.__class__.__name__}. Check Render logs if this repeats."}), 500
+
+
+@app.route("/admin/live-edit/style", methods=["POST"])
+@login_required
+@require_role("owner")
+def admin_live_edit_style():
+    """Save style changes from the toolbar for the selected editable field."""
+    data = request.get_json(silent=True) or {}
+    target = (data.get("target") or "").strip()
+    field = (data.get("field") or "").strip()
+    target_id = data.get("id") or ""
+    props = data.get("props") if isinstance(data.get("props"), dict) else {}
+    allowed = live_edit_allowed_fields()
+    if target not in allowed or field not in allowed[target]:
+        return jsonify({"ok": False, "error": "Style target is not editable."}), 400
+    clean = {}
+    for prop, value in props.items():
+        if prop in STYLE_PROPS:
+            clean[prop] = str(value or "")[:120]
+    try:
+        if target in {"setting", "appearance", "about"}:
+            section = {"setting": "settings", "appearance": "appearance", "about": "about"}[target]
+            for prop, value in clean.items():
+                set_setting(style_key(section, field, prop), value)
+        else:
+            obj = live_edit_get_item(target, target_id)
+            if not obj:
+                return jsonify({"ok": False, "error": "Item not found for style update."}), 404
+            try:
+                styles = json.loads(getattr(obj, "styles_json", "") or "{}")
+                if not isinstance(styles, dict):
+                    styles = {}
+            except Exception:
+                styles = {}
+            current = styles.get(field, {}) if isinstance(styles.get(field, {}), dict) else {}
+            current.update(clean)
+            styles[field] = {k: v for k, v in current.items() if v not in {"", None}}
+            obj.styles_json = json.dumps(styles, ensure_ascii=False)
+            if hasattr(obj, "updated_at"):
+                obj.updated_at = datetime.utcnow()
+        db.session.commit()
+        audit("live_edit_style", f"{target}.{field}{':' + str(target_id) if target_id else ''}")
+        return jsonify({"ok": True})
+    except Exception as exc:
+        db.session.rollback()
+        app.logger.exception("Live edit style failed: %s", exc)
+        return jsonify({"ok": False, "error": f"Style save failed: {exc.__class__.__name__}."}), 500
+
+
+def next_sort_order(model):
+    row = model.query.order_by(model.sort_order.desc()).first()
+    return (row.sort_order + 1) if row else 1
+
+
+@app.route("/admin/live-edit/action", methods=["POST"])
+@login_required
+@require_role("owner")
+def admin_live_edit_action():
+    """Create/replace media from the Live Editor. Uses normal multipart forms for reliability."""
+    action = (request.form.get("action") or "").strip()
+    page = request.form.get("page") or request.args.get("page") or "home"
+    try:
+        if action == "create_service":
+            title = request.form.get("title", "").strip() or "New service"
+            obj = Service(title=title[:200], description=request.form.get("description", "").strip()[:5000], icon=request.form.get("icon", "building").strip() or "building", sort_order=next_sort_order(Service), is_active=True, is_published=True, published_at=datetime.utcnow())
+            image = request.files.get("image")
+            if image and image.filename:
+                obj.image_path = save_upload(image, "service")
+            db.session.add(obj)
+            flash("Service added from Live Editor.", "success")
+        elif action == "create_project":
+            title = request.form.get("title", "").strip() or "New project"
+            obj = Project(title=title[:220], location=request.form.get("location", "").strip()[:220], description=request.form.get("description", "").strip()[:12000], status=request.form.get("status", "Documented Work").strip()[:80], year=request.form.get("year", "").strip()[:20], sort_order=next_sort_order(Project), is_published=True, published_at=datetime.utcnow())
+            image = request.files.get("image")
+            if image and image.filename:
+                obj.image_path = save_upload(image, "project")
+            db.session.add(obj)
+            flash("Project added from Live Editor.", "success")
+        elif action == "create_gallery":
+            image = request.files.get("image")
+            if not image or not image.filename:
+                flash("Gallery image is required.", "danger")
+                return redirect(url_for("admin_live_edit", page="gallery"))
+            path = save_upload(image, "gallery")
+            obj = GalleryItem(title=(request.form.get("title", "").strip() or "Work photo")[:220], caption=request.form.get("caption", "").strip()[:5000], image_path=path, sort_order=next_sort_order(GalleryItem), is_published=True, published_at=datetime.utcnow())
+            db.session.add(obj)
+            flash("Gallery image added from Live Editor.", "success")
+        elif action == "create_block":
+            block = PageBlock(page=(request.form.get("block_page") or "home")[:80], block_type="text", title=request.form.get("title", "").strip()[:240], body=request.form.get("body", "").strip()[:12000], button_text=request.form.get("button_text", "").strip()[:160], button_url=request.form.get("button_url", "").strip(), sort_order=next_sort_order(PageBlock), is_published=True)
+            image = request.files.get("image")
+            if image and image.filename:
+                block.image_path = save_upload(image, "block")
+            db.session.add(block)
+            flash("Homepage block added from Live Editor.", "success")
+        elif action == "replace_image":
+            target = request.form.get("target", "").strip()
+            obj = live_edit_get_item(target, request.form.get("id", ""))
+            image = request.files.get("image")
+            if target not in {"service", "project", "gallery", "page_block"} or not obj:
+                flash("Image target not found. Refresh Live Editor.", "danger")
+                return redirect(url_for("admin_live_edit", page=page))
+            if not image or not image.filename:
+                flash("Choose an image first.", "danger")
+                return redirect(url_for("admin_live_edit", page=page))
+            if getattr(obj, "image_path", ""):
+                delete_media(obj.image_path)
+            obj.image_path = save_upload(image, target)
+            if hasattr(obj, "updated_at"):
+                obj.updated_at = datetime.utcnow()
+            flash("Image replaced.", "success")
+        else:
+            flash("Unsupported Live Editor action.", "danger")
+            return redirect(url_for("admin_live_edit", page=page))
+        db.session.commit()
+        audit("live_edit_action", action)
+    except Exception as exc:
+        db.session.rollback()
+        app.logger.exception("Live editor action failed: %s", exc)
+        flash(f"Live Editor action failed: {exc}", "danger")
+    return redirect(url_for("admin_live_edit", page=page))
 
 
 @app.route("/admin/versions")

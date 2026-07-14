@@ -83,9 +83,9 @@
   {% for block in page_blocks %}
   <article class="page-block {{ block.block_type }}">
     {% if block.image_path %}<img src="{{ media_url(block.image_path) }}" alt="{{ block.title }}">{% endif %}
-    {% if block.title %}<h2>{{ block.title }}</h2>{% endif %}
-    {% if block.body %}<div class="wysiwyg-content">{{ block.body|safe }}</div>{% endif %}
-    {% if block.button_text and block.button_url %}<a class="btn btn-primary" href="{{ block.button_url }}">{{ block.button_text }}</a>{% endif %}
+    {% if block.title %}<h2 {{ live_edit_attrs('page_block','title', block.id)|safe }} style="{{ item_style_inline(block,'page_block','title') }}">{{ block.title }}</h2>{% endif %}
+    {% if block.body %}<div class="wysiwyg-content" {{ live_edit_attrs('page_block','body', block.id)|safe }} style="{{ item_style_inline(block,'page_block','body') }}">{{ block.body|safe }}</div>{% endif %}
+    {% if block.button_text and block.button_url %}<a class="btn btn-primary" {{ live_edit_attrs('page_block','button_text', block.id)|safe }} style="{{ item_style_inline(block,'page_block','button_text') }}" href="{{ block.button_url }}">{{ block.button_text }}</a>{% endif %}
   </article>
   {% endfor %}
 </div></section>

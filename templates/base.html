@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}{% if field_visible('settings','seo_title') %}{{ site.seo_title or site.company_name or 'M-GROUPS INFRA PROJECTS' }}{% else %}Civil & Infrastructure Works{% endif %}{% endblock %}</title>
     {% if field_visible('settings','seo_description') %}<meta name="description" content="{% block meta_description %}{{ site.seo_description or site.short_description or 'Civil construction and infrastructure project services.' }}{% endblock %}">{% endif %}
     <meta property="og:title" content="{{ site.seo_title or site.company_name or 'Civil & Infrastructure Works' }}">
@@ -26,16 +27,85 @@
 {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="container flash-wrap">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
 
 {% if live_edit_mode|default(false) %}
-<div class="live-edit-toolbar" data-live-edit-toolbar>
-  <strong>Live Edit</strong>
-  <a class="{{ 'active' if live_edit_page == 'home' else '' }}" href="{{ url_for('admin_live_edit', page='home') }}">Home</a>
-  <a class="{{ 'active' if live_edit_page == 'about' else '' }}" href="{{ url_for('admin_live_edit', page='about') }}">About</a>
-  <a class="{{ 'active' if live_edit_page == 'services' else '' }}" href="{{ url_for('admin_live_edit', page='services') }}">Services</a>
-  <a class="{{ 'active' if live_edit_page == 'projects' else '' }}" href="{{ url_for('admin_live_edit', page='projects') }}">Projects</a>
-  <a class="{{ 'active' if live_edit_page == 'gallery' else '' }}" href="{{ url_for('admin_live_edit', page='gallery') }}">Gallery</a>
-  <a class="{{ 'active' if live_edit_page == 'contact' else '' }}" href="{{ url_for('admin_live_edit', page='contact') }}">Contact</a>
-  <span class="live-edit-status" data-live-edit-status>Click text to edit. Saves on blur.</span>
-  <a class="exit" href="{{ url_for('admin_dashboard') }}">Exit</a>
+<div class="live-editor-shell" data-live-editor-shell>
+  <aside class="live-page-panel" aria-label="Live editor page navigation">
+    <strong>Pages</strong>
+    {% for p in live_editor_pages %}
+      <a class="{{ 'active' if live_edit_page == p.key else '' }}" href="{{ p.url }}">{{ p.label }}</a>
+    {% endfor %}
+    <hr>
+    <button type="button" data-modal-open="service">+ Service</button>
+    <button type="button" data-modal-open="project">+ Project</button>
+    <button type="button" data-modal-open="gallery">+ Gallery Image</button>
+    <button type="button" data-modal-open="block">+ Home Block</button>
+  </aside>
+  <div class="live-edit-toolbar" data-live-edit-toolbar>
+    <strong>Live Editor</strong>
+    <button type="button" data-live-save>Save</button>
+    <select data-style-font title="Font">
+      <option value="">Font</option><option>Montserrat</option><option>Manrope</option><option>Inter</option><option>Poppins</option><option>Roboto Slab</option>
+    </select>
+    <input data-style-size type="text" placeholder="Size e.g. 42px" aria-label="Font size">
+    <button type="button" data-style-bold title="Bold">B</button>
+    <button type="button" data-style-italic title="Italic">I</button>
+    <input data-style-color type="color" title="Text color" value="#ffffff">
+    <select data-style-align title="Align"><option value="">Align</option><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select>
+    <a href="{{ url_for('admin_appearance') }}" target="_blank">Design Center</a>
+    <a href="{{ url_for('admin_dashboard') }}" class="exit">Exit</a>
+    <span class="live-edit-status" data-live-edit-status>Click highlighted text to edit.</span>
+  </div>
+</div>
+
+<div class="live-modal-backdrop" data-live-modal-backdrop hidden>
+  <div class="live-modal" role="dialog" aria-modal="true" aria-label="Add content">
+    <button class="live-modal-close" type="button" data-modal-close>×</button>
+    <div data-live-modal-panel="service" hidden>
+      <h2>Add Service</h2>
+      <form method="post" action="{{ url_for('admin_live_edit_action') }}" enctype="multipart/form-data">
+        {{ csrf_field()|safe }}<input type="hidden" name="action" value="create_service"><input type="hidden" name="page" value="services">
+        <label>Title<input name="title" required placeholder="Civil Engineering Works"></label>
+        <label>Description<textarea name="description" rows="4" placeholder="Short service description"></textarea></label>
+        <label>Icon / label<input name="icon" placeholder="building"></label>
+        <label>Image<input type="file" name="image" accept="image/*"></label>
+        <button class="btn btn-primary" type="submit">Add Service</button>
+      </form>
+    </div>
+    <div data-live-modal-panel="project" hidden>
+      <h2>Add Project</h2>
+      <form method="post" action="{{ url_for('admin_live_edit_action') }}" enctype="multipart/form-data">
+        {{ csrf_field()|safe }}<input type="hidden" name="action" value="create_project"><input type="hidden" name="page" value="projects">
+        <label>Title<input name="title" required placeholder="Overhead Tank Documentation - Nagercoil"></label>
+        <label>Location<input name="location" placeholder="Nagercoil, Tamil Nadu"></label>
+        <label>Status<input name="status" placeholder="Documented Work"></label>
+        <label>Year<input name="year" placeholder="2026"></label>
+        <label>Description<textarea name="description" rows="4" placeholder="Short project description"></textarea></label>
+        <label>Image<input type="file" name="image" accept="image/*"></label>
+        <button class="btn btn-primary" type="submit">Add Project</button>
+      </form>
+    </div>
+    <div data-live-modal-panel="gallery" hidden>
+      <h2>Add Gallery Image</h2>
+      <form method="post" action="{{ url_for('admin_live_edit_action') }}" enctype="multipart/form-data">
+        {{ csrf_field()|safe }}<input type="hidden" name="action" value="create_gallery"><input type="hidden" name="page" value="gallery">
+        <label>Title<input name="title" placeholder="Water tank work - Nagercoil"></label>
+        <label>Caption<textarea name="caption" rows="3" placeholder="Short factual caption"></textarea></label>
+        <label>Image<input type="file" name="image" accept="image/*" required></label>
+        <button class="btn btn-primary" type="submit">Add Gallery Image</button>
+      </form>
+    </div>
+    <div data-live-modal-panel="block" hidden>
+      <h2>Add Home Block</h2>
+      <form method="post" action="{{ url_for('admin_live_edit_action') }}" enctype="multipart/form-data">
+        {{ csrf_field()|safe }}<input type="hidden" name="action" value="create_block"><input type="hidden" name="page" value="home"><input type="hidden" name="block_page" value="home">
+        <label>Title<input name="title" placeholder="Section title"></label>
+        <label>Body<textarea name="body" rows="4" placeholder="Approved short text"></textarea></label>
+        <label>Image<input type="file" name="image" accept="image/*"></label>
+        <label>Button Text<input name="button_text" placeholder="Contact Now"></label>
+        <label>Button URL<input name="button_url" placeholder="/contact"></label>
+        <button class="btn btn-primary" type="submit">Add Block</button>
+      </form>
+    </div>
+  </div>
 </div>
 {% endif %}
 <main>{% block content %}{% endblock %}</main>
