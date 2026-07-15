@@ -375,10 +375,14 @@ PERMISSION_GROUPS = [
         "title": "Website management",
         "description": "Public website content and design controls.",
         "permissions": [
-            ("website_edit", "Edit website content", "About, services, projects, gallery text/content"),
-            ("design_edit", "Design Center", "Theme, colors, fonts, homepage visibility"),
-            ("media_edit", "Media Library", "Upload/crop images"),
+            ("website_live_edit", "Live Editor", "Edit visible website text from the live preview"),
             ("website_settings_edit", "Website settings", "Company profile, SEO, contact, credentials"),
+            ("design_edit", "Design Center", "Theme, colors, fonts, buttons and homepage visibility"),
+            ("website_about_edit", "About & Experience", "Company description, mission, vision and experience summary"),
+            ("website_services_edit", "Services", "Add, edit and publish service cards"),
+            ("website_projects_edit", "Projects / Works", "Maintain project records, descriptions and images"),
+            ("website_gallery_edit", "Gallery", "Publish or hide site/work photos and captions"),
+            ("media_edit", "Media Library", "Upload/crop/reuse website images"),
         ],
     },
     {
@@ -468,7 +472,8 @@ ROLE_DEFAULT_PERMISSIONS = {
         "users_create", "users_edit",
     },
     "editor": {
-        "portal_view", "website_view", "website_edit", "media_edit", "stock_view", "employees_view",
+        "portal_view", "website_view", "website_live_edit", "website_about_edit", "website_services_edit",
+        "website_projects_edit", "website_gallery_edit", "media_edit", "stock_view", "employees_view",
         "reports_view", "users_view", "users_create", "users_edit",
     },
     "supervisor": {
@@ -658,14 +663,15 @@ DEFAULT_EDITOR_PERMISSION = {
 }
 
 ADMIN_AREA_REQUIRED_PERMISSION = {
+    "live_edit": "website_live_edit",
     "settings": "website_settings_edit",
     "appearance": "design_edit",
-    "about": "website_edit",
-    "services": "website_edit",
-    "projects": "website_edit",
-    "gallery": "website_edit",
-    "page_builder": "website_edit",
-    "ordering": "website_edit",
+    "about": "website_about_edit",
+    "services": "website_services_edit",
+    "projects": "website_projects_edit",
+    "gallery": "website_gallery_edit",
+    "page_builder": "website_about_edit",
+    "ordering": "website_projects_edit",
     "media": "media_edit",
     "restore": "backup_restore",
     "versions": "audit_view",
@@ -674,6 +680,7 @@ ADMIN_AREA_REQUIRED_PERMISSION = {
 
 
 def admin_area_from_path(path):
+    if path.startswith("/admin/live-edit"): return "live_edit"
     if path.startswith("/admin/settings"): return "settings"
     if path.startswith("/admin/appearance"): return "appearance"
     if path.startswith("/admin/about"): return "about"
@@ -749,7 +756,22 @@ def login_required(view):
 
 
 @app.before_request
-def protect_state_changes():
+def protect_admin_requests():
+    # Keep portal modules truly separated. A user who can see the Website box
+    # should not automatically see every old /admin page. Each old admin page
+    # is now guarded by its own module/action permission.
+    if request.path.startswith("/admin") and session.get("admin_id"):
+        exempt_prefixes = (
+            "/admin/login", "/admin/logout", "/admin/forgot-password",
+            "/admin/reset-password", "/admin/mode",
+        )
+        if request.path not in {"/admin", "/admin/"} and not request.path.startswith(exempt_prefixes):
+            area = admin_area_from_path(request.path)
+            required = ADMIN_AREA_REQUIRED_PERMISSION.get(area)
+            if required and not has_permission(required):
+                flash("Your role does not have access to that page. Use My Workspace for assigned tools.", "danger")
+                return redirect(url_for("portal_workspace"))
+
     if request.method == "POST":
         validate_csrf()
         if request.path.startswith("/admin") and session.get("admin_id"):

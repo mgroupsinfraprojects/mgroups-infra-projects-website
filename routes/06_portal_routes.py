@@ -12,12 +12,13 @@ def portal_workspace():
 @login_required
 @permission_required('website_view')
 def portal_web():
-    # Website module hub. This keeps My Workspace logic clean:
-    # Portal card -> module landing page -> exact website-admin action.
+    # Website module hub. The Website box only opens this module page.
+    # Each card below has its own permission, so a manager/supervisor can be
+    # given Website access without automatically seeing every website tool.
     quick_cards = [
         {
             'title': 'Public Website Preview',
-            'description': 'Open the public website in a new tab to check the published result.',
+            'description': 'Open the published public website to check what visitors see.',
             'url': '/',
             'permission': 'website_view',
             'icon': '🌐',
@@ -26,8 +27,15 @@ def portal_web():
             'title': 'Live Editor',
             'description': 'Edit public website text directly from the page preview.',
             'url': '/admin/live-edit?page=home&module=website',
-            'permission': 'website_edit',
+            'permission': 'website_live_edit',
             'icon': '✍️',
+        },
+        {
+            'title': 'Website Settings',
+            'description': 'Company profile, SEO, contact details and public business information.',
+            'url': '/admin/settings?module=website',
+            'permission': 'website_settings_edit',
+            'icon': '⚙️',
         },
         {
             'title': 'Design Center',
@@ -37,45 +45,38 @@ def portal_web():
             'icon': '🎨',
         },
         {
-            'title': 'Website Settings',
-            'description': 'Company profile, SEO, contact details and public business information.',
-            'url': '/admin/settings?module=website',
-            'permission': 'website_edit',
-            'icon': '⚙️',
-        },
-        {
             'title': 'About & Experience',
             'description': 'Company description, mission, vision, values and experience summary.',
             'url': '/admin/about?module=website',
-            'permission': 'website_edit',
+            'permission': 'website_about_edit',
             'icon': '🏢',
         },
         {
             'title': 'Services',
             'description': 'Add, edit and publish service cards.',
             'url': '/admin/services?module=website',
-            'permission': 'website_edit',
+            'permission': 'website_services_edit',
             'icon': '🧱',
         },
         {
             'title': 'Projects / Works',
             'description': 'Maintain project records, descriptions and project images.',
             'url': '/admin/projects?module=website',
-            'permission': 'website_edit',
+            'permission': 'website_projects_edit',
             'icon': '🏗️',
         },
         {
             'title': 'Gallery',
             'description': 'Publish or hide site/work photos and captions.',
             'url': '/admin/gallery?module=website',
-            'permission': 'website_edit',
+            'permission': 'website_gallery_edit',
             'icon': '🖼️',
         },
         {
             'title': 'Media Library',
             'description': 'Upload and reuse images for website content.',
             'url': '/admin/media?module=website',
-            'permission': 'website_edit',
+            'permission': 'media_edit',
             'icon': '📁',
         },
     ]
@@ -84,9 +85,10 @@ def portal_web():
         'portal/module_hub.html',
         module_title='Website Management',
         module_kicker='Portal Module',
-        module_description='Edit the public M-GROUPS website. This module is separate from Stock, Users, GST and System tools.',
+        module_description='Website tools are separated from Stock, Users, GST and System. Only allowed website actions are shown here.',
         cards=cards,
         back_url=url_for('portal_workspace'),
+        notice=None if cards else 'Your role can open Website, but no website action permissions are enabled yet. Ask the Developer/Company Owner to enable specific website actions.',
     )
 
 
