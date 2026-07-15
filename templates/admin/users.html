@@ -4,57 +4,83 @@
 <h1>Users & Roles</h1>
 <section class="admin-panel">
   <p class="admin-note"><strong>Portal access:</strong> every user logs in once, then sees only the modules allowed for their role.</p>
-  <p class="admin-note"><strong>User creation rule:</strong> Developer can create anyone. Company Owner can create manager/supervisor/authorized/viewer. Manager can create supervisor/authorized/viewer.</p>
-  <p class="admin-note"><strong>Password recovery on Free Render:</strong> use <strong>Edit / Reset Password</strong> for manual reset because SMTP may be blocked on Free services.</p>
+  <p class="admin-note"><strong>Role selection:</strong> choose who the person is: Company Owner, Manager, Supervisor, Authorized Person, or Viewer.</p>
+  <p class="admin-note"><strong>Permission editing:</strong> use <a href="{{ url_for('admin_permissions') }}">Role Permissions</a> to control what each role can see/change.</p>
 </section>
 
 {% if creatable_roles %}
-<form method="post" class="admin-form two-col">
+<form method="post" class="admin-form two-col user-create-form">
   {{ csrf_field()|safe }}
   <label>Username<input name="username" required placeholder="manager1"></label>
   <label>Email<input name="email" type="email" placeholder="person@example.com"></label>
   <label>Recovery Email<input name="recovery_email" type="email" placeholder="backup@example.com"></label>
   <label>Password<input name="password" type="password" minlength="10" required placeholder="Minimum 10 characters"></label>
-  <label>Role
+  <label>Who is this user? / Role
     <select name="role">
       {% for value, label in creatable_roles %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
     </select>
+    <small class="muted">Modules/actions come from Role Permissions.</small>
   </label>
-  <div class="full"><button class="btn" type="submit">Create User</button></div>
+  <div class="full admin-inline-actions">
+    <button class="btn" type="submit">Create User</button>
+    <a class="btn secondary" href="{{ url_for('admin_permissions') }}">Open Role Permissions</a>
+  </div>
 </form>
 {% else %}
-<section class="admin-panel"><p class="admin-note">Your role cannot create new users.</p></section>
+<section class="admin-panel"><p class="admin-note">Your role can view users but cannot create new users.</p></section>
 {% endif %}
 
-<table class="admin-table">
-  <thead><tr><th>User</th><th>Email</th><th>Recovery</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
-  <tbody>
-    {% for user in users %}
-    <tr>
-      <td>{{ user.username }}</td>
-      <td>{{ user.email or '-' }}</td>
-      <td>{{ user.recovery_email or '-' }}</td>
-      <td>{{ role_label(user.role) }}</td>
-      <td>{{ 'Active' if user.is_active else 'Disabled' }}</td>
-      <td>
-        <div class="admin-inline-actions">
-          <a class="btn small" href="{{ url_for('admin_user_edit', user_id=user.id) }}">Edit / Reset Password</a>
-          {% if user.id != session.admin_id %}
-          <form method="post" action="{{ url_for('admin_user_toggle', user_id=user.id) }}">
-            {{ csrf_field()|safe }}
-            <button class="small">{{ 'Disable' if user.is_active else 'Enable' }}</button>
-          </form>
-          <form method="post" action="{{ url_for('admin_user_delete', user_id=user.id) }}" onsubmit="return confirm('Delete this user permanently? Use Disable instead if you are not sure.');">
-            {{ csrf_field()|safe }}
-            <button class="small danger">Delete</button>
-          </form>
-          {% else %}
-          <span class="muted">Current user</span>
-          {% endif %}
-        </div>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<section class="admin-panel user-access-panel">
+  <div class="role-matrix-head">
+    <div>
+      <span class="role-card-kicker">User access summary</span>
+      <h2>Who can access what</h2>
+      <p>Module visibility below is calculated from each user's role permissions.</p>
+    </div>
+    <a class="btn secondary small" href="{{ url_for('admin_permissions') }}">Manage Role Permissions</a>
+  </div>
+
+  <table class="admin-table user-access-table">
+    <thead><tr><th>User</th><th>Role</th><th>Allowed modules</th><th>Email</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td><strong>{{ user.username }}</strong>{% if user.id == session.admin_id %}<br><span class="muted">Current user</span>{% endif %}</td>
+        <td>{{ role_label(user.role) }}</td>
+        <td>
+          <div class="module-chip-list">
+            {% set module_titles = user_allowed_module_titles(user) %}
+            {% if module_titles %}
+              {% for title in module_titles %}<span>{{ title }}</span>{% endfor %}
+            {% else %}
+              <em class="muted">No modules</em>
+            {% endif %}
+          </div>
+        </td>
+        <td>{{ user.email or '-' }}<br><span class="muted">Recovery: {{ user.recovery_email or '-' }}</span></td>
+        <td><span class="status-pill {{ 'ok' if user.is_active else 'off' }}">{{ 'Active' if user.is_active else 'Disabled' }}</span></td>
+        <td>
+          <div class="admin-inline-actions">
+            {% if can_manage_user_account(user) or user.id == session.admin_id %}
+            <a class="btn small" href="{{ url_for('admin_user_edit', user_id=user.id) }}">Edit / Reset Password</a>
+            {% endif %}
+            {% if user.id != session.admin_id and can_manage_user_account(user) and has_permission('users_edit') %}
+            <form method="post" action="{{ url_for('admin_user_toggle', user_id=user.id) }}">
+              {{ csrf_field()|safe }}
+              <button class="small">{{ 'Disable' if user.is_active else 'Enable' }}</button>
+            </form>
+            {% endif %}
+            {% if user.id != session.admin_id and can_manage_user_account(user) and has_permission('users_delete') %}
+            <form method="post" action="{{ url_for('admin_user_delete', user_id=user.id) }}" onsubmit="return confirm('Delete this user permanently? Use Disable instead if you are not sure.');">
+              {{ csrf_field()|safe }}
+              <button class="small danger">Delete</button>
+            </form>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
 {% endblock %}

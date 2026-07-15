@@ -66,16 +66,28 @@ def admin_media_crop(filename):
 
 @app.route("/admin/permissions", methods=["GET", "POST"])
 @login_required
-@require_role("owner")
+@permission_required("roles_manage")
 def admin_permissions():
     if request.method == "POST":
-        for key, _label, _note in ADMIN_PERMISSION_AREAS:
-            set_setting(f"perm_editor_{key}", "1" if request.form.get(f"perm_editor_{key}") else "0")
+        validate_csrf()
+        # Developer/legacy owner stays locked with full control. Editable matrix starts from company_owner.
+        for role in MANAGEABLE_PERMISSION_ROLES:
+            for permission in ALL_PERMISSION_KEYS:
+                set_setting(permission_setting_key(role, permission), "1" if request.form.get(f"perm__{role}__{permission}") else "0")
         db.session.commit()
-        audit("permissions_update", "Editor role permissions updated")
-        flash("Role permissions saved.", "success")
+        audit("role_permissions_update", f"Updated role matrix by {admin_username()}")
+        flash("Role permission matrix saved. Users will see allowed modules from their next page load.", "success")
         return redirect(url_for("admin_permissions"))
-    return render_template("admin/permissions.html", areas=ADMIN_PERMISSION_AREAS, defaults=DEFAULT_EDITOR_PERMISSION)
+    role_maps = {role: role_permission_map(role) for role in MANAGEABLE_PERMISSION_ROLES}
+    role_modules = {role: role_allowed_module_titles(role) for role in MANAGEABLE_PERMISSION_ROLES}
+    return render_template(
+        "admin/permissions.html",
+        roles=MANAGEABLE_PERMISSION_ROLES,
+        role_maps=role_maps,
+        role_modules=role_modules,
+        groups=PERMISSION_GROUPS,
+        role_label=role_label,
+    )
 
 @app.errorhandler(400)
 def bad_request(e):
@@ -135,9 +147,12 @@ def admin_page_builder_delete(block_id):
 
 @app.route("/admin/users", methods=["GET", "POST"])
 @login_required
-@require_role("owner")
+@permission_required("users_view")
 def admin_users():
     if request.method == "POST":
+        if not has_permission("users_create"):
+            flash("Your role can view users, but cannot create new users.", "danger")
+            return redirect(url_for("admin_users"))
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
         email = request.form.get("email", "").strip()
@@ -157,8 +172,8 @@ def admin_users():
         audit("admin_user_create", username)
         flash("Admin user created.", "success")
         return redirect(url_for("admin_users"))
-    users = Admin.query.order_by(Admin.id.asc()).all()
-    return render_template("admin/users.html", users=users, creatable_roles=creatable_roles_for_current_user(), role_label=role_label)
+    users = visible_users_for_current_user()
+    return render_template("admin/users.html", users=users, creatable_roles=creatable_roles_for_current_user() if has_permission("users_create") else [], role_label=role_label, user_allowed_module_titles=user_allowed_module_titles, can_manage_user_account=can_manage_user_account, has_permission=has_permission)
 
 
 def _active_owner_count(exclude_user_id=None):
@@ -170,9 +185,12 @@ def _active_owner_count(exclude_user_id=None):
 
 @app.route("/admin/users/<int:user_id>/edit", methods=["GET", "POST"])
 @login_required
-@require_role("owner")
+@permission_required("users_edit")
 def admin_user_edit(user_id):
     user = Admin.query.get_or_404(user_id)
+    if not can_manage_user_account(user) and user.id != session.get("admin_id"):
+        flash("Your role cannot edit this user.", "danger")
+        return redirect(url_for("admin_users"))
     if request.method == "POST":
         validate_csrf()
         username = request.form.get("username", "").strip()
@@ -218,15 +236,21 @@ def admin_user_edit(user_id):
         audit("admin_user_edit", f"{old_username} -> {username}")
         flash("Admin user updated. If a new password was entered, the user can login with that password immediately. No email is required for this manual reset.", "success")
         return redirect(url_for("admin_users"))
-    return render_template("admin/user_edit.html", user=user, role_options=creatable_roles_for_current_user() or [(user.role, role_label(user.role))], role_label=role_label)
+    role_options = creatable_roles_for_current_user()
+    if user.role and user.role not in [r for r, _label in role_options]:
+        role_options = [(user.role, role_label(user.role))] + role_options
+    return render_template("admin/user_edit.html", user=user, role_options=role_options or [(user.role, role_label(user.role))], role_label=role_label, user_allowed_module_titles=user_allowed_module_titles(user), can_manage_role=(user.id != session.get("admin_id")))
 
 
 @app.route("/admin/users/<int:user_id>/toggle", methods=["POST"])
 @login_required
-@require_role("owner")
+@permission_required("users_edit")
 def admin_user_toggle(user_id):
     validate_csrf()
     user = Admin.query.get_or_404(user_id)
+    if not can_manage_user_account(user):
+        flash("Your role cannot change this user.", "danger")
+        return redirect(url_for("admin_users"))
     if user.id == session.get("admin_id"):
         flash("You cannot disable your own account.", "danger")
         return redirect(url_for("admin_users"))
@@ -241,10 +265,13 @@ def admin_user_toggle(user_id):
 
 @app.route("/admin/users/<int:user_id>/delete", methods=["POST"])
 @login_required
-@require_role("owner")
+@permission_required("users_delete")
 def admin_user_delete(user_id):
     validate_csrf()
     user = Admin.query.get_or_404(user_id)
+    if not can_manage_user_account(user):
+        flash("Your role cannot delete this user.", "danger")
+        return redirect(url_for("admin_users"))
     if user.id == session.get("admin_id"):
         flash("You cannot delete your own account.", "danger")
         return redirect(url_for("admin_users"))

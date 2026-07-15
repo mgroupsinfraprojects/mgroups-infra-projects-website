@@ -2,13 +2,73 @@
 {% block title %}Role Permissions{% endblock %}
 {% block content %}
 <h1>Role Permissions</h1>
-<section class="admin-panel"><p class="admin-note">Owner always has full control. Viewer is read-only. Safer default: editors can update About, Services, Projects, Gallery, and Media only. They should not control users, permissions, restore backup, global settings, or production setup.</p></section>
-<form method="post" class="admin-form">{{ csrf_field()|safe }}
-<table class="admin-table"><thead><tr><th>Admin Area</th><th>Editor can publish/change?</th><th>Notes</th></tr></thead><tbody>
-{% for key,label,note in areas %}
-<tr><td><strong>{{ label }}</strong><br><small>{{ key }}</small></td><td><label><input type="checkbox" name="perm_editor_{{ key }}" {% if is_on('perm_editor_' ~ key, defaults.get(key, False)) %}checked{% endif %}> Allow editor</label></td><td>{{ note }}</td></tr>
-{% endfor %}
-</tbody></table>
-<div class="admin-actions"><button class="btn" type="submit">Save Permissions</button></div>
+
+<section class="admin-panel access-intro">
+  <p class="admin-note"><strong>How this works:</strong> user role decides their default access. This page controls what each role can see and what actions they can perform.</p>
+  <p class="admin-note"><strong>Developer / legacy owner:</strong> locked with full control and not editable here. Change only company-side roles below.</p>
+  <p class="admin-note"><strong>Safe rule:</strong> give view access first. Give add/edit/delete/system permissions only when required.</p>
+</section>
+
+<section class="role-card-grid">
+  {% for role in roles %}
+  <a class="role-card" href="#role-{{ role }}">
+    <span class="role-card-kicker">Role</span>
+    <strong>{{ role_label(role) }}</strong>
+    <small>Visible modules: {{ role_modules[role]|join(', ') if role_modules[role] else 'None' }}</small>
+  </a>
+  {% endfor %}
+</section>
+
+<form method="post" class="role-permission-form">
+  {{ csrf_field()|safe }}
+  <div class="permission-savebar">
+    <div>
+      <strong>Role permission matrix</strong>
+      <small>Tick permissions for each role, then save. Existing users update immediately after refresh/login.</small>
+    </div>
+    <button class="btn" type="submit">Save Role Permissions</button>
+  </div>
+
+  {% for role in roles %}
+  <section class="admin-panel role-matrix" id="role-{{ role }}">
+    <div class="role-matrix-head">
+      <div>
+        <span class="role-card-kicker">Configure role</span>
+        <h2>{{ role_label(role) }}</h2>
+        <p>Current modules: {{ role_modules[role]|join(', ') if role_modules[role] else 'No module boxes will show' }}</p>
+      </div>
+      <a class="btn secondary small" href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Top</a>
+    </div>
+
+    {% for group in groups %}
+    <details class="permission-group" {% if loop.first %}open{% endif %}>
+      <summary>
+        <span>{{ group.title }}</span>
+        <small>{{ group.description }}</small>
+      </summary>
+      <div class="permission-grid">
+        {% for key, label, note in group.permissions %}
+        <label class="permission-tile {% if role_maps[role].get(key) %}is-on{% endif %}">
+          <input type="checkbox" name="perm__{{ role }}__{{ key }}" value="1" {% if role_maps[role].get(key) %}checked{% endif %}>
+          <span>
+            <strong>{{ label }}</strong>
+            <small>{{ note }}</small>
+            <em>{{ key }}</em>
+          </span>
+        </label>
+        {% endfor %}
+      </div>
+    </details>
+    {% endfor %}
+  </section>
+  {% endfor %}
+
+  <div class="permission-savebar bottom">
+    <div>
+      <strong>Save changes</strong>
+      <small>After saving, test one manager, supervisor and viewer login in incognito.</small>
+    </div>
+    <button class="btn" type="submit">Save Role Permissions</button>
+  </div>
 </form>
 {% endblock %}

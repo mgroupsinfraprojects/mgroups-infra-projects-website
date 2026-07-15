@@ -308,7 +308,7 @@ def require_role(*roles):
 
 
 # ─────────────────────────────────────────────────────────────
-# Portal roles and permissions
+# Portal roles and role-permission matrix
 # ─────────────────────────────────────────────────────────────
 ROLE_LABELS = {
     "developer": "Developer / Super Admin",
@@ -322,6 +322,9 @@ ROLE_LABELS = {
 }
 
 ROLE_ORDER = ["developer", "company_owner", "manager", "supervisor", "authorized", "viewer"]
+MANAGEABLE_PERMISSION_ROLES = ["company_owner", "manager", "supervisor", "authorized", "viewer"]
+LOCKED_FULL_CONTROL_ROLES = {"developer", "owner"}
+
 USER_CREATABLE_ROLES = {
     "developer": ["developer", "company_owner", "manager", "supervisor", "authorized", "viewer"],
     "owner": ["developer", "company_owner", "manager", "supervisor", "authorized", "viewer"],
@@ -330,25 +333,134 @@ USER_CREATABLE_ROLES = {
     "editor": ["supervisor", "authorized", "viewer"],
 }
 
-ROLE_PERMISSIONS = {
+PERMISSION_GROUPS = [
+    {
+        "key": "modules",
+        "title": "Module visibility",
+        "description": "Controls which boxes appear in My Workspace after login.",
+        "permissions": [
+            ("portal_view", "Portal access", "Can login and open My Workspace"),
+            ("website_view", "Website box", "Can open Website module"),
+            ("stock_view", "Stock box", "Can open Stock module"),
+            ("employees_view", "Employees box", "Can open Employees module"),
+            ("gst_view", "GST / Audit box", "Can open GST module"),
+            ("reports_view", "Reports box", "Can open Reports module"),
+            ("users_view", "Users box", "Can open Users & Roles"),
+            ("system_settings", "System box", "Can open System controls"),
+        ],
+    },
+    {
+        "key": "website",
+        "title": "Website management",
+        "description": "Public website content and design controls.",
+        "permissions": [
+            ("website_edit", "Edit website content", "About, services, projects, gallery text/content"),
+            ("design_edit", "Design Center", "Theme, colors, fonts, homepage visibility"),
+            ("media_edit", "Media Library", "Upload/crop images"),
+            ("website_settings_edit", "Website settings", "Company profile, SEO, contact, credentials"),
+        ],
+    },
+    {
+        "key": "stock",
+        "title": "Stock management",
+        "description": "Stock permissions are ready now; stock pages will use them after integration.",
+        "permissions": [
+            ("stock_add", "Add / receive stock", "Can add stock-in or material receive records"),
+            ("stock_transfer", "Transfer stock", "Can move material between store/site"),
+            ("stock_adjust", "Adjust stock", "Can correct stock with approval/audit"),
+            ("stock_delete", "Delete stock records", "Dangerous permission; keep mostly off"),
+            ("stock_reports", "Stock reports", "Can view/export stock reports"),
+        ],
+    },
+    {
+        "key": "employees",
+        "title": "Employee management",
+        "description": "Employee module permissions for future employee system.",
+        "permissions": [
+            ("employees_add", "Add employee", "Can create employee records"),
+            ("employees_edit", "Edit employee", "Can update employee data"),
+            ("employees_delete", "Delete employee", "Dangerous permission; keep mostly off"),
+            ("employees_reports", "Employee reports", "Can view/export employee reports"),
+        ],
+    },
+    {
+        "key": "gst",
+        "title": "GST / Audit",
+        "description": "GST permissions for invoice upload, audit checking and reports.",
+        "permissions": [
+            ("gst_upload", "Upload invoices", "Can upload GST/invoice files"),
+            ("gst_edit", "Edit GST records", "Can correct GST/invoice entries"),
+            ("gst_reports", "GST reports", "Can view/export GST audit reports"),
+        ],
+    },
+    {
+        "key": "reports_audit",
+        "title": "Reports & audit",
+        "description": "Reporting and activity log access.",
+        "permissions": [
+            ("reports_export", "Export reports", "Can download business reports"),
+            ("audit_view", "View audit logs", "Can see activity history"),
+        ],
+    },
+    {
+        "key": "users",
+        "title": "Users & roles",
+        "description": "User creation/edit controls. Role editing is restricted separately.",
+        "permissions": [
+            ("users_create", "Create users", "Can create only allowed lower-level roles"),
+            ("users_edit", "Edit / reset users", "Can edit allowed lower-level users and reset password"),
+            ("users_delete", "Delete users", "Dangerous permission; disable is safer"),
+            ("roles_manage", "Manage role permissions", "Can change this permission matrix"),
+        ],
+    },
+    {
+        "key": "system",
+        "title": "System control",
+        "description": "Production-level controls. Keep this mostly for Developer only.",
+        "permissions": [
+            ("backup_download", "Download backup", "Can download system/content backup"),
+            ("backup_restore", "Restore backup", "Can overwrite content from backup"),
+        ],
+    },
+]
+
+ALL_PERMISSION_KEYS = []
+for _group in PERMISSION_GROUPS:
+    for _key, _label, _note in _group["permissions"]:
+        if _key not in ALL_PERMISSION_KEYS:
+            ALL_PERMISSION_KEYS.append(_key)
+
+ROLE_DEFAULT_PERMISSIONS = {
     "developer": {"*"},
     "owner": {"*"},
     "company_owner": {
-        "portal_view", "website_view", "stock_view", "employees_view", "gst_view", "reports_view",
-        "users_view", "users_create", "users_edit", "audit_view"
+        "portal_view", "stock_view", "employees_view", "gst_view", "reports_view", "users_view",
+        "stock_add", "stock_transfer", "stock_adjust", "stock_reports",
+        "employees_add", "employees_edit", "employees_reports",
+        "gst_upload", "gst_edit", "gst_reports", "reports_export", "audit_view",
+        "users_create", "users_edit", "backup_download",
     },
     "manager": {
-        "portal_view", "stock_view", "stock_add", "stock_transfer", "employees_view", "employees_edit",
-        "reports_view", "users_view", "users_create", "users_edit"
+        "portal_view", "stock_view", "employees_view", "reports_view", "users_view",
+        "stock_add", "stock_transfer", "stock_reports",
+        "employees_add", "employees_edit", "employees_reports", "reports_export",
+        "users_create", "users_edit",
     },
     "editor": {
-        "portal_view", "website_view", "website_edit", "stock_view", "employees_view", "reports_view",
-        "users_view", "users_create", "users_edit"
+        "portal_view", "website_view", "website_edit", "media_edit", "stock_view", "employees_view",
+        "reports_view", "users_view", "users_create", "users_edit",
     },
-    "supervisor": {"portal_view", "stock_view", "stock_add", "stock_transfer", "reports_view"},
-    "authorized": {"portal_view", "stock_view", "stock_add", "reports_view"},
-    "viewer": {"portal_view", "reports_view", "stock_view"},
+    "supervisor": {
+        "portal_view", "stock_view", "reports_view", "stock_add", "stock_transfer", "stock_reports",
+    },
+    "authorized": {
+        "portal_view", "stock_view", "reports_view", "stock_add", "stock_reports",
+    },
+    "viewer": {"portal_view", "reports_view", "stock_view", "stock_reports"},
 }
+
+# Backward-compatible name used by older code.
+ROLE_PERMISSIONS = ROLE_DEFAULT_PERMISSIONS
 
 PORTAL_MODULES = [
     {"key": "website", "title": "Website", "description": "Live Editor, Design Center, public content and media.", "url_endpoint": "portal_web", "permission": "website_view", "icon": "🌐"},
@@ -370,12 +482,53 @@ def current_role():
     return adm.role if adm else None
 
 
+def permission_setting_key(role, permission):
+    return f"roleperm_{role}_{permission}"
+
+
+def role_default_has_permission(role, permission):
+    defaults = ROLE_DEFAULT_PERMISSIONS.get(role, set())
+    return "*" in defaults or permission in defaults
+
+
+def role_permission_enabled(role, permission, site=None):
+    if role in LOCKED_FULL_CONTROL_ROLES:
+        return True
+    if permission not in ALL_PERMISSION_KEYS and permission != "*":
+        return role_default_has_permission(role, permission)
+    site = site or settings_dict()
+    key = permission_setting_key(role, permission)
+    if key in site:
+        return flag_value(site.get(key), False)
+    return role_default_has_permission(role, permission)
+
+
+def role_permission_map(role):
+    site = settings_dict()
+    return {permission: role_permission_enabled(role, permission, site=site) for permission in ALL_PERMISSION_KEYS}
+
+
+def role_allowed_module_keys(role):
+    perms = role_permission_map(role)
+    return [m["key"] for m in PORTAL_MODULES if perms.get(m["permission"], False)]
+
+
+def role_allowed_module_titles(role):
+    perms = role_permission_map(role)
+    return [m["title"] for m in PORTAL_MODULES if perms.get(m["permission"], False)]
+
+
+def user_allowed_module_titles(user):
+    if not user or not user.is_active:
+        return []
+    return role_allowed_module_titles(user.role)
+
+
 def has_permission(permission):
     adm = current_admin()
     if not adm:
         return False
-    perms = ROLE_PERMISSIONS.get(adm.role, set())
-    return "*" in perms or permission in perms
+    return role_permission_enabled(adm.role, permission)
 
 
 def allowed_modules():
@@ -399,6 +552,29 @@ def creatable_roles_for_current_user():
 
 def can_create_role(role):
     return role in USER_CREATABLE_ROLES.get(current_role(), [])
+
+
+def can_manage_user_account(user):
+    adm = current_admin()
+    if not adm or not user:
+        return False
+    if adm.role in LOCKED_FULL_CONTROL_ROLES:
+        return True
+    if user.id == adm.id:
+        return False
+    return user.role in USER_CREATABLE_ROLES.get(adm.role, [])
+
+
+def visible_users_for_current_user():
+    adm = current_admin()
+    if not adm:
+        return []
+    if adm.role in LOCKED_FULL_CONTROL_ROLES:
+        return Admin.query.order_by(Admin.id.asc()).all()
+    allowed_roles = USER_CREATABLE_ROLES.get(adm.role, [])
+    if not allowed_roles:
+        return [adm]
+    return Admin.query.filter(Admin.role.in_(allowed_roles)).order_by(Admin.id.asc()).all()
 
 
 def permission_required(permission):
@@ -437,6 +613,21 @@ DEFAULT_EDITOR_PERMISSION = {
     "media": True, "enquiries": False, "restore": False, "versions": False,
 }
 
+ADMIN_AREA_REQUIRED_PERMISSION = {
+    "settings": "website_settings_edit",
+    "appearance": "design_edit",
+    "about": "website_edit",
+    "services": "website_edit",
+    "projects": "website_edit",
+    "gallery": "website_edit",
+    "page_builder": "website_edit",
+    "ordering": "website_edit",
+    "media": "media_edit",
+    "restore": "backup_restore",
+    "versions": "audit_view",
+    "enquiries": "reports_view",
+}
+
 
 def admin_area_from_path(path):
     if path.startswith("/admin/settings"): return "settings"
@@ -451,12 +642,21 @@ def admin_area_from_path(path):
     if path.startswith("/admin/restore"): return "restore"
     if path.startswith("/admin/versions"): return "versions"
     if path.startswith("/admin/enquiries") or path.startswith("/admin/export/enquiries"): return "enquiries"
+    if path.startswith("/admin/users"): return "users"
+    if path.startswith("/admin/permissions"): return "permissions"
     return "settings"
 
 
 def role_can_write(role, area):
-    if role in {"developer", "owner"}:
+    if role in LOCKED_FULL_CONTROL_ROLES:
         return True
+    if area == "users":
+        return role_permission_enabled(role, "users_edit") or role_permission_enabled(role, "users_create")
+    if area == "permissions":
+        return role_permission_enabled(role, "roles_manage")
+    permission = ADMIN_AREA_REQUIRED_PERMISSION.get(area)
+    if permission:
+        return role_permission_enabled(role, permission)
     if role == "company_owner":
         return area not in {"restore"}
     if role in {"viewer", "supervisor", "authorized"}:

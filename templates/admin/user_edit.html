@@ -4,23 +4,37 @@
 <h1>Edit User</h1>
 <section class="admin-panel">
   <p class="admin-note"><strong>Manual password reset:</strong> set a new password here and give it to the user privately. Leave password blank to keep the current password.</p>
-  <p class="admin-note"><strong>Recovery email:</strong> used only for email reset if SMTP/email service is available. Manual reset works without email.</p>
+  <p class="admin-note"><strong>Access control:</strong> this user's visible modules come from the selected role. Change module/action permissions in <a href="{{ url_for('admin_permissions') }}">Role Permissions</a>.</p>
 </section>
 <form method="post" class="admin-form two-col">
   {{ csrf_field()|safe }}
   <label>Username<input name="username" value="{{ user.username }}" required></label>
   <label>Email<input name="email" type="email" value="{{ user.email or '' }}" placeholder="person@example.com"></label>
   <label>Recovery Email<input name="recovery_email" type="email" value="{{ user.recovery_email or '' }}" placeholder="backup@example.com"></label>
-  <label>Role
-    <select name="role">
+  <label>Who is this user? / Role
+    <select name="role" {% if not can_manage_role %}disabled{% endif %}>
       {% for value, label in role_options %}<option value="{{ value }}" {% if user.role == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>
+    {% if not can_manage_role %}<input type="hidden" name="role" value="{{ user.role }}">{% endif %}
   </label>
   <label>Set New Password <span class="muted">optional, no email required</span><input name="password" type="password" minlength="10" placeholder="Enter new password to manually reset"></label>
   <label class="checkline"><input type="checkbox" name="is_active" value="1" {% if user.is_active %}checked{% endif %}> Active account</label>
+
+  <div class="full access-preview-box">
+    <strong>Allowed module boxes for this role</strong>
+    <div class="module-chip-list">
+      {% if user_allowed_module_titles %}
+        {% for title in user_allowed_module_titles %}<span>{{ title }}</span>{% endfor %}
+      {% else %}
+        <em class="muted">No modules assigned.</em>
+      {% endif %}
+    </div>
+  </div>
+
   <div class="full admin-inline-actions">
     <button class="btn" type="submit">Save / Reset Password</button>
     <a class="btn secondary" href="{{ url_for('admin_users') }}">Back</a>
+    <a class="btn secondary" href="{{ url_for('admin_permissions') }}">Role Permissions</a>
   </div>
 </form>
 {% endblock %}
