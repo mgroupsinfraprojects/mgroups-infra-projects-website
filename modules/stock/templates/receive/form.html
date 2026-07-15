@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Receive {{ movement.movement_no }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3"><div><h3 class="mb-0">Receive {{ movement.movement_no }}</h3><div class="small-muted">{{ movement.from_location.name }} → {{ movement.to_location.name }} · {{ movement.vehicle_no }}</div></div><a href="{{ url_for('receive_list') }}" class="btn btn-outline-secondary">Back</a></div>
+<form method="post" action="{{ url_for('receive_submit', movement_id=movement.id) }}" enctype="multipart/form-data">
+<div class="form-section"><div class="row g-3"><div class="col-md-4"><label class="form-label">Received Date & Time</label><input type="datetime-local" name="received_datetime" value="{{ current_datetime }}" class="form-control"></div><div class="col-md-4"><label class="form-label">Receive Proof Photo/File</label><input type="file" name="receive_proof_file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.pdf"></div><div class="col-md-4"><label class="form-label">Remarks</label><input name="receive_remarks" class="form-control"></div></div></div>
+<div class="card p-3"><h5>Confirm Items</h5><div class="table-responsive"><table class="table table-bordered mb-0"><thead><tr><th>Material</th><th>Sent Qty</th><th>Received Good Qty</th><th>Damaged Qty</th></tr></thead><tbody>{% for i in movement.items %}<tr><td><strong>{{ i.material.name }}</strong><br><span class="small-muted">{{ i.unit }}</span></td><td>{{ '%g'|format(i.quantity_sent) }}</td><td><input name="received_qty[]" type="number" min="0" step="0.01" value="{{ i.quantity_sent }}" class="form-control"></td><td><input name="damaged_qty[]" type="number" min="0" step="0.01" value="0" class="form-control"></td></tr>{% endfor %}</tbody></table></div><div class="small-muted mt-2">Destination stock increases only by the received good quantity. Damaged/shortage is recorded separately.</div></div>
+<button class="btn btn-brand btn-lg mt-3">Submit Receive Confirmation</button>
+</form>
+{% endblock %}

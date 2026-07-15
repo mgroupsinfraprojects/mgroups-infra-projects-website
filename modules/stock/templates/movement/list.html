@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Material Entries{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div><h3 class="mb-0">Material Entries</h3><div class="small-muted">One flow for purchase, shifting, return, usage, damage/missing, adjustment and opening stock.</div></div>
+  <a class="btn btn-brand" href="{{ url_for('movement_new') }}">New Entry</a>
+</div>
+<div class="card p-2 p-md-3"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>No</th><th>Date</th><th>Type</th><th>Status</th><th>From</th><th>To</th><th>Vehicle</th><th>Items</th><th>Entered</th></tr></thead><tbody>
+{% for m in movements %}<tr><td><a href="{{ url_for('movement_detail', id=m.id) }}"><strong>{{ m.movement_no }}</strong></a></td><td>{{ m.movement_datetime.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ m.custom_movement_name or (m.movement_type|movement_label) }}</td><td><span class="badge {{ 'bg-success' if m.status in ['Closed','Received'] else 'bg-warning text-dark' if m.status in ['In Transit','Partially Received'] else 'bg-danger' if m.status=='Damaged' else 'bg-secondary' }}">{{ m.status }}</span></td><td>{{ m.from_location.name if m.from_location else '-' }}</td><td>{{ m.to_location.name if m.to_location else '-' }}</td><td>{{ m.vehicle_no or '-' }}</td><td>{{ m.items|length }}</td><td>{{ m.entered_by }}</td></tr>{% else %}<tr><td colspan="9" class="text-center text-muted">No entries.</td></tr>{% endfor %}
+</tbody></table></div>{% include "_pagination.html" %}</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}New Entry{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div><h3 class="mb-0">New Entry</h3><div class="small-muted">Choose the action first. The form will show only the details needed for that action.</div></div>
+  <a href="{{ url_for('movement_list') }}" class="btn btn-outline-secondary">Back</a>
+</div>
+
+<div class="row g-2 mb-3 no-print">
+  {% set cards = [
+    ('PURCHASE_TO_STORE','bi-cart-plus','Purchase Material','Material bought and added to store'),
+    ('STORE_TO_SITE','bi-truck','Send Store to Site','Godown material sent to site'),
+    ('SITE_TO_SITE','bi-arrow-left-right','Shift Site to Site','Move material from one site to another'),
+    ('SITE_TO_STORE_RETURN','bi-arrow-return-left','Return to Store','Unused site material returned'),
+    ('SITE_CONSUMPTION','bi-hammer','Use at Site','Material used in work'),
+    ('DAMAGE_MISSING','bi-exclamation-triangle','Damage / Missing','Record damaged, wasted, missing material'),
+    ('STOCK_ADJUSTMENT','bi-clipboard-check','Physical Count','Correct system stock after checking'),
+    ('OPENING_STOCK','bi-box-arrow-in-down','Opening Stock','Initial stock entry'),
+    ('MISC','bi-three-dots','Other Entry','Custom action with stock effect')
+  ] %}
+  {% for code, icon, title, desc in cards %}
+  <div class="col-6 col-md-4 col-xl-3">
+    <div class="card quick-card p-3" data-type="{{ code }}" onclick="selectMovementType('{{ code }}')">
+      <div class="icon"><i class="bi {{ icon }}"></i></div>
+      <div class="fw-bold">{{ title }}</div>
+      <div class="small-muted">{{ desc }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<form method="post" action="{{ url_for('movement_create') }}" enctype="multipart/form-data" id="movementForm">
+  <div class="form-section">
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label">Movement Type *</label><select name="movement_type" id="movementType" class="form-select" required>{% for code,label in movement_types %}<option value="{{ code }}" {{ 'selected' if selected_type==code else '' }}>{{ label }}</option>{% endfor %}</select></div>
+      <div class="col-md-4 custom-movement-field"><label class="form-label">Custom Movement Name *</label><input name="custom_movement_name" class="form-control" placeholder="Example: sample testing, temporary handover"></div>
+      <div class="col-md-4 stock-effect-field"><label class="form-label">Stock Effect *</label><select name="stock_effect" id="stockEffect" class="form-select"><option value="">-- Select --</option><option value="INCREASE">Increase Stock</option><option value="DECREASE">Decrease Stock</option><option value="TRANSFER">Transfer Stock / Receive Later</option><option value="NO_EFFECT">No Stock Effect</option></select></div>
+      <div class="col-md-4"><label class="form-label">Date & Time</label><input type="datetime-local" name="movement_datetime" class="form-control" value="{{ current_datetime }}"></div>
+      <div class="col-md-4 supplier-field"><label class="form-label">Supplier</label><select name="supplier_id" class="form-select"><option value="">-- Select --</option>{% for s in suppliers %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select></div>
+      <div class="col-md-4 from-field"><label class="form-label">From Location</label><select name="from_location_id" id="fromLocation" class="form-select"><option value="">-- Select --</option>{% for l in locations %}<option value="{{ l.id }}" data-type="{{ l.type }}">{{ l.name }} ({{ l.type }})</option>{% endfor %}</select></div>
+      <div class="col-md-4 to-field"><label class="form-label">To Location</label><select name="to_location_id" id="toLocation" class="form-select"><option value="">-- Select --</option>{% for l in locations %}<option value="{{ l.id }}" data-type="{{ l.type }}">{{ l.name }} ({{ l.type }})</option>{% endfor %}</select></div>
+      <div class="col-md-4 invoice-field"><label class="form-label">Invoice No</label><input name="invoice_no" class="form-control"></div>
+      <div class="col-md-4 dc-field"><label class="form-label">DC / Challan No</label><input name="dc_no" class="form-control"></div>
+      <div class="col-md-4 vehicle-field"><label class="form-label">Vehicle No</label><input name="vehicle_no" class="form-control" placeholder="TN-74-1234"></div>
+      <div class="col-md-4 vehicle-field"><label class="form-label">Driver Name</label><input name="driver_name" class="form-control"></div>
+      <div class="col-md-4 invoice-field"><label class="form-label">Invoice / Bill File</label><input type="file" name="invoice_file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.pdf"></div>
+      <div class="col-md-4 proof-field"><label class="form-label">Proof / Challan Photo</label><input type="file" name="proof_file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.pdf"></div>
+      <div class="col-md-4 damage-field"><label class="form-label">Damage / Missing Proof</label><input type="file" name="damage_file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.pdf"></div>
+      <div class="col-12"><label class="form-label">Remarks</label><input name="remarks" class="form-control"></div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="d-flex justify-content-between align-items-center mb-2"><h5 class="mb-0">Material Items</h5><button type="button" class="btn btn-sm btn-outline-secondary" onclick="addItemRow()">Add Item</button></div>
+    <div class="table-responsive"><table class="table table-bordered align-middle mb-0" id="itemsTable"><thead><tr><th style="min-width:220px">Material</th><th>Qty</th><th class="rate-col">Rate</th><th class="physical-col">Physical Qty</th><th class="usage-col">Usage Type</th><th class="usage-col">Work Activity</th><th>Remarks</th><th></th></tr></thead><tbody id="itemsBody"></tbody></table></div>
+    <div class="small-muted mt-2">Purchase/opening increases stock. Transfer dispatch reduces source stock and waits for Receive confirmation. Consumption and damage/missing reduce stock. Physical count sets the correct physical quantity.</div>
+  </div>
+  <button class="btn btn-brand btn-lg">Save Entry</button>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+const selectedType = "{{ selected_type }}";
+const materials = [{% for m in materials %}{id:{{m.id}}, name:`{{m.name|e}} {{m.size_spec|e}}`, unit:`{{m.unit|e}}`, rate:{{m.standard_rate or 0}}},{% endfor %}];
+</script>
+<script src="{{ url_for('static', filename='js/movement.js') }}"></script>
+{% endblock %}

@@ -20,6 +20,15 @@ def admin_login():
         if admin and admin.is_active and check_password_hash(admin.password_hash, password):
             session.clear()
             session["admin_id"] = admin.id
+            session["user_id"] = str(admin.id)
+            session["user_name"] = admin.username
+            session["user_role"] = admin.role
+            session["admin_name"] = admin.username
+            session["admin_role"] = admin.role
+            try:
+                session["portal_permissions"] = sorted([key for key, enabled in role_permission_map(admin.role).items() if enabled])
+            except Exception:
+                session["portal_permissions"] = ["*"] if admin.role in {"developer", "owner"} else []
             session["csrf_token"] = secrets.token_urlsafe(32)
             audit("login", "Admin logged in")
             return redirect(url_for("portal_workspace"))

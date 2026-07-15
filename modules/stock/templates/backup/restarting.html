@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Restarting{% endblock %}
+{% block content %}
+<div class="card p-4 restart-card">
+  <h3>Backup restored. App is restarting.</h3>
+  <p class="mb-2">Restored backup: <strong>{{ filename }}</strong></p>
+  <p class="mb-2">Safety backup created before restore: <strong>{{ safety }}</strong></p>
+  <p class="small-muted">The runner will restart automatically. Wait 5-10 seconds, then open the dashboard again.</p>
+  <a class="btn btn-brand" href="{{ url_for('dashboard') }}">Open Dashboard</a>
+</div>
+<script>
+setTimeout(() => { window.location.href = "{{ url_for('dashboard') }}"; }, 8000);
+</script>
+{% endblock %}

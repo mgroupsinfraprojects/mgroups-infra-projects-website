@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h3 class="mb-0">Material Location Dashboard</h3>
+    <div class="small-muted">Find which material is in store, site, in-transit, damaged/missing and total.</div>
+  </div>
+  <a class="btn btn-brand" href="{{ url_for('movement_new') }}"><i class="bi bi-plus-lg"></i> New Entry</a>
+</div>
+
+{% if inactive_stock_locations %}
+<div class="alert alert-warning">
+  <strong>Stock in inactive location:</strong>
+  {% for row in inactive_stock_locations %}{{ row.location.name }} has {{ '%g'|format(row.qty) }} stock{% if not loop.last %}, {% endif %}{% endfor %}.
+  This is shown in dashboard to avoid hidden stock.
+</div>
+{% endif %}
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-lg-2"><div class="card stat-card p-3"><div class="small-muted">Materials</div><div class="stat-value">{{ materials|length }}</div></div></div>
+  <div class="col-6 col-lg-2"><div class="card stat-card p-3"><div class="small-muted">Locations</div><div class="stat-value">{{ locations|length }}</div></div></div>
+  <div class="col-6 col-lg-2"><div class="card stat-card p-3"><div class="small-muted">In Transit</div><div class="stat-value">{{ in_transit_count }}</div></div></div>
+  <div class="col-6 col-lg-2"><div class="card stat-card p-3"><div class="small-muted">Today Entries</div><div class="stat-value">{{ today_movements }}</div></div></div>
+  <div class="col-6 col-lg-2"><div class="card stat-card p-3"><div class="small-muted">Low Stock</div><div class="stat-value text-danger">{{ low_stock|length }}</div></div></div>
+  <div class="col-6 col-lg-2"><div class="card stat-card p-3"><div class="small-muted">Store Value</div><div class="stat-value">₹{{ '%.0f'|format(store_value) }}</div></div></div>
+  <div class="col-6 col-lg-2"><div class="card stat-card p-3"><div class="small-muted">Site Value</div><div class="stat-value">₹{{ '%.0f'|format(site_value) }}</div></div></div>
+</div>
+
+<div class="finder-box mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-8">
+      <label class="form-label fw-semibold">Where is this material?</label>
+      <select name="material_id" class="form-select">
+        <option value="">-- Select material to locate --</option>
+        {% for m in materials %}<option value="{{ m.id }}" {{ 'selected' if selected_material and selected_material.id==m.id else '' }}>{{ m.name }} {{ m.size_spec }} ({{ m.unit }})</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2"><button class="btn btn-brand w-100">Find</button></div>
+    <div class="col-md-2"><a class="btn btn-outline-secondary w-100" href="{{ url_for('dashboard') }}">Clear</a></div>
+  </form>
+  {% if selected_material %}
+  <div class="table-responsive mt-3">
+    <table class="table table-sm mb-0">
+      <thead><tr><th>Location</th><th>Type</th><th>Status</th><th>Quantity</th></tr></thead>
+      <tbody>
+      {% for r in finder_rows %}
+        <tr><td>{{ r.location.name }}</td><td>{{ r.location.type }}</td><td>{{ r.location.status }}</td><td><strong>{{ '%g'|format(r.qty) }} {{ selected_material.unit }}</strong></td></tr>
+      {% else %}<tr><td colspan="4" class="text-muted text-center">No stock found for this material.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+
+<div class="card p-3 mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">Material Location Matrix</h5>
+    <a href="{{ url_for('report_current_stock_excel') }}" class="btn btn-sm btn-outline-success">Export Excel</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Material</th>
+          {% for loc in locations %}<th>{{ loc.name }}{% if loc.status!='Active' %} <span class="badge bg-secondary">Inactive</span>{% endif %}<br><span class="fw-normal">{{ loc.type }}</span></th>{% endfor %}
+          <th>In Transit</th><th>Damaged / Missing</th><th>Total Current</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in matrix %}
+        <tr class="{{ 'low-row' if row in low_stock else '' }}">
+          <td><strong>{{ row.material.name }}</strong><br><span class="small-muted">{{ row.material.size_spec }} · {{ row.material.unit }}</span></td>
+          {% for loc in locations %}<td>{{ '%g'|format(row.locations[loc.id]) }}</td>{% endfor %}
+          <td><span class="badge badge-transit">{{ '%g'|format(row.in_transit) }}</span></td>
+          <td>{{ '%g'|format(row.damaged) }}</td>
+          <td><strong>{{ '%g'|format(row.total) }} {{ row.material.unit }}</strong></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="99" class="text-center text-muted">No material stock yet. Add opening stock or purchase first.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card p-3">
+      <h5>Recent Movements</h5>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <thead><tr><th>No</th><th>Type</th><th>Status</th><th>From</th><th>To</th></tr></thead>
+          <tbody>
+          {% for m in recent %}
+            <tr><td><a href="{{ url_for('movement_detail', id=m.id) }}">{{ m.movement_no }}</a></td><td>{{ m.custom_movement_name or (m.movement_type|movement_label) }}</td><td>{{ m.status }}</td><td>{{ m.from_location.name if m.from_location else '-' }}</td><td>{{ m.to_location.name if m.to_location else '-' }}</td></tr>
+          {% else %}<tr><td colspan="5" class="text-muted text-center">No movements yet.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card p-3"><h5>Stock Value View</h5><canvas id="stockChart" height="130"></canvas></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const ctx = document.getElementById('stockChart');
+if (ctx) {
+  new Chart(ctx, {type:'bar', data:{labels:['Store Value','Site Value'], datasets:[{label:'Value ₹', data:[{{ store_value|round(2) }}, {{ site_value|round(2) }}]}]}, options:{responsive:true, plugins:{legend:{display:false}}}});
+}
+</script>
+{% endblock %}

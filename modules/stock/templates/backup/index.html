@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Backup{% endblock %}
+{% block content %}
+<h3>Backup</h3><div class="small-muted mb-3">SQLite local backup. Create backup before restore. For online production, use server scheduled backup also.</div>
+<div class="card p-3 mb-3"><form method="post" action="{{ url_for('backup_create') }}"><button class="btn btn-brand">Create Backup</button></form></div>
+<div class="card p-3"><h5>Available Backups</h5><div class="table-responsive"><table class="table mb-0"><thead><tr><th>File</th><th>Download</th><th>Restore</th></tr></thead><tbody>{% for b in backups %}<tr><td>{{ b }}</td><td><a class="btn btn-sm btn-outline-success" href="{{ url_for('backup_download', filename=b) }}">Download</a></td><td><form method="post" action="{{ url_for('backup_restore') }}" class="row g-1"><input type="hidden" name="filename" value="{{ b }}"><div class="col"><input name="confirm" class="form-control form-control-sm" placeholder="Type YES"></div><div class="col-auto"><button class="btn btn-sm btn-outline-danger">Restore</button></div></form></td></tr>{% else %}<tr><td colspan="3" class="text-muted text-center">No backups created.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

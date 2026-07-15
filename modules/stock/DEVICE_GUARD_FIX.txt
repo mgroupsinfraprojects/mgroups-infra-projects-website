@@ -1,0 +1,16 @@
+Device Guard Fix
+
+This project avoids direct .venv\Scripts\pip.exe execution.
+Use run.bat or RUN_SAFE_NO_VENV.bat.
+They install packages using:
+python -m pip install --user -r requirements.txt
+
+If Windows still blocks execution:
+1. Move folder from Downloads to C:\MGroupsInventory.
+2. Right-click ZIP > Properties > Unblock, then extract again.
+3. Open Command Prompt as normal user and run run.bat.
+
+For phone access on same WiFi:
+- Use run.bat.
+- Open the LAN URL printed in the terminal from your phone.
+- Allow Windows Firewall TCP 5000 if prompted.

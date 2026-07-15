@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}Audit Log{% endblock %}
+{% block content %}
+<h3>Audit Log</h3><div class="small-muted mb-3">Tracks create/update/receive/backup actions. User comes from your manual login hooks or defaults to Admin.</div>
+<div class="card p-2 p-md-3"><div class="table-responsive"><table class="table table-hover mb-0"><thead><tr><th>Date</th><th>User</th><th>Role</th><th>Action</th><th>Module</th><th>Record</th><th>Description</th><th>IP</th></tr></thead><tbody>{% for l in logs %}<tr><td>{{ l.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ l.user_name }}</td><td>{{ l.user_role }}</td><td>{{ l.action }}</td><td>{{ l.module }}</td><td>{{ l.record_id }}</td><td>{{ l.description }}</td><td>{{ l.ip_address }}</td></tr>{% else %}<tr><td colspan="8" class="text-center text-muted">No audit records.</td></tr>{% endfor %}</tbody></table></div>{% include "_pagination.html" %}</div>
+{% endblock %}

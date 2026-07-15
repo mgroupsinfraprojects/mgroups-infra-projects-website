@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<h3>Reports</h3><div class="small-muted mb-3">Excel/PDF exports for office usage.</div>
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card p-3"><h5>Current Stock</h5><p class="small-muted">Location-wise current quantity and value.</p><a href="{{ url_for('report_current_stock_excel') }}" class="btn btn-sm btn-outline-success w-100 mb-1">Excel</a><a href="{{ url_for('report_current_stock_pdf') }}" class="btn btn-sm btn-outline-danger w-100">PDF</a></div></div>
+  <div class="col-md-3"><div class="card p-3"><h5>Stock Ledger</h5><p class="small-muted">Every stock in/out/adjust transaction.</p><a href="{{ url_for('report_ledger_excel') }}" class="btn btn-sm btn-outline-success w-100">Excel</a></div></div>
+  <div class="col-md-3"><div class="card p-3"><h5>Material Movements</h5><p class="small-muted">Purchase, transfer, receive, usage, adjustment list.</p><a href="{{ url_for('report_movements_excel') }}" class="btn btn-sm btn-outline-success w-100">Excel</a></div></div>
+  <div class="col-md-3"><div class="card p-3"><h5>Damage / Missing</h5><p class="small-muted">Loss, damage, missing and damaged receipt.</p><a href="{{ url_for('report_damage_missing_excel') }}" class="btn btn-sm btn-outline-success w-100">Excel</a></div></div>
+</div>
+<div class="row g-3"><div class="col-lg-5"><div class="card p-3"><h5>Material Summary</h5><div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Material</th><th>Total</th><th>Unit</th></tr></thead><tbody>{% for r in rows %}<tr><td>{{ r.name }}</td><td>{{ '%g'|format(r.qty or 0) }}</td><td>{{ r.unit }}</td></tr>{% else %}<tr><td colspan="3" class="text-center text-muted">No stock.</td></tr>{% endfor %}</tbody></table></div></div></div><div class="col-lg-7"><div class="card p-3"><h5>Latest Ledger</h5><div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Date</th><th>Material</th><th>Location</th><th>Type</th><th>Qty</th><th>Balance</th></tr></thead><tbody>{% for l in ledgers %}<tr><td>{{ l.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ l.material.name }}</td><td>{{ l.location.name }}</td><td>{{ l.movement_type|movement_label }}</td><td>{{ '%+g'|format(l.quantity) }}</td><td>{{ '%g'|format(l.balance_after) }}</td></tr>{% else %}<tr><td colspan="6" class="text-center text-muted">No ledger.</td></tr>{% endfor %}</tbody></table></div></div></div></div>
+{% endblock %}

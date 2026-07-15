@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Materials{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div><h3 class="mb-0">Materials Master</h3><div class="small-muted">Material photo, unit, rate, GST, reorder level.</div></div>
+  <button class="btn btn-brand" data-bs-toggle="modal" data-bs-target="#addMaterial">Add Material</button>
+</div>
+
+<form class="card p-3 mb-3" method="get"><div class="row g-2"><div class="col-md-10"><input class="form-control" name="q" value="{{ q }}" placeholder="Search material"></div><div class="col-md-2"><button class="btn btn-brand w-100">Search</button></div></div></form>
+
+<div class="card p-2 p-md-3"><div class="table-responsive"><table class="table table-hover mb-0">
+<thead><tr><th>Photo</th><th>Code</th><th>Name</th><th>Category</th><th>Spec</th><th>Unit</th><th>Rate</th><th>Min</th><th>Status</th><th></th></tr></thead>
+<tbody>
+{% for m in materials %}
+<tr>
+  <td>{% if m.photo_path %}<img class="material-photo" src="{{ url_for('static', filename=m.photo_path) }}">{% else %}<div class="material-photo"></div>{% endif %}</td>
+  <td>{{ m.material_code }}</td><td><strong>{{ m.name }}</strong></td><td>{{ m.category }}</td><td>{{ m.size_spec }}</td><td>{{ m.unit }}</td><td>₹{{ '%.2f'|format(m.standard_rate or 0) }}</td><td>{{ '%g'|format(m.min_stock or 0) }}</td><td><span class="badge {{ 'bg-success' if m.status=='Active' else 'bg-secondary' }}">{{ m.status }}</span></td>
+  <td><form method="post" action="{{ url_for('materials_toggle', id=m.id) }}"><button class="btn btn-sm btn-outline-secondary">Toggle</button></form></td>
+</tr>
+{% else %}<tr><td colspan="10" class="text-center text-muted">No materials.</td></tr>{% endfor %}
+</tbody></table></div>{% include "_pagination.html" %}</div>
+
+<div class="modal fade" id="addMaterial"><div class="modal-dialog modal-lg"><form class="modal-content" method="post" enctype="multipart/form-data" action="{{ url_for('materials_add') }}"><div class="modal-header"><h5>Add Material</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body">
+<div class="row g-3">
+  <div class="col-md-4"><label class="form-label">Material Code</label><input name="material_code" class="form-control" placeholder="Auto if blank"></div>
+  <div class="col-md-8"><label class="form-label">Material Name *</label><input name="name" class="form-control" required></div>
+  <div class="col-md-4"><label class="form-label">Category</label><select name="category" id="categorySelect" class="form-select"><option>Civil</option><option>Pipeline</option><option>Steel</option><option>Electrical</option><option>Plumbing</option><option>Tools</option><option>Safety</option><option>Shuttering</option><option>Other</option></select><input name="custom_category" id="customCategory" class="form-control mt-2 d-none" placeholder="Type category"></div>
+  <div class="col-md-4"><label class="form-label">Sub Category</label><input name="sub_category" class="form-control"></div>
+  <div class="col-md-4"><label class="form-label">Brand</label><input name="brand" class="form-control"></div>
+  <div class="col-md-4"><label class="form-label">Size / Specification</label><input name="size_spec" class="form-control" placeholder="50kg / 150mm / 6m"></div>
+  <div class="col-md-2"><label class="form-label">Unit *</label><select name="unit" id="unitSelect" class="form-select" required><option>Bag</option><option>Nos</option><option>Meter</option><option>Kg</option><option>Ton</option><option>Liter</option><option>Cft</option><option>Sqft</option><option>Box</option><option>Roll</option><option>Other</option></select><input name="custom_unit" id="customUnit" class="form-control mt-2 d-none" placeholder="Type unit"></div>
+  <div class="col-md-2"><label class="form-label">GST %</label><input name="gst_percent" type="number" step="0.01" class="form-control"></div>
+  <div class="col-md-2"><label class="form-label">Min Stock</label><input name="min_stock" type="number" step="0.01" class="form-control"></div>
+  <div class="col-md-2"><label class="form-label">Rate</label><input name="standard_rate" type="number" step="0.01" class="form-control"></div>
+  <div class="col-md-4"><label class="form-label">HSN Code</label><input name="hsn_code" class="form-control"></div>
+  <div class="col-md-4"><label class="form-label">Photo</label><input type="file" name="photo" class="form-control" accept=".jpg,.jpeg,.png,.webp"></div>
+  <div class="col-md-4"><label class="form-label">Status</label><select name="status" class="form-select"><option>Active</option><option>Inactive</option></select></div>
+  <div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control"></textarea></div>
+</div></div><div class="modal-footer"><button class="btn btn-brand">Save</button></div></form></div></div>
+<script>
+document.getElementById('categorySelect').addEventListener('change', e=>document.getElementById('customCategory').classList.toggle('d-none', e.target.value!=='Other'));
+document.getElementById('unitSelect').addEventListener('change', e=>document.getElementById('customUnit').classList.toggle('d-none', e.target.value!=='Other'));
+</script>
+{% endblock %}

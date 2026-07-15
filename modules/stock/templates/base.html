@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}M-Groups Inventory V6.2{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark app-navbar sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="{{ url_for('dashboard') }}"><i class="bi bi-box-seam"></i> M-Groups Inventory V6.2</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link {{ 'active' if active_endpoint=='dashboard' else '' }}" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link {{ 'active' if active_endpoint in ['movement_list','movement_new','movement_detail','movement_create'] else '' }}" href="{{ url_for('movement_list') }}"><i class="bi bi-plus-square"></i> New Entry</a></li>
+        <li class="nav-item"><a class="nav-link {{ 'active' if active_endpoint in ['receive_list','receive_form','receive_submit'] else '' }}" href="{{ url_for('receive_list') }}"><i class="bi bi-box-arrow-in-down"></i> Receive {% if pending_receive_count %}<span class="badge rounded-pill bg-warning text-dark">{{ pending_receive_count }}</span>{% endif %}</a></li>
+        <li class="nav-item"><a class="nav-link {{ 'active' if active_endpoint in ['stock_view'] else '' }}" href="{{ url_for('stock_view') }}"><i class="bi bi-search"></i> Current Stock</a></li>
+        <li class="nav-item"><a class="nav-link {{ 'active' if active_endpoint in ['materials_list','materials_add','materials_toggle'] else '' }}" href="{{ url_for('materials_list') }}"><i class="bi bi-box"></i> Materials</a></li>
+        <li class="nav-item"><a class="nav-link {{ 'active' if active_endpoint in ['locations_list','locations_add','locations_toggle'] else '' }}" href="{{ url_for('locations_list') }}"><i class="bi bi-geo-alt"></i> Sites / Stores</a></li>
+        <li class="nav-item"><a class="nav-link {{ 'active' if active_endpoint in ['suppliers_list','suppliers_add'] else '' }}" href="{{ url_for('suppliers_list') }}"><i class="bi bi-truck"></i> Suppliers</a></li>
+        <li class="nav-item"><a class="nav-link {{ 'active' if active_endpoint in ['reports_home'] or active_endpoint.startswith('report_') else '' }}" href="{{ url_for('reports_home') }}"><i class="bi bi-file-earmark-spreadsheet"></i> Reports</a></li>
+        <li class="nav-item"><a class="nav-link {{ 'active' if active_endpoint=='audit_log' else '' }}" href="{{ url_for('audit_log') }}"><i class="bi bi-list-check"></i> Audit</a></li>
+        <li class="nav-item"><a class="nav-link {{ 'active' if active_endpoint.startswith('backup') else '' }}" href="{{ url_for('backup_home') }}"><i class="bi bi-shield-check"></i> Backup</a></li>
+      </ul>
+      <span class="navbar-text small">{{ current_user.name }} · {{ current_user.role }}</span>
+    </div>
+  </div>
+</nav>
+
+<main class="container-fluid px-3 px-md-4 py-3">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
