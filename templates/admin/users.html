@@ -40,6 +40,18 @@
     <a class="btn secondary small" href="{{ url_for('admin_permissions') }}">Manage Role Permissions</a>
   </div>
 
+
+  {% if pagination and pagination.pages > 1 %}
+  <div class="pagination-bar">
+    <span>Showing {{ users|length }} of {{ pagination.total }} users</span>
+    <div>
+      {% if pagination.has_prev %}<a class="btn secondary small" href="{{ url_for('admin_users', page=pagination.prev_num) }}">Previous</a>{% endif %}
+      <span class="page-indicator">Page {{ pagination.page }} / {{ pagination.pages }}</span>
+      {% if pagination.has_next %}<a class="btn secondary small" href="{{ url_for('admin_users', page=pagination.next_num) }}">Next</a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
   <table class="admin-table user-access-table">
     <thead><tr><th>User</th><th>Role</th><th>Allowed modules</th><th>Email</th><th>Status</th><th>Action</th></tr></thead>
     <tbody>
@@ -82,5 +94,17 @@
       {% endfor %}
     </tbody>
   </table>
+
+  {% if pagination and pagination.pages > 1 %}
+  <div class="pagination-bar bottom">
+    <span>Total: {{ pagination.total }} users</span>
+    <div>
+      {% if pagination.has_prev %}<a class="btn secondary small" href="{{ url_for('admin_users', page=pagination.prev_num) }}">Previous</a>{% endif %}
+      <span class="page-indicator">Page {{ pagination.page }} / {{ pagination.pages }}</span>
+      {% if pagination.has_next %}<a class="btn secondary small" href="{{ url_for('admin_users', page=pagination.next_num) }}">Next</a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
 </section>
 {% endblock %}

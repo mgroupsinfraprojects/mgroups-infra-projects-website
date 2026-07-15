@@ -3,8 +3,26 @@
 # ─────────────────────────────────────────────────────────────
 # Helpers
 # ─────────────────────────────────────────────────────────────
-def settings_dict():
-    return {row.key: row.value for row in Setting.query.all()}
+def settings_dict(force_refresh=False):
+    """Return website settings with request-level caching.
+
+    Many public/admin templates call settings_dict(), field_visible(),
+    style_inline(), has_permission(), etc. Without caching, one page render can
+    repeatedly query the Setting table. This cache is per request, so it is
+    safe and refreshes automatically on the next request.
+    """
+    if not force_refresh and hasattr(g, "_settings_dict_cache"):
+        return g._settings_dict_cache
+    g._settings_dict_cache = {row.key: row.value for row in Setting.query.all()}
+    return g._settings_dict_cache
+
+
+def clear_settings_cache():
+    if hasattr(g, "_settings_dict_cache"):
+        try:
+            delattr(g, "_settings_dict_cache")
+        except Exception:
+            pass
 
 
 def set_setting(key, value):
@@ -13,6 +31,9 @@ def set_setting(key, value):
         row.value = value or ""
     else:
         db.session.add(Setting(key=key, value=value or ""))
+    # Keep current request cache accurate after updates.
+    if hasattr(g, "_settings_dict_cache"):
+        g._settings_dict_cache[key] = value or ""
 
 
 def allowed_file(filename):
@@ -565,16 +586,39 @@ def can_manage_user_account(user):
     return user.role in USER_CREATABLE_ROLES.get(adm.role, [])
 
 
-def visible_users_for_current_user():
+def visible_users_query_for_current_user():
     adm = current_admin()
     if not adm:
-        return []
+        return Admin.query.filter(False)
     if adm.role in LOCKED_FULL_CONTROL_ROLES:
-        return Admin.query.order_by(Admin.id.asc()).all()
+        return Admin.query.order_by(Admin.id.asc())
     allowed_roles = USER_CREATABLE_ROLES.get(adm.role, [])
     if not allowed_roles:
-        return [adm]
-    return Admin.query.filter(Admin.role.in_(allowed_roles)).order_by(Admin.id.asc()).all()
+        return Admin.query.filter(Admin.id == adm.id).order_by(Admin.id.asc())
+    return Admin.query.filter(Admin.role.in_(allowed_roles)).order_by(Admin.id.asc())
+
+
+def visible_users_for_current_user():
+    return visible_users_query_for_current_user().all()
+
+
+def paginate_query(query, page=1, per_page=10):
+    try:
+        page = max(1, int(page or 1))
+    except Exception:
+        page = 1
+    try:
+        per_page = max(5, min(50, int(per_page or 10)))
+    except Exception:
+        per_page = 10
+    total = query.count()
+    pages = max(1, (total + per_page - 1) // per_page)
+    page = min(page, pages)
+    items = query.offset((page - 1) * per_page).limit(per_page).all()
+    return SimpleNamespace(
+        items=items, page=page, per_page=per_page, total=total, pages=pages,
+        has_prev=page > 1, has_next=page < pages, prev_num=page - 1, next_num=page + 1,
+    )
 
 
 def permission_required(permission):

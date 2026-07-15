@@ -4,40 +4,38 @@
 <h1>Role Permissions</h1>
 
 <section class="admin-panel access-intro">
-  <p class="admin-note"><strong>How this works:</strong> user role decides their default access. This page controls what each role can see and what actions they can perform.</p>
-  <p class="admin-note"><strong>Developer / legacy owner:</strong> locked with full control and not editable here. Change only company-side roles below.</p>
-  <p class="admin-note"><strong>Safe rule:</strong> give view access first. Give add/edit/delete/system permissions only when required.</p>
+  <p class="admin-note"><strong>Fast mode:</strong> this page now loads one role at a time. Select a role, tick permissions, then save.</p>
+  <p class="admin-note"><strong>Developer / legacy owner:</strong> locked with full control and not editable here.</p>
 </section>
 
-<section class="role-card-grid">
+<section class="role-card-grid role-card-grid-compact">
   {% for role in roles %}
-  <a class="role-card" href="#role-{{ role }}">
+  <a class="role-card {% if role == selected_role %}is-active{% endif %}" href="{{ url_for('admin_permissions', role=role) }}">
     <span class="role-card-kicker">Role</span>
     <strong>{{ role_label(role) }}</strong>
-    <small>Visible modules: {{ role_modules[role]|join(', ') if role_modules[role] else 'None' }}</small>
+    <small>Modules: {{ role_modules[role]|join(', ') if role_modules[role] else 'None' }}</small>
   </a>
   {% endfor %}
 </section>
 
-<form method="post" class="role-permission-form">
+<form method="post" action="{{ url_for('admin_permissions', role=selected_role) }}" class="role-permission-form slim-role-form">
   {{ csrf_field()|safe }}
   <div class="permission-savebar">
     <div>
-      <strong>Role permission matrix</strong>
-      <small>Tick permissions for each role, then save. Existing users update immediately after refresh/login.</small>
+      <strong>{{ role_label(selected_role) }}</strong>
+      <small>Only this role is loaded and saved. This keeps the page fast.</small>
     </div>
-    <button class="btn" type="submit">Save Role Permissions</button>
+    <button class="btn" type="submit">Save {{ role_label(selected_role) }}</button>
   </div>
 
-  {% for role in roles %}
-  <section class="admin-panel role-matrix" id="role-{{ role }}">
+  <section class="admin-panel role-matrix" id="role-{{ selected_role }}">
     <div class="role-matrix-head">
       <div>
         <span class="role-card-kicker">Configure role</span>
-        <h2>{{ role_label(role) }}</h2>
-        <p>Current modules: {{ role_modules[role]|join(', ') if role_modules[role] else 'No module boxes will show' }}</p>
+        <h2>{{ role_label(selected_role) }}</h2>
+        <p>Current modules: {{ role_modules[selected_role]|join(', ') if role_modules[selected_role] else 'No module boxes will show' }}</p>
       </div>
-      <a class="btn secondary small" href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Top</a>
+      <a class="btn secondary small" href="{{ url_for('admin_users') }}">Users</a>
     </div>
 
     {% for group in groups %}
@@ -48,8 +46,8 @@
       </summary>
       <div class="permission-grid">
         {% for key, label, note in group.permissions %}
-        <label class="permission-tile {% if role_maps[role].get(key) %}is-on{% endif %}">
-          <input type="checkbox" name="perm__{{ role }}__{{ key }}" value="1" {% if role_maps[role].get(key) %}checked{% endif %}>
+        <label class="permission-tile {% if selected_map.get(key) %}is-on{% endif %}">
+          <input type="checkbox" name="perm__{{ selected_role }}__{{ key }}" value="1" {% if selected_map.get(key) %}checked{% endif %}>
           <span>
             <strong>{{ label }}</strong>
             <small>{{ note }}</small>
@@ -61,14 +59,13 @@
     </details>
     {% endfor %}
   </section>
-  {% endfor %}
 
   <div class="permission-savebar bottom">
     <div>
-      <strong>Save changes</strong>
-      <small>After saving, test one manager, supervisor and viewer login in incognito.</small>
+      <strong>Save {{ role_label(selected_role) }}</strong>
+      <small>After saving, test that role in incognito.</small>
     </div>
-    <button class="btn" type="submit">Save Role Permissions</button>
+    <button class="btn" type="submit">Save Permissions</button>
   </div>
 </form>
 {% endblock %}

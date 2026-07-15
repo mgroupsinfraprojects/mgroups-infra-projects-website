@@ -68,22 +68,28 @@ def admin_media_crop(filename):
 @login_required
 @permission_required("roles_manage")
 def admin_permissions():
+    selected_role = request.values.get("role") or MANAGEABLE_PERMISSION_ROLES[0]
+    if selected_role not in MANAGEABLE_PERMISSION_ROLES:
+        selected_role = MANAGEABLE_PERMISSION_ROLES[0]
+
     if request.method == "POST":
         validate_csrf()
-        # Developer/legacy owner stays locked with full control. Editable matrix starts from company_owner.
-        for role in MANAGEABLE_PERMISSION_ROLES:
-            for permission in ALL_PERMISSION_KEYS:
-                set_setting(permission_setting_key(role, permission), "1" if request.form.get(f"perm__{role}__{permission}") else "0")
+        # Save only the selected role instead of rendering/saving every role at once.
+        # This keeps the page small and faster on Render Free.
+        for permission in ALL_PERMISSION_KEYS:
+            set_setting(permission_setting_key(selected_role, permission), "1" if request.form.get(f"perm__{selected_role}__{permission}") else "0")
         db.session.commit()
-        audit("role_permissions_update", f"Updated role matrix by {admin_username()}")
-        flash("Role permission matrix saved. Users will see allowed modules from their next page load.", "success")
-        return redirect(url_for("admin_permissions"))
-    role_maps = {role: role_permission_map(role) for role in MANAGEABLE_PERMISSION_ROLES}
+        audit("role_permissions_update", f"Updated {selected_role} permissions by {admin_username()}")
+        flash(f"{role_label(selected_role)} permissions saved. Users update on next page load/login.", "success")
+        return redirect(url_for("admin_permissions", role=selected_role))
+
     role_modules = {role: role_allowed_module_titles(role) for role in MANAGEABLE_PERMISSION_ROLES}
+    selected_map = role_permission_map(selected_role)
     return render_template(
         "admin/permissions.html",
         roles=MANAGEABLE_PERMISSION_ROLES,
-        role_maps=role_maps,
+        selected_role=selected_role,
+        selected_map=selected_map,
         role_modules=role_modules,
         groups=PERMISSION_GROUPS,
         role_label=role_label,
@@ -172,8 +178,19 @@ def admin_users():
         audit("admin_user_create", username)
         flash("Admin user created.", "success")
         return redirect(url_for("admin_users"))
-    users = visible_users_for_current_user()
-    return render_template("admin/users.html", users=users, creatable_roles=creatable_roles_for_current_user() if has_permission("users_create") else [], role_label=role_label, user_allowed_module_titles=user_allowed_module_titles, can_manage_user_account=can_manage_user_account, has_permission=has_permission)
+    page = request.args.get("page", 1)
+    pagination = paginate_query(visible_users_query_for_current_user(), page=page, per_page=10)
+    users = pagination.items
+    return render_template(
+        "admin/users.html",
+        users=users,
+        pagination=pagination,
+        creatable_roles=creatable_roles_for_current_user() if has_permission("users_create") else [],
+        role_label=role_label,
+        user_allowed_module_titles=user_allowed_module_titles,
+        can_manage_user_account=can_manage_user_account,
+        has_permission=has_permission,
+    )
 
 
 def _active_owner_count(exclude_user_id=None):
