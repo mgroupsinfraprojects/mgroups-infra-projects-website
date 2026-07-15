@@ -7,13 +7,35 @@
 {% set simple = admin_mode() == 'simple' %}
 {% set daily_eps = ['admin_dashboard','admin_preview','admin_live_edit','admin_enquiries'] %}
 {% set content_eps = ['admin_about','admin_services','admin_service_form','admin_service_new','admin_service_edit','admin_projects','admin_project_form','admin_project_new','admin_project_edit','admin_gallery','admin_media'] %}
-{% set owner_eps = ['admin_settings','admin_users','admin_user_edit','backup_json'] %}
-{% set advanced_eps = ['admin_appearance','admin_permissions','restore_backup','admin_ordering','admin_page_builder','admin_versions','admin_version_compare','export_enquiries_csv'] %}
+{% set website_control_eps = ['admin_settings','admin_appearance','admin_ordering','admin_page_builder'] %}
+{% set access_eps = ['admin_users','admin_user_edit','admin_permissions'] %}
+{% set system_eps = ['restore_backup','admin_versions','admin_version_compare','backup_json','export_enquiries_csv'] %}
 {% set account_eps = ['admin_password'] %}
-<aside class="admin-sidebar pro-sidebar">
+{% if ep in access_eps %}
+  {% set module_mode = 'users' %}
+{% elif ep in system_eps %}
+  {% set module_mode = 'system' %}
+{% elif ep in daily_eps or ep in content_eps or ep in website_control_eps %}
+  {% set module_mode = 'website' %}
+{% else %}
+  {% set module_mode = request.args.get('module') or 'admin' %}
+{% endif %}
+{% set is_full_control = adm and adm.role in ['owner','developer'] %}
+<aside class="admin-sidebar pro-sidebar module-aware-sidebar module-{{ module_mode }}">
     <div class="admin-brand-block">
-        <h2>M-GROUPS Admin</h2>
-        <span class="admin-role-chip">{{ (adm.role if adm else 'user')|title }}</span>
+        {% if module_mode == 'website' %}
+          <h2>M-GROUPS<br>Website</h2>
+          <span class="admin-role-chip">Website</span>
+        {% elif module_mode == 'users' %}
+          <h2>M-GROUPS<br>Access</h2>
+          <span class="admin-role-chip">Users</span>
+        {% elif module_mode == 'system' %}
+          <h2>M-GROUPS<br>System</h2>
+          <span class="admin-role-chip">System</span>
+        {% else %}
+          <h2>M-GROUPS<br>Admin</h2>
+          <span class="admin-role-chip">{{ (adm.role if adm else 'user')|title }}</span>
+        {% endif %}
     </div>
 
     <div class="mode-box pro-mode-box">
@@ -26,16 +48,19 @@
     </div>
 
     <div class="sidebar-actions">
-        <a class="primary" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a class="primary" href="{{ url_for('portal_workspace') }}">My Workspace</a>
         <a href="{{ url_for('home') }}" target="_blank">View Site</a>
     </div>
 
     <nav class="admin-nav-pro" aria-label="Admin navigation">
+        {% if module_mode == 'website' %}
+        <div class="module-context-note">Website module only. User and system controls are separated.</div>
+
         <details class="nav-section" {% if ep in daily_eps %}open{% endif %}>
-            <summary>Daily Work</summary>
-            <a class="{{ 'active' if ep == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <summary>Website Work</summary>
+            <a class="{{ 'active' if ep == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}">Website Dashboard</a>
             <a class="{{ 'active' if ep == 'admin_preview' else '' }}" href="{{ url_for('admin_preview') }}" target="_blank">Live Preview</a>
-            {% if adm and adm.role == 'owner' %}<a class="{{ 'active' if ep == 'admin_live_edit' else '' }}" href="{{ url_for('admin_live_edit', page='home') }}" target="_blank">Live Edit</a>{% endif %}
+            {% if is_full_control or (has_permission is defined and has_permission('website_edit')) %}<a class="{{ 'active' if ep == 'admin_live_edit' else '' }}" href="{{ url_for('admin_live_edit', page='home') }}" target="_blank">Live Editor</a>{% endif %}
             <a class="{{ 'active' if ep == 'admin_enquiries' else '' }}" href="{{ url_for('admin_enquiries') }}">Enquiries</a>
         </details>
 
@@ -48,8 +73,64 @@
             <a class="{{ 'active' if ep == 'admin_media' else '' }}" href="{{ url_for('admin_media') }}">Media Library</a>
         </details>
 
-        {% if adm and adm.role == 'owner' %}
-        <details class="nav-section" {% if ep in owner_eps %}open{% endif %}>
+        <details class="nav-section" {% if ep in website_control_eps %}open{% endif %}>
+            <summary>Website Design</summary>
+            <a class="{{ 'active' if ep == 'admin_settings' else '' }}" href="{{ url_for('admin_settings') }}">Website Settings</a>
+            <a class="{{ 'active' if ep == 'admin_appearance' else '' }}" href="{{ url_for('admin_appearance') }}">Design Center</a>
+            {% if not simple %}
+            <a class="{{ 'active' if ep == 'admin_ordering' else '' }}" href="{{ url_for('admin_ordering') }}">Ordering</a>
+            <a class="{{ 'active' if ep == 'admin_page_builder' else '' }}" href="{{ url_for('admin_page_builder') }}">Home Blocks</a>
+            {% endif %}
+        </details>
+
+        {% elif module_mode == 'users' %}
+        <div class="module-context-note">Access-control module only. Website editing is separated.</div>
+
+        <details class="nav-section" open>
+            <summary>People & Access</summary>
+            <a class="{{ 'active' if ep in ['admin_users','admin_user_edit'] else '' }}" href="{{ url_for('admin_users') }}">Users & Roles</a>
+            <a class="{{ 'active' if ep == 'admin_permissions' else '' }}" href="{{ url_for('admin_permissions') }}">Role Permissions</a>
+            <a class="{{ 'active' if ep == 'admin_users' else '' }}" href="{{ url_for('admin_users') }}#access-summary">User Access Summary</a>
+        </details>
+
+        <details class="nav-section" open>
+            <summary>Access Rules</summary>
+            <a href="{{ url_for('portal_users') }}">Users Module Home</a>
+            <a href="{{ url_for('portal_workspace') }}">My Workspace</a>
+        </details>
+
+        {% elif module_mode == 'system' %}
+        <div class="module-context-note">System module only. Use carefully.</div>
+
+        <details class="nav-section" open>
+            <summary>System Control</summary>
+            <a class="{{ 'active' if ep == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}">Production Status</a>
+            <a href="{{ url_for('backup_json') }}">Download Backup</a>
+            <a class="{{ 'active' if ep == 'restore_backup' else '' }}" href="{{ url_for('restore_backup') }}">Restore Backup</a>
+            <a class="{{ 'active' if ep == 'admin_versions' else '' }}" href="{{ url_for('admin_versions') }}">Version History</a>
+            <a href="{{ url_for('export_enquiries_csv') }}">Export Enquiries</a>
+        </details>
+
+        {% else %}
+        <details class="nav-section" {% if ep in daily_eps %}open{% endif %}>
+            <summary>Daily Work</summary>
+            <a class="{{ 'active' if ep == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a class="{{ 'active' if ep == 'admin_preview' else '' }}" href="{{ url_for('admin_preview') }}" target="_blank">Live Preview</a>
+            {% if is_full_control %}<a class="{{ 'active' if ep == 'admin_live_edit' else '' }}" href="{{ url_for('admin_live_edit', page='home') }}" target="_blank">Live Edit</a>{% endif %}
+            <a class="{{ 'active' if ep == 'admin_enquiries' else '' }}" href="{{ url_for('admin_enquiries') }}">Enquiries</a>
+        </details>
+
+        <details class="nav-section" {% if ep in content_eps %}open{% endif %}>
+            <summary>Website Content</summary>
+            <a class="{{ 'active' if ep == 'admin_about' else '' }}" href="{{ url_for('admin_about') }}">About</a>
+            <a class="{{ 'active' if ep in ['admin_services','admin_service_form','admin_service_new','admin_service_edit'] else '' }}" href="{{ url_for('admin_services') }}">Services</a>
+            <a class="{{ 'active' if ep in ['admin_projects','admin_project_form','admin_project_new','admin_project_edit'] else '' }}" href="{{ url_for('admin_projects') }}">Projects</a>
+            <a class="{{ 'active' if ep == 'admin_gallery' else '' }}" href="{{ url_for('admin_gallery') }}">Gallery</a>
+            <a class="{{ 'active' if ep == 'admin_media' else '' }}" href="{{ url_for('admin_media') }}">Media Library</a>
+        </details>
+
+        {% if is_full_control %}
+        <details class="nav-section" {% if ep in ['admin_settings','admin_users','admin_user_edit','backup_json'] %}open{% endif %}>
             <summary>Owner Controls</summary>
             <a class="{{ 'active' if ep == 'admin_settings' else '' }}" href="{{ url_for('admin_settings') }}">Website Settings</a>
             <a class="{{ 'active' if ep in ['admin_users','admin_user_edit'] else '' }}" href="{{ url_for('admin_users') }}">Users & Roles</a>
@@ -57,7 +138,7 @@
         </details>
 
         {% if not simple %}
-        <details class="nav-section" {% if ep in advanced_eps %}open{% endif %}>
+        <details class="nav-section" {% if ep in ['admin_appearance','admin_permissions','restore_backup','admin_ordering','admin_page_builder','admin_versions','admin_version_compare','export_enquiries_csv'] %}open{% endif %}>
             <summary>Advanced Tools</summary>
             <a class="{{ 'active' if ep == 'admin_appearance' else '' }}" href="{{ url_for('admin_appearance') }}">Design Center</a>
             <a class="{{ 'active' if ep == 'admin_permissions' else '' }}" href="{{ url_for('admin_permissions') }}">Role Permissions</a>
@@ -67,11 +148,7 @@
             <a class="{{ 'active' if ep == 'admin_versions' else '' }}" href="{{ url_for('admin_versions') }}">Version History</a>
             <a href="{{ url_for('export_enquiries_csv') }}">Export Enquiries</a>
         </details>
-        {% else %}
-        <div class="nav-muted-box">
-            Advanced tools are hidden in Simple Mode.
-            <a href="{{ url_for('admin_set_mode', mode='advanced') }}">Show advanced tools</a>
-        </div>
+        {% endif %}
         {% endif %}
         {% endif %}
 

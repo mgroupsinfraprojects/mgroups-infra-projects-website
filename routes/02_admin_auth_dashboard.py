@@ -111,6 +111,13 @@ def admin_set_mode(mode):
 @app.route("/admin")
 @login_required
 def admin_dashboard():
+    # V15.6.3: /admin is a developer/system dashboard only.
+    # Managers, supervisors, viewers and normal business users must stay in /portal
+    # and only see the modules/actions permitted for their role.
+    if not has_permission("system_settings"):
+        flash("Admin production dashboard is restricted. Use My Workspace for your assigned tools.", "warning")
+        return redirect(url_for("portal_workspace"))
+
     counts = {
         "services": Service.query.count(),
         "projects": Project.query.count(),

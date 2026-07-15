@@ -16,65 +16,65 @@ def portal_web():
     # Portal card -> module landing page -> exact website-admin action.
     quick_cards = [
         {
-            'title': 'Website Dashboard',
-            'description': 'Open the existing admin dashboard, content warnings and production status.',
-            'url': '/admin',
+            'title': 'Public Website Preview',
+            'description': 'Open the public website in a new tab to check the published result.',
+            'url': '/',
             'permission': 'website_view',
-            'icon': '📊',
+            'icon': '🌐',
         },
         {
             'title': 'Live Editor',
             'description': 'Edit public website text directly from the page preview.',
-            'url': '/admin/live-edit?page=home',
+            'url': '/admin/live-edit?page=home&module=website',
             'permission': 'website_edit',
             'icon': '✍️',
         },
         {
             'title': 'Design Center',
             'description': 'Control theme, colors, fonts, buttons and homepage section visibility.',
-            'url': '/admin/appearance',
+            'url': '/admin/appearance?module=website',
             'permission': 'design_edit',
             'icon': '🎨',
         },
         {
             'title': 'Website Settings',
             'description': 'Company profile, SEO, contact details and public business information.',
-            'url': '/admin/settings',
+            'url': '/admin/settings?module=website',
             'permission': 'website_edit',
             'icon': '⚙️',
         },
         {
             'title': 'About & Experience',
             'description': 'Company description, mission, vision, values and experience summary.',
-            'url': '/admin/about',
+            'url': '/admin/about?module=website',
             'permission': 'website_edit',
             'icon': '🏢',
         },
         {
             'title': 'Services',
             'description': 'Add, edit and publish service cards.',
-            'url': '/admin/services',
+            'url': '/admin/services?module=website',
             'permission': 'website_edit',
             'icon': '🧱',
         },
         {
             'title': 'Projects / Works',
             'description': 'Maintain project records, descriptions and project images.',
-            'url': '/admin/projects',
+            'url': '/admin/projects?module=website',
             'permission': 'website_edit',
             'icon': '🏗️',
         },
         {
             'title': 'Gallery',
             'description': 'Publish or hide site/work photos and captions.',
-            'url': '/admin/gallery',
+            'url': '/admin/gallery?module=website',
             'permission': 'website_edit',
             'icon': '🖼️',
         },
         {
             'title': 'Media Library',
             'description': 'Upload and reuse images for website content.',
-            'url': '/admin/media',
+            'url': '/admin/media?module=website',
             'permission': 'website_edit',
             'icon': '📁',
         },
@@ -184,9 +184,9 @@ def portal_reports():
 @permission_required('users_view')
 def portal_users():
     cards = [
-        {'title': 'Users & Roles', 'description': 'Create users, assign roles, reset passwords and disable accounts.', 'url': '/admin/users', 'permission': 'users_view', 'icon': '👤'},
-        {'title': 'Role Permissions', 'description': 'Choose what Company Owner, Manager, Supervisor, Authorized Person and Viewer can see/change.', 'url': '/admin/permissions', 'permission': 'roles_manage', 'icon': '🔐'},
-        {'title': 'User Access Summary', 'description': 'Review who can access Website, Stock, Employees, GST, Reports, Users and System.', 'url': '/admin/users', 'permission': 'users_view', 'icon': '📋'},
+        {'title': 'Users & Roles', 'description': 'Create users, assign roles, reset passwords and disable accounts.', 'url': '/admin/users?module=users', 'permission': 'users_view', 'icon': '👤'},
+        {'title': 'Role Permissions', 'description': 'Choose what Company Owner, Manager, Supervisor, Authorized Person and Viewer can see/change.', 'url': '/admin/permissions?module=users', 'permission': 'roles_manage', 'icon': '🔐'},
+        {'title': 'User Access Summary', 'description': 'Review who can access Website, Stock, Employees, GST, Reports, Users and System.', 'url': '/admin/users?module=users', 'permission': 'users_view', 'icon': '📋'},
         {'title': 'Audit / Access Logs', 'description': 'Access-log page placeholder until audit log UI is separated.', 'url': '/portal/system', 'permission': 'audit_view', 'icon': '🧭'},
     ]
     cards = [c for c in cards if has_permission(c['permission'])]
@@ -205,10 +205,10 @@ def portal_users():
 @permission_required('system_settings')
 def portal_system():
     cards = [
-        {'title': 'Admin Dashboard', 'description': 'Production status and content warnings.', 'url': '/admin', 'permission': 'system_settings', 'icon': '📊'},
-        {'title': 'Download Backup', 'description': 'Download website content backup.', 'url': '/admin/backup', 'permission': 'backup_download', 'icon': '💾'},
-        {'title': 'Restore Backup', 'description': 'Restore JSON backups carefully.', 'url': '/admin/restore', 'permission': 'backup_restore', 'icon': '♻️'},
-        {'title': 'Version History', 'description': 'Review old content versions.', 'url': '/admin/versions', 'permission': 'audit_view', 'icon': '🕒'},
+        {'title': 'Admin Dashboard', 'description': 'Production status and content warnings.', 'url': '/admin?module=system', 'permission': 'system_settings', 'icon': '📊'},
+        {'title': 'Download Backup', 'description': 'Download website content backup.', 'url': '/admin/backup?module=system', 'permission': 'backup_download', 'icon': '💾'},
+        {'title': 'Restore Backup', 'description': 'Restore JSON backups carefully.', 'url': '/admin/restore?module=system', 'permission': 'backup_restore', 'icon': '♻️'},
+        {'title': 'Version History', 'description': 'Review old content versions.', 'url': '/admin/versions?module=system', 'permission': 'audit_view', 'icon': '🕒'},
     ]
     cards = [c for c in cards if has_permission(c['permission'])]
     return render_template(
