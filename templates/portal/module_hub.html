@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ module_title }} | M-GROUPS Portal{% endblock %}
+{% block content %}
+<section class="portal-hero compact module-hub-hero">
+  <div class="container portal-hero-inner">
+    <div>
+      <p class="eyebrow">{{ module_kicker or 'Portal Module' }}</p>
+      <h1>{{ module_title }}</h1>
+      <p>{{ module_description }}</p>
+    </div>
+    <a class="btn secondary" href="{{ back_url or url_for('portal_workspace') }}">← My Workspace</a>
+  </div>
+</section>
+
+<section class="section portal-module-section">
+  <div class="container">
+    {% if notice %}
+    <div class="portal-module-notice">{{ notice }}</div>
+    {% endif %}
+
+    {% if cards %}
+    <div class="portal-action-grid">
+      {% for card in cards %}
+      <a class="portal-action-card {% if card.url == '#' %}is-disabled{% endif %}" href="{{ card.url if card.url != '#' else 'javascript:void(0)' }}">
+        <span class="portal-icon">{{ card.icon }}</span>
+        <h2>{{ card.title }}</h2>
+        <p>{{ card.description }}</p>
+        {% if card.url == '#' %}
+          <strong>Coming soon</strong>
+        {% else %}
+          <strong>Open →</strong>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="content-card">
+      <h2>No actions assigned</h2>
+      <p>Your role can open this module, but no detailed actions are assigned. Ask the developer/company owner to update Role Permissions.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
