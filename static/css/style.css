@@ -238,18 +238,26 @@ body:has(.live-edit-toolbar){padding-bottom:96px}.preview-banner{padding-left:23
 .role-card-grid-compact .role-card{min-height:110px}.role-card.is-active{border-color:var(--accent,#c4822a);box-shadow:0 10px 30px rgba(13,31,53,.12);background:#fffaf1}.slim-role-form .role-matrix{margin-top:16px}.pagination-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 14px;padding:12px 14px;border:1px solid var(--line,#d8e6f0);background:#f8fbff;border-radius:14px}.pagination-bar.bottom{margin:14px 0 0}.page-indicator{display:inline-flex;align-items:center;min-height:34px;padding:0 12px;border:1px solid var(--line,#d8e6f0);border-radius:10px;background:white;font-weight:800;color:var(--text,#0d1f35)}
 @media(max-width:760px){.pagination-bar{align-items:flex-start;flex-direction:column}.role-card-grid-compact{grid-template-columns:1fr}}
 
-/* V15.6.1 Portal module hub cleanup */
-.module-hub-hero{padding-top:56px;padding-bottom:56px;}
-.portal-module-section{padding-top:52px;}
-.portal-module-notice{padding:14px 16px;border:1px solid rgba(196,130,42,.28);background:#fff7e8;border-radius:14px;margin-bottom:18px;color:#65420e;font-weight:700;}
-.portal-action-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;}
-.portal-action-card{display:flex;flex-direction:column;gap:10px;padding:24px;border:1px solid var(--line, #d8e6f0);border-radius:20px;background:#fff;text-decoration:none;color:inherit;min-height:205px;box-shadow:0 18px 38px rgba(13,31,53,.06);transition:.18s ease;}
-.portal-action-card:hover{transform:translateY(-2px);box-shadow:0 22px 46px rgba(13,31,53,.1);}
-.portal-action-card h2{margin:8px 0 0;font-size:1.45rem;line-height:1.05;}
-.portal-action-card p{margin:0;color:var(--muted, #5a7089);line-height:1.55;}
-.portal-action-card strong{margin-top:auto;color:var(--primary, #0d1f35);}
-.portal-action-card.is-disabled{opacity:.72;cursor:not-allowed;background:#f7fbff;}
-.portal-action-card.is-disabled:hover{transform:none;box-shadow:0 18px 38px rgba(13,31,53,.06);}
-.portal-action-card.is-disabled strong{color:#8a6a23;}
-@media (max-width: 980px){.portal-action-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
-@media (max-width: 640px){.portal-action-grid{grid-template-columns:1fr}.module-hub-hero{padding-top:36px;padding-bottom:36px;}}
+/* V15.6.2 - portal-aware admin sidebar separation */
+.module-aware-sidebar .module-context-note{
+  margin: 10px 10px 14px;
+  padding: 10px 11px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: rgba(255,255,255,.06);
+  color: rgba(235,246,255,.78);
+  font-size: .78rem;
+  line-height: 1.4;
+  font-weight: 800;
+}
+.module-aware-sidebar.module-users .admin-role-chip,
+.module-aware-sidebar.module-website .admin-role-chip,
+.module-aware-sidebar.module-system .admin-role-chip{
+  letter-spacing: .03em;
+}
+.module-aware-sidebar.module-users .sidebar-actions .primary,
+.module-aware-sidebar.module-website .sidebar-actions .primary,
+.module-aware-sidebar.module-system .sidebar-actions .primary{
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.22);
+}
