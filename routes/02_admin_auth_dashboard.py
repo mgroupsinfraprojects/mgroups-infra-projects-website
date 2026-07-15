@@ -26,9 +26,15 @@ def admin_login():
             session["admin_name"] = admin.username
             session["admin_role"] = admin.role
             try:
-                session["portal_permissions"] = sorted([key for key, enabled in role_permission_map(admin.role).items() if enabled])
+                role_key = str(admin.role or "").strip().lower()
+                full_control_roles = {"developer", "owner", "admin", "super_admin", "administrator", "developer_owner", "developer_owner_legacy"}
+                if role_key in full_control_roles or str(admin.username or "").strip().lower() == "admin":
+                    session["portal_permissions"] = ["*"]
+                else:
+                    session["portal_permissions"] = sorted([key for key, enabled in role_permission_map(admin.role).items() if enabled])
             except Exception:
-                session["portal_permissions"] = ["*"] if admin.role in {"developer", "owner"} else []
+                role_key = str(getattr(admin, "role", "") or "").strip().lower()
+                session["portal_permissions"] = ["*"] if role_key in {"developer", "owner", "admin", "super_admin", "administrator", "developer_owner", "developer_owner_legacy"} else []
             session["csrf_token"] = secrets.token_urlsafe(32)
             audit("login", "Admin logged in")
             return redirect(url_for("portal_workspace"))

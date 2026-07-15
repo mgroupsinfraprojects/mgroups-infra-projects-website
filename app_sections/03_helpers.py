@@ -334,6 +334,11 @@ def require_role(*roles):
 ROLE_LABELS = {
     "developer": "Developer / Super Admin",
     "owner": "Developer / Owner (Legacy)",
+    "admin": "Developer / Super Admin (Legacy)",
+    "super_admin": "Developer / Super Admin (Legacy)",
+    "administrator": "Developer / Super Admin (Legacy)",
+    "developer_owner": "Developer / Owner (Legacy)",
+    "developer_owner_legacy": "Developer / Owner (Legacy)",
     "company_owner": "Company Owner",
     "manager": "Manager",
     "editor": "Manager / Editor (Legacy)",
@@ -344,7 +349,7 @@ ROLE_LABELS = {
 
 ROLE_ORDER = ["developer", "company_owner", "manager", "supervisor", "authorized", "viewer"]
 MANAGEABLE_PERMISSION_ROLES = ["company_owner", "manager", "supervisor", "authorized", "viewer"]
-LOCKED_FULL_CONTROL_ROLES = {"developer", "owner"}
+LOCKED_FULL_CONTROL_ROLES = {"developer", "owner", "admin", "super_admin", "administrator", "developer_owner", "developer_owner_legacy"}
 
 USER_CREATABLE_ROLES = {
     "developer": ["developer", "company_owner", "manager", "supervisor", "authorized", "viewer"],
@@ -458,6 +463,11 @@ for _group in PERMISSION_GROUPS:
 ROLE_DEFAULT_PERMISSIONS = {
     "developer": {"*"},
     "owner": {"*"},
+    "admin": {"*"},
+    "super_admin": {"*"},
+    "administrator": {"*"},
+    "developer_owner": {"*"},
+    "developer_owner_legacy": {"*"},
     "company_owner": {
         "portal_view", "stock_view", "employees_view", "gst_view", "reports_view", "users_view",
         "stock_add", "stock_transfer", "stock_adjust", "stock_reports",

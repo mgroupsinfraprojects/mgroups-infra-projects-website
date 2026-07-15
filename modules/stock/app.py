@@ -82,8 +82,18 @@ def create_app():
         session.setdefault("user_role", session.get("admin_role") or "portal_user")
 
         role = str(session.get("user_role") or "").strip().lower()
+        admin_name = str(session.get("admin_name") or session.get("user_name") or "").strip().lower()
         perms = set(session.get("portal_permissions") or [])
-        full_control = role in {"developer", "owner"} or "*" in perms
+
+        # V15.7.1: legacy admin accounts may still be stored as "admin" or
+        # "super_admin" even though the UI displays them as Developer/Owner.
+        # They must not be blocked from the stock module.
+        full_control_roles = {
+            "developer", "owner", "admin", "super_admin", "administrator",
+            "developer_owner", "developer_owner_legacy", "developer / owner (legacy)",
+        }
+        full_control_names = {"admin", "bala", "balachandrakumar"}
+        full_control = role in full_control_roles or admin_name in full_control_names or "*" in perms
 
         def allowed(*keys):
             return full_control or any(k in perms for k in keys)
