@@ -182,6 +182,31 @@ def production_check_groups():
     return {"required": required, "recommended": recommended, "completed": completed, "missing": missing}
 
 
+def live_edit_attrs(target, field, target_id=None):
+    """Return safe data attributes used only by the protected Live Editor.
+
+    Public pages call this helper too, but it must output nothing outside
+    /admin/live-edit so the public site remains normal and cannot crash when
+    Live Editor is not active.
+    """
+    try:
+        if not request.path.startswith("/admin/live-edit"):
+            return ""
+    except Exception:
+        return ""
+
+    target = str(target or "").strip().replace("\"", "").replace("'", "")
+    field = str(field or "").strip().replace("\"", "").replace("'", "")
+    if not target or not field:
+        return ""
+
+    attrs = f'data-live-edit="1" data-live-target="{target}" data-live-field="{field}"'
+    if target_id is not None and str(target_id).strip() != "":
+        safe_id = str(target_id).strip().replace("\"", "").replace("'", "")
+        attrs += f' data-live-id="{safe_id}"'
+    return attrs
+
+
 @app.context_processor
 def inject_globals():
     try:
@@ -221,6 +246,7 @@ def inject_globals():
         "css_dimension": css_dimension,
         "style_props": STYLE_PROPS,
         "current_admin": current_admin,
+        "live_edit_attrs": live_edit_attrs,
     }
 
 
