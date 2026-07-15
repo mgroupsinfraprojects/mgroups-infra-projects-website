@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ module_title }} | M-GROUPS Portal{% endblock %}
+{% block content %}
+<section class="portal-hero compact">
+  <div class="container portal-hero-inner">
+    <div>
+      <p class="eyebrow">Portal Module</p>
+      <h1>{{ module_title }}</h1>
+      <p>{{ module_description }}</p>
+    </div>
+    <a class="btn secondary" href="{{ url_for('portal_workspace') }}">← Back to My Workspace</a>
+  </div>
+</section>
+<section class="section">
+  <div class="container portal-placeholder-grid">
+    <div class="content-card">
+      <h2>Module status</h2>
+      <p>{{ status }}</p>
+    </div>
+    <div class="content-card">
+      <h2>Planned quick actions</h2>
+      <ul>
+        {% for action in quick_actions %}<li>{{ action }}</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

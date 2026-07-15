@@ -305,6 +305,117 @@ def require_role(*roles):
 
 
 
+
+
+# ─────────────────────────────────────────────────────────────
+# Portal roles and permissions
+# ─────────────────────────────────────────────────────────────
+ROLE_LABELS = {
+    "developer": "Developer / Super Admin",
+    "owner": "Developer / Owner (Legacy)",
+    "company_owner": "Company Owner",
+    "manager": "Manager",
+    "editor": "Manager / Editor (Legacy)",
+    "supervisor": "Supervisor",
+    "authorized": "Authorized Person",
+    "viewer": "Viewer",
+}
+
+ROLE_ORDER = ["developer", "company_owner", "manager", "supervisor", "authorized", "viewer"]
+USER_CREATABLE_ROLES = {
+    "developer": ["developer", "company_owner", "manager", "supervisor", "authorized", "viewer"],
+    "owner": ["developer", "company_owner", "manager", "supervisor", "authorized", "viewer"],
+    "company_owner": ["manager", "supervisor", "authorized", "viewer"],
+    "manager": ["supervisor", "authorized", "viewer"],
+    "editor": ["supervisor", "authorized", "viewer"],
+}
+
+ROLE_PERMISSIONS = {
+    "developer": {"*"},
+    "owner": {"*"},
+    "company_owner": {
+        "portal_view", "website_view", "stock_view", "employees_view", "gst_view", "reports_view",
+        "users_view", "users_create", "users_edit", "audit_view"
+    },
+    "manager": {
+        "portal_view", "stock_view", "stock_add", "stock_transfer", "employees_view", "employees_edit",
+        "reports_view", "users_view", "users_create", "users_edit"
+    },
+    "editor": {
+        "portal_view", "website_view", "website_edit", "stock_view", "employees_view", "reports_view",
+        "users_view", "users_create", "users_edit"
+    },
+    "supervisor": {"portal_view", "stock_view", "stock_add", "stock_transfer", "reports_view"},
+    "authorized": {"portal_view", "stock_view", "stock_add", "reports_view"},
+    "viewer": {"portal_view", "reports_view", "stock_view"},
+}
+
+PORTAL_MODULES = [
+    {"key": "website", "title": "Website", "description": "Live Editor, Design Center, public content and media.", "url_endpoint": "portal_web", "permission": "website_view", "icon": "🌐"},
+    {"key": "stock", "title": "Stock", "description": "Materials, stock in/out, transfers, site stock and stock reports.", "url_endpoint": "portal_stock", "permission": "stock_view", "icon": "📦"},
+    {"key": "employees", "title": "Employees", "description": "Employee records, attendance, roles and work details.", "url_endpoint": "portal_employees", "permission": "employees_view", "icon": "👥"},
+    {"key": "gst", "title": "GST / Audit", "description": "GST dashboard, invoice upload, audit checks and reports.", "url_endpoint": "portal_gst", "permission": "gst_view", "icon": "🧾"},
+    {"key": "reports", "title": "Reports", "description": "Business, stock, project and user-access reports.", "url_endpoint": "portal_reports", "permission": "reports_view", "icon": "📊"},
+    {"key": "users", "title": "Users", "description": "Create users, set roles, reset passwords and control access.", "url_endpoint": "portal_users", "permission": "users_view", "icon": "🔐"},
+    {"key": "system", "title": "System", "description": "Backup, restore, versions, audit logs and system status.", "url_endpoint": "portal_system", "permission": "system_settings", "icon": "⚙️"},
+]
+
+
+def role_label(role):
+    return ROLE_LABELS.get(role or "", (role or "Unknown").replace("_", " ").title())
+
+
+def current_role():
+    adm = current_admin()
+    return adm.role if adm else None
+
+
+def has_permission(permission):
+    adm = current_admin()
+    if not adm:
+        return False
+    perms = ROLE_PERMISSIONS.get(adm.role, set())
+    return "*" in perms or permission in perms
+
+
+def allowed_modules():
+    rows = []
+    for module in PORTAL_MODULES:
+        if has_permission(module["permission"]):
+            item = dict(module)
+            try:
+                item["url"] = url_for(module["url_endpoint"])
+            except Exception:
+                item["url"] = "#"
+            rows.append(item)
+    return rows
+
+
+def creatable_roles_for_current_user():
+    role = current_role()
+    allowed = USER_CREATABLE_ROLES.get(role, [])
+    return [(r, role_label(r)) for r in allowed]
+
+
+def can_create_role(role):
+    return role in USER_CREATABLE_ROLES.get(current_role(), [])
+
+
+def permission_required(permission):
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            if not current_admin():
+                flash("Login required.", "warning")
+                return redirect(url_for("admin_login"))
+            if not has_permission(permission):
+                flash("You do not have access to that module.", "danger")
+                return redirect(url_for("portal_workspace"))
+            return fn(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
 ADMIN_PERMISSION_AREAS = [
     ("settings", "Website Settings", "Company profile, SEO, contact and public credential fields"),
     ("appearance", "Visibility & Appearance", "Global colors, fonts, labels and section visibility"),
@@ -344,11 +455,13 @@ def admin_area_from_path(path):
 
 
 def role_can_write(role, area):
-    if role == "owner":
+    if role in {"developer", "owner"}:
         return True
-    if role == "viewer":
+    if role == "company_owner":
+        return area not in {"restore"}
+    if role in {"viewer", "supervisor", "authorized"}:
         return False
-    if role == "editor":
+    if role in {"manager", "editor"}:
         site = settings_dict()
         return flag_value(site.get(f"perm_editor_{area}"), DEFAULT_EDITOR_PERMISSION.get(area, False))
     return False
@@ -359,25 +472,6 @@ def audit(action, detail=""):
         db.session.commit()
     except Exception:
         db.session.rollback()
-
-
-
-def live_edit_attrs(target_type, field, target_id=""):
-    """Return safe data attributes only inside the owner live-edit route."""
-    try:
-        if request.endpoint != "admin_live_edit":
-            return ""
-        from markupsafe import Markup, escape
-        attrs = (
-            'data-live-edit="1" '
-            f'data-live-target="{escape(str(target_type))}" '
-            f'data-live-field="{escape(str(field))}" '
-            f'data-live-id="{escape(str(target_id or ""))}" '
-            'title="Click to edit. Changes save on blur."'
-        )
-        return Markup(attrs)
-    except Exception:
-        return ""
 
 
 def csrf_token():
@@ -404,7 +498,7 @@ def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         if not current_admin():
-            flash("Admin login required or account disabled.", "warning")
+            flash("Login required or account disabled.", "warning")
             return redirect(url_for("admin_login"))
         return view(*args, **kwargs)
     return wrapped

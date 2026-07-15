@@ -169,6 +169,7 @@ SECTION_FILES = [
     "routes/03_admin_advanced_cms.py",
     "routes/04_admin_content.py",
     "routes/05_admin_tools_users.py",
+    "routes/06_portal_routes.py",
 ]
 
 

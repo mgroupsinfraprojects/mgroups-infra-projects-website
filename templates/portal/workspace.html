@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}M-GROUPS Portal | My Workspace{% endblock %}
+{% block content %}
+<section class="portal-hero">
+  <div class="container portal-hero-inner">
+    <div>
+      <p class="eyebrow">M-GROUPS Portal</p>
+      <h1>My Workspace</h1>
+      <p>Open the tools assigned to your account. Only allowed modules are shown here.</p>
+    </div>
+    <div class="portal-user-card">
+      <span>Logged in as</span>
+      <strong>{{ user.username }}</strong>
+      <small>{{ role_label(user.role) }}</small>
+      <a href="{{ url_for('admin_logout') }}">Logout</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    {% if modules %}
+    <div class="portal-grid">
+      {% for module in modules %}
+      <a class="portal-module-card" href="{{ module.url }}">
+        <span class="portal-icon">{{ module.icon }}</span>
+        <h2>{{ module.title }}</h2>
+        <p>{{ module.description }}</p>
+        <strong>Open {{ module.title }} →</strong>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="content-card">
+      <h2>No modules assigned</h2>
+      <p>Your account is active, but no portal modules are assigned. Contact the developer or company owner.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -197,3 +197,23 @@ body:has(.live-edit-toolbar){padding-bottom:96px}.preview-banner{padding-left:23
 .live-editor-panel-help{margin:12px 0 0;color:#5a7089;font-size:.82rem;line-height:1.45}
 .live-edit-field{cursor:pointer!important;user-select:none}.live-edit-field.live-edit-active{user-select:auto}
 @media(max-width:900px){.live-editor-sidepanel{left:8px;right:8px;top:76px;width:auto}.live-edit-toolbar input[type="text"]{width:96px!important}}
+
+
+/* V15.3 Design Center preview/button fixes */
+.design-savebar{justify-content:flex-start!important;flex-wrap:wrap!important;min-height:70px!important}
+.design-savebar .btn{min-width:150px!important;text-decoration:none!important;opacity:1!important;visibility:visible!important}
+.design-savebar .btn-primary{background:linear-gradient(135deg,var(--secondary),var(--amber2))!important;color:#fff!important;border:1px solid transparent!important;box-shadow:0 12px 26px rgba(196,130,42,.22)!important}
+.design-savebar .btn.secondary{background:#eef4fb!important;color:var(--navy)!important;border:1px solid var(--line)!important;box-shadow:none!important}
+.design-savebar .btn.ghost{background:#fff!important;color:var(--navy)!important;border:1px solid var(--line)!important;box-shadow:none!important}
+.design-savebar .btn:disabled{opacity:.55!important;cursor:not-allowed!important}
+.draft-design-note{background:#fff8e8;border:1px solid #f4ddb0;border-left:4px solid var(--secondary);border-radius:12px;color:#6d4300;font-weight:800;line-height:1.45;padding:11px 13px;margin:0 0 16px}
+.design-intro-actions .btn{white-space:nowrap}
+@media(max-width:720px){.design-savebar .btn{width:100%!important}.design-intro-actions .btn{width:100%}}
+
+/* V15.4 Portal / My Workspace */
+.nav-login{display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;background:rgba(255,255,255,.12);color:#fff!important;border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:10px 14px!important;font-weight:900;white-space:nowrap;transition:.18s ease}
+.nav-login:hover{background:var(--secondary,#C4822A);border-color:var(--secondary,#C4822A);color:#07121f!important;transform:translateY(-1px)}
+.portal-hero{background:linear-gradient(135deg,var(--primary,#0D1F35),var(--header-bg,#152C47));color:#fff;padding:66px 0 46px;border-bottom:1px solid rgba(255,255,255,.08)}
+.portal-hero.compact{padding:44px 0 34px}.portal-hero-inner{display:flex;align-items:center;justify-content:space-between;gap:24px}.portal-hero h1{font-size:clamp(2rem,4vw,3.8rem);margin:6px 0 10px;color:#fff}.portal-hero p{max-width:720px;color:#d9e6f2;line-height:1.6}.portal-user-card{min-width:230px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:18px;text-align:left;box-shadow:0 16px 42px rgba(0,0,0,.18)}.portal-user-card span,.portal-user-card small{display:block;color:#b8cadb;font-weight:800}.portal-user-card strong{display:block;font-size:1.35rem;color:#fff;margin:5px 0}.portal-user-card a{display:inline-block;margin-top:12px;color:#ffd38a;font-weight:900;text-decoration:none}.portal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.portal-module-card{display:block;background:#fff;border:1px solid var(--line,#D8E6F0);border-radius:22px;padding:22px;text-decoration:none;color:var(--text,#1C2E3F);box-shadow:0 12px 36px rgba(13,31,53,.07);transition:.18s ease;min-height:210px}.portal-module-card:hover{transform:translateY(-3px);box-shadow:0 22px 54px rgba(13,31,53,.13);border-color:rgba(196,130,42,.45)}.portal-icon{width:52px;height:52px;border-radius:18px;display:grid;place-items:center;background:#fff5df;font-size:1.55rem;margin-bottom:16px}.portal-module-card h2{margin:0 0 8px;color:var(--primary,#0D1F35);font-size:1.25rem}.portal-module-card p{color:var(--muted,#5A7089);line-height:1.55;margin:0 0 18px}.portal-module-card strong{color:var(--secondary,#C4822A)}.portal-placeholder-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.portal-placeholder-grid ul{margin:0 0 0 18px;line-height:1.8;color:var(--muted,#5A7089)}
+@media(max-width:980px){.portal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.portal-hero-inner{align-items:flex-start;flex-direction:column}.portal-user-card{width:100%}}
+@media(max-width:640px){.portal-grid,.portal-placeholder-grid{grid-template-columns:1fr}.nav-login{width:100%;margin-top:8px}}

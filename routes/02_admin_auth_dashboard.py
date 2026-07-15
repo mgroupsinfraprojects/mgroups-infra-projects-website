@@ -3,11 +3,12 @@
 # ─────────────────────────────────────────────────────────────
 # Admin auth
 # ─────────────────────────────────────────────────────────────
+@app.route("/login", methods=["GET", "POST"])
 @app.route("/admin/login", methods=["GET", "POST"])
 @((limiter.limit("8 per minute")) if limiter else (lambda f: f))
 def admin_login():
     if session.get("admin_id"):
-        return redirect(url_for("admin_dashboard"))
+        return redirect(url_for("portal_workspace"))
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
@@ -21,7 +22,7 @@ def admin_login():
             session["admin_id"] = admin.id
             session["csrf_token"] = secrets.token_urlsafe(32)
             audit("login", "Admin logged in")
-            return redirect(url_for("admin_dashboard"))
+            return redirect(url_for("portal_workspace"))
         flash("Invalid username or password.", "danger")
     return render_template("admin/login.html")
 
@@ -30,7 +31,7 @@ def admin_login():
 @((limiter.limit("5 per hour")) if limiter else (lambda f: f))
 def admin_forgot_password():
     if session.get("admin_id"):
-        return redirect(url_for("admin_dashboard"))
+        return redirect(url_for("portal_workspace"))
     if request.method == "POST":
         validate_csrf()
         username = request.form.get("username", "").strip()
@@ -52,8 +53,9 @@ def admin_forgot_password():
                     audit("password_reset_email_sent", username)
                     flash("Password reset link sent to the registered recovery email.", "success")
                     return redirect(url_for("admin_login"))
-            except Exception:
+            except Exception as exc:
                 db.session.rollback()
+                app.logger.exception("SMTP reset email failed for user %s: %s", username, exc)
             audit("password_reset_email_failed", username)
             flash("Reset email could not be sent. Check SMTP settings and recovery email, then try again.", "danger")
             return redirect(url_for("admin_forgot_password"))
@@ -90,6 +92,7 @@ def admin_reset_password(token):
     return render_template("admin/reset_password.html", token=token)
 
 
+@app.route("/logout")
 @app.route("/admin/logout")
 def admin_logout():
     audit("logout", "Admin logged out")

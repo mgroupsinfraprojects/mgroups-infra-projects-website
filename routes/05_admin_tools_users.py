@@ -143,8 +143,9 @@ def admin_users():
         email = request.form.get("email", "").strip()
         recovery_email = request.form.get("recovery_email", "").strip()
         role = request.form.get("role", "viewer")
-        if role not in {"owner", "editor", "viewer"}:
-            role = "viewer"
+        if not can_create_role(role):
+            flash("Your account cannot create that role.", "danger")
+            return redirect(url_for("admin_users"))
         if not username or len(password) < 10:
             flash("Username and password of at least 10 characters are required.", "danger")
             return redirect(url_for("admin_users"))
@@ -157,11 +158,11 @@ def admin_users():
         flash("Admin user created.", "success")
         return redirect(url_for("admin_users"))
     users = Admin.query.order_by(Admin.id.asc()).all()
-    return render_template("admin/users.html", users=users)
+    return render_template("admin/users.html", users=users, creatable_roles=creatable_roles_for_current_user(), role_label=role_label)
 
 
 def _active_owner_count(exclude_user_id=None):
-    query = Admin.query.filter_by(role="owner", is_active=True)
+    query = Admin.query.filter(Admin.role.in_(["developer", "owner"]), Admin.is_active == True)
     if exclude_user_id is not None:
         query = query.filter(Admin.id != exclude_user_id)
     return query.count()
@@ -180,8 +181,9 @@ def admin_user_edit(user_id):
         role = request.form.get("role", "viewer")
         is_active = request.form.get("is_active") == "1"
         new_password = request.form.get("password", "")
-        if role not in {"owner", "editor", "viewer"}:
-            role = "viewer"
+        if role != user.role and not can_create_role(role):
+            flash("Your account cannot assign that role.", "danger")
+            return redirect(url_for("admin_user_edit", user_id=user.id))
         if not username:
             flash("Username is required.", "danger")
             return redirect(url_for("admin_user_edit", user_id=user.id))
@@ -193,10 +195,10 @@ def admin_user_edit(user_id):
             if not is_active:
                 flash("You cannot disable your own account.", "danger")
                 return redirect(url_for("admin_user_edit", user_id=user.id))
-            if role != "owner":
-                flash("You cannot remove owner role from your own account.", "danger")
+            if role not in {"developer", "owner"}:
+                flash("You cannot remove full-control role from your own account.", "danger")
                 return redirect(url_for("admin_user_edit", user_id=user.id))
-        if user.role == "owner" and user.is_active and (role != "owner" or not is_active) and _active_owner_count(exclude_user_id=user.id) < 1:
+        if user.role in {"developer", "owner"} and user.is_active and (role not in {"developer", "owner"} or not is_active) and _active_owner_count(exclude_user_id=user.id) < 1:
             flash("At least one active owner account is required.", "danger")
             return redirect(url_for("admin_user_edit", user_id=user.id))
         if new_password and len(new_password) < 10:
@@ -216,7 +218,7 @@ def admin_user_edit(user_id):
         audit("admin_user_edit", f"{old_username} -> {username}")
         flash("Admin user updated. If a new password was entered, the user can login with that password immediately. No email is required for this manual reset.", "success")
         return redirect(url_for("admin_users"))
-    return render_template("admin/user_edit.html", user=user)
+    return render_template("admin/user_edit.html", user=user, role_options=creatable_roles_for_current_user() or [(user.role, role_label(user.role))], role_label=role_label)
 
 
 @app.route("/admin/users/<int:user_id>/toggle", methods=["POST"])
@@ -228,7 +230,7 @@ def admin_user_toggle(user_id):
     if user.id == session.get("admin_id"):
         flash("You cannot disable your own account.", "danger")
         return redirect(url_for("admin_users"))
-    if user.is_active and user.role == "owner" and _active_owner_count(exclude_user_id=user.id) < 1:
+    if user.is_active and user.role in {"developer", "owner"} and _active_owner_count(exclude_user_id=user.id) < 1:
         flash("At least one active owner account is required.", "danger")
         return redirect(url_for("admin_users"))
     user.is_active = not user.is_active
@@ -246,7 +248,7 @@ def admin_user_delete(user_id):
     if user.id == session.get("admin_id"):
         flash("You cannot delete your own account.", "danger")
         return redirect(url_for("admin_users"))
-    if user.role == "owner" and user.is_active and _active_owner_count(exclude_user_id=user.id) < 1:
+    if user.role in {"developer", "owner"} and user.is_active and _active_owner_count(exclude_user_id=user.id) < 1:
         flash("At least one active owner account is required.", "danger")
         return redirect(url_for("admin_users"))
     username = user.username
