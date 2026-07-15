@@ -26,7 +26,13 @@ from services import (
 
 
 def create_app():
-    app = Flask(__name__)
+    module_dir = os.path.abspath(os.path.dirname(__file__))
+    app = Flask(
+        __name__,
+        root_path=module_dir,
+        template_folder=os.path.join(module_dir, "templates"),
+        static_folder=os.path.join(module_dir, "static"),
+    )
     app.config.from_object(Config)
     os.makedirs(app.instance_path, exist_ok=True)
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
