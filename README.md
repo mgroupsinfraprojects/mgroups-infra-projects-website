@@ -1,3 +1,5 @@
+# V16.2 Premium 3D Owner UI
+
 # M-GROUPS INFRA PROJECTS — v4 Top Production Website
 
 Professional Flask website for M-GROUPS INFRA PROJECTS with public company pages, admin content management, production storage support, SEO pages, enquiry notification, and backup/restore.
@@ -156,3 +158,19 @@ Important privacy default: phone and WhatsApp are hidden publicly unless enabled
 ## V13 admin password recovery
 
 This package includes a forgot-password flow for admin accounts. Configure `ADMIN_RECOVERY_EMAIL` and SMTP variables in Render, then test `/admin/forgot-password`. See `PASSWORD_RECOVERY_SETUP.md`.
+
+## V16 Owner-Ready Portal Flow
+
+Public website stays open for visitors. Internal tools are protected:
+
+Public Website → Login → My Workspace → Website / Stock / Employees / GST / Reports / Users / System.
+
+Use role permissions to decide which module boxes and child actions each user can see.
+
+For best speed on Render, disable auto-deploy while testing and use a paid web service for business use.
+
+
+## V16.2 Premium 3D Owner UI
+- Adds premium 3D hero, 3D cards, reveal animations and owner-demo polish.
+- Keeps V16.1 stock database fix and portal/permission structure.
+- Use this version for owner demo if you want premium visual impact.

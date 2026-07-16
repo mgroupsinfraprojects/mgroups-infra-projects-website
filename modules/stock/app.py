@@ -3,6 +3,7 @@ import socket
 import threading
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, current_app, jsonify, abort, session
+from jinja2 import ChoiceLoader, FileSystemLoader
 from sqlalchemy import func, or_
 from openpyxl import Workbook
 from reportlab.lib import colors
@@ -34,7 +35,22 @@ def create_app():
         static_folder=os.path.join(module_dir, "static"),
     )
     app.config.from_object(Config)
+
+    # V16: keep the stock system inside modules/stock without renaming files,
+    # but make template loading explicit when mounted under /portal/stock.
+    # This prevents TemplateNotFound: dashboard.html on Render.
+    stock_template_dir = os.path.join(module_dir, "templates")
+    app.jinja_loader = ChoiceLoader([FileSystemLoader(stock_template_dir), app.jinja_loader])
+
+    # V16.1: make all local folders before db.create_all().
+    # Important for Windows/local ZIP runs and Render fallback when no DATABASE_URL exists.
     os.makedirs(app.instance_path, exist_ok=True)
+    db_uri = app.config.get("SQLALCHEMY_DATABASE_URI", "")
+    if db_uri.startswith("sqlite:///"):
+        sqlite_path = db_uri.replace("sqlite:///", "", 1)
+        sqlite_dir = os.path.dirname(sqlite_path)
+        if sqlite_dir:
+            os.makedirs(sqlite_dir, exist_ok=True)
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
     os.makedirs(app.config["EXPORT_FOLDER"], exist_ok=True)
     os.makedirs(app.config["BACKUP_FOLDER"], exist_ok=True)

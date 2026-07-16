@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block title %}{% if field_visible('settings','company_name') %}{{ site.company_name }} | {% endif %}Infrastructure & Civil Works{% endblock %}
 {% block content %}
-<section class="hero">
+<section class="hero premium-hero-3d">
+  <canvas id="hero3d-canvas" class="hero-3d-canvas" aria-hidden="true"></canvas>
   <div class="hero-bg"></div>
   <div class="container hero-grid">
     <div class="hero-copy">
