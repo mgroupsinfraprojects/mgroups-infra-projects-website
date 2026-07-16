@@ -183,7 +183,21 @@ def month_year_from_request() -> tuple[int, int]:
 
 
 def create_app(test_config: dict | None = None) -> Flask:
-    app = Flask(__name__, instance_relative_config=True)
+    # When this employee ERP is mounted inside the main M-GROUPS portal,
+    # Flask must be pointed explicitly at its own folders. Otherwise Jinja
+    # searches the main website templates and raises TemplateNotFound for
+    # dashboard.html, sites.html, employees.html, etc.
+    module_instance_dir = BASE_DIR / "instance"
+    module_instance_dir.mkdir(parents=True, exist_ok=True)
+    app = Flask(
+        __name__,
+        root_path=str(BASE_DIR),
+        template_folder=str(BASE_DIR / "templates"),
+        static_folder=str(BASE_DIR / "static"),
+        static_url_path="/static",
+        instance_path=str(module_instance_dir),
+        instance_relative_config=True,
+    )
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)  # type: ignore[method-assign]
 
     database_url = normalize_database_url(
