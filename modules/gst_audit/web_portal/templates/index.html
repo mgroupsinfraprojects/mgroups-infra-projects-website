@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GST Audit Web</title>
+  <link rel="stylesheet" href="/static/web.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand-block">
+      <div class="brand-logo">GST</div>
+      <div><h1>GST Audit Web</h1><p>Invoice audit workspace</p></div>
+    </div>
+    <nav>
+      <a href="#upload">Start Audit</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#months">Month Wise</a>
+      <a href="#review">Review</a>
+      <a href="#suppliers">Suppliers</a>
+      <a href="#approved">Invoice Data</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a class="side-link" href="/report">Report</a>
+      <a class="side-link" href="/export">Export Excel</a>
+      <a class="side-link" href="/audit-log">Audit log CSV</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">No-login local web module</p>
+        <h2>GST Invoice Audit</h2>
+        <small id="version"></small>
+      </div>
+      <form method="post" action="/clear" class="inline-form"><button class="secondary" type="submit">Clear Session</button></form>
+    </header>
+
+    <div id="error" class="error">{{ERROR}}</div>
+
+    <section class="card upload-card" id="upload">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Start audit</p>
+          <h3>Upload Excel / CSV files</h3>
+          <p class="muted">Only invoice rows with company name, GSTIN, invoice number, and invoice value are used in the web dashboard and review queue.</p>
+        </div>
+      </div>
+      <form action="/audit" method="post" enctype="multipart/form-data" class="upload-form">
+        <label class="drop-zone">
+          <span class="drop-title">Choose GST Excel / CSV files</span>
+          <span class="drop-note">XLSX, XLSM, XLS, CSV, TSV · up to 50 MB per file</span>
+          <input type="file" name="files" multiple accept=".xlsx,.xlsm,.xls,.csv,.tsv" required>
+        </label>
+        <button type="submit">Run Audit</button>
+      </form>
+      <p id="uploadStatus" class="processing-note hidden"></p>
+    </section>
+
+    <section id="dashboard" class="grid metrics"></section>
+
+    <section class="card chart-card" id="months">
+      <div class="section-title">
+        <div><p class="eyebrow">Dashboard</p><h3>Month-wise and file-wise totals</h3></div>
+        <a href="/report" class="button-like secondary">Open report</a>
+      </div>
+      <div class="chart-grid">
+        <div><h4>Month-wise invoice value</h4><div id="monthChart" class="bar-chart"></div></div>
+        <div><h4>Source file-wise invoice value</h4><div id="sourceChart" class="bar-chart"></div></div>
+      </div>
+      <div class="table-split">
+        <div><h4>Month-wise table</h4><div id="monthTable" class="table-wrap"></div></div>
+        <div><h4>File-wise table</h4><div id="sourceTable" class="table-wrap"></div></div>
+      </div>
+    </section>
+
+    <section class="card" id="review">
+      <div class="section-title">
+        <div><p class="eyebrow">Fix only real invoice issues</p><h3>Review Rows</h3></div>
+        <form action="/review" method="post" id="approveAllForm">
+          <input type="hidden" name="scope" value="all_review">
+          <input type="hidden" name="action" value="approve">
+          <input type="hidden" name="note" value="Bulk approved from web mode.">
+          <button type="submit" class="secondary">Approve All</button>
+        </form>
+      </div>
+      <p class="muted">Header rows, GSTR section labels, ITC summaries, zero-value support rows, and rows without invoice identity are not shown here.</p>
+      <div class="tool-row"><input id="reviewSearch" type="search" placeholder="Search supplier, GSTIN, invoice no, issue..."></div>
+      <div id="reviewRows" class="table-wrap"></div>
+    </section>
+
+    <section class="card" id="suppliers">
+      <div class="section-title"><div><p class="eyebrow">Supplier details</p><h3>Supplier Summary</h3></div></div>
+      <div class="tool-row"><input id="supplierSearch" type="search" placeholder="Search supplier or GSTIN..."></div>
+      <div id="suppliersTable" class="table-wrap"></div>
+      <div class="supplier-detail-card">
+        <h3 id="selectedSupplierTitle">Selected Supplier — Invoice Details</h3>
+        <p id="selectedSupplierMeta" class="muted">Click a supplier row to see invoice-level details.</p>
+        <div id="supplierInvoices" class="table-wrap"></div>
+      </div>
+    </section>
+
+    <section class="card" id="approved">
+      <div class="section-title"><div><p class="eyebrow">Clean invoice data</p><h3>Approved Invoice Rows</h3></div></div>
+      <div class="tool-row"><input id="invoiceSearch" type="search" placeholder="Search invoice data..."></div>
+      <div id="approvedRows" class="table-wrap"></div>
+    </section>
+  </main>
+  <script id="payload" type="application/json">{{DATA_JSON}}</script>
+  <script src="/static/web.js"></script>
+</body>
+</html>

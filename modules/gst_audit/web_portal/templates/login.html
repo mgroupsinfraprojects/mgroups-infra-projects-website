@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GST Audit Pro Premium Login</title>
+  <link rel="stylesheet" href="/static/web.css">
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <section class="login-panel glass-card">
+      <div class="brand-mark">GST</div>
+      <p class="eyebrow">Premium local audit workspace · v{{VERSION}}</p>
+      <h1>GST Audit Pro</h1>
+      <p class="muted">Secure browser mode for Excel/CSV GST invoice audit, review decisions, management reporting, and export control.</p>
+      <div class="error">{{ERROR}}</div>
+      <form method="post" action="/login" class="login-form">
+        <label>Username<input name="username" autocomplete="username" required autofocus value="admin"></label>
+        <label>Password<input type="password" name="password" autocomplete="current-password" required value="admin123"></label>
+        <button type="submit">Open Premium Workspace</button>
+      </form>
+      <div class="credential-box">
+        <strong>Local demo credentials</strong>
+        <span>admin / admin123</span>
+        <span>auditor / audit123</span>
+        <span>viewer / view123</span>
+      </div>
+      <p class="fine-print">For LAN/server use, change defaults using GST_AUDIT_WEB_ADMIN_PASSWORD before first launch.</p>
+    </section>
+    <section class="login-benefits">
+      <h2>What premium mode adds</h2>
+      <div class="benefit"><b>Role access</b><span>Admin, auditor, viewer permissions</span></div>
+      <div class="benefit"><b>Activity log</b><span>Upload, review, export, clear events</span></div>
+      <div class="benefit"><b>Executive summary</b><span>Readiness score, verdict, next action</span></div>
+      <div class="benefit"><b>Export controls</b><span>Verified workbook + management report</span></div>
+    </section>
+  </main>
+</body>
+</html>

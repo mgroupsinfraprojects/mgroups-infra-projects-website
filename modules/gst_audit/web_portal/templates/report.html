@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GST Audit Report</title>
+  <link rel="stylesheet" href="/static/web.css">
+</head>
+<body class="report-page">
+  <main class="report-shell">
+    <header class="report-header">
+      <div><p class="eyebrow">Audit report</p><h1>GST Invoice Audit Summary</h1><p id="reportMeta" class="muted"></p></div>
+      <button onclick="window.print()" class="secondary print-hide">Print / Save PDF</button>
+    </header>
+    <section id="reportMetrics" class="grid metrics"></section>
+    <section class="card"><h3>Month-wise totals</h3><div id="reportMonths" class="table-wrap"></div></section>
+    <section class="card"><h3>Supplier summary</h3><div id="reportSuppliers" class="table-wrap"></div></section>
+    <section class="card"><h3>Pending invoice review rows</h3><div id="reportReview" class="table-wrap"></div></section>
+  </main>
+  <script id="payload" type="application/json">{{DATA_JSON}}</script>
+  <script src="/static/web.js"></script>
+</body>
+</html>
