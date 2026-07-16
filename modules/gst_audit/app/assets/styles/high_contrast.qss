@@ -1,0 +1,7 @@
+/* Audit High Contrast reference skin for long review sessions and error checking. */
+QWidget { background: #000000; color: #FFFFFF; }
+QFrame#AppSidebar, QFrame#MetricCard, QFrame#SettingsSection { background: #101010; border: 1px solid #FFFFFF; border-radius: 16px; }
+QPushButton#NavButton:checked, QPushButton { background: #FFCC00; color: #000000; font-weight: 900; }
+QLineEdit, QTextEdit, QComboBox, QSpinBox, QTableView, QTableWidget { background: #000000; color: #FFFFFF; border: 1px solid #FFFFFF; }
+QHeaderView::section { background: #FFFFFF; color: #000000; font-weight: 900; }
+QLabel#MutedText { color: #FFFFFF; }

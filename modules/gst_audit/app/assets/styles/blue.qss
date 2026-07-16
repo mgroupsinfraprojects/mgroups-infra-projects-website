@@ -1,0 +1,8 @@
+/* Professional Blue reference skin for CA firm branding. */
+QWidget { background: #EEF4FF; color: #0F172A; }
+QFrame#AppSidebar { background: #0F2F66; border-radius: 20px; }
+QPushButton#NavButton:checked, QPushButton { background: #1D4ED8; color: #FFFFFF; }
+QPushButton:hover { background: #1E40AF; }
+QFrame#MetricCard, QFrame#SettingsSection { background: #FFFFFF; border: 1px solid #B8C7DF; border-radius: 18px; }
+QHeaderView::section { background: #DBEAFE; color: #0F172A; font-weight: 800; }
+QLineEdit, QTextEdit, QComboBox, QSpinBox { background: #FFFFFF; border: 1px solid #B8C7DF; border-radius: 10px; padding: 8px; }

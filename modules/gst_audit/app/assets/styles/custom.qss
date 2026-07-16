@@ -1,0 +1,7 @@
+/* Custom Theme reference skin. Actual custom colors are saved from Settings and rendered at runtime. */
+QWidget { background: #F5F7FB; color: #111827; }
+QFrame#AppSidebar { background: #0F172A; border-radius: 20px; }
+QPushButton#NavButton:checked, QPushButton { background: #2563EB; color: #FFFFFF; }
+QFrame#MetricCard, QFrame#SettingsSection { background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 18px; }
+QLineEdit, QTextEdit, QComboBox, QSpinBox { background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 8px; }
+QHeaderView::section { background: #111827; color: #FFFFFF; font-weight: 800; }
