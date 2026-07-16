@@ -1,0 +1,16 @@
+{
+  "app_name": "GST Audit Pro",
+  "window_title": "GST Invoice Audit Software",
+  "sidebar_title": "GST Audit Pro",
+  "sidebar_subtitle": "Invoice verification workspace",
+  "navigation": {
+    "upload": "Start Audit",
+    "dashboard": "Dashboard",
+    "review": "Fix Issues",
+    "suppliers": "Suppliers",
+    "reconciliation": "Proof",
+    "exports": "Export",
+    "settings": "Settings"
+  },
+  "version": "11.13.0"
+}

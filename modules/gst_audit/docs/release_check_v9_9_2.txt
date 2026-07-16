@@ -1,0 +1,67 @@
+Release verification passed.
+GST Invoice Audit processor smoke test
+Files processed: 1
+Sheets processed: 1
+Raw rows read: 3
+Classified rows: 3
+Final approved rows: 1
+Review rows: 1
+Row coverage: MATCHED
+Amount reconciliation: MATCHED
+Final status: BALANCED_BUT_REVIEW_REQUIRED
+Export check: /tmp/gst_audit_smoke_export.xlsx
+Duplicate invoice excluded: file=02_review_and_duplicate_cases.xlsx sheet=Sheet1 row=4 duplicate_of=3 gstin=33*********F1Z7
+Duplicate invoice excluded: file=02_review_and_duplicate_cases.xlsx sheet=Sheet1 row=4 duplicate_of=7 gstin=33*********F1Z7
+
+[balanced_excel]
+files_processed=1
+raw_rows_read=4
+classified_rows=4
+approved_rows=3
+review_rows=0
+duplicate_rows=0
+row_coverage=MATCHED
+amount_reconciliation=MATCHED
+final_status=FULLY_VERIFIED
+export=/tmp/gst_audit_balanced_excel.xlsx
+
+[review_duplicate_excel]
+files_processed=1
+raw_rows_read=5
+classified_rows=5
+approved_rows=1
+review_rows=3
+duplicate_rows=1
+row_coverage=MATCHED
+amount_reconciliation=MATCHED
+final_status=BALANCED_BUT_REVIEW_REQUIRED
+export=/tmp/gst_audit_review_duplicate_excel.xlsx
+
+[csv_import]
+files_processed=1
+raw_rows_read=3
+classified_rows=3
+approved_rows=2
+review_rows=0
+duplicate_rows=0
+row_coverage=MATCHED
+amount_reconciliation=MATCHED
+final_status=FULLY_VERIFIED
+export=/tmp/gst_audit_csv_import.xlsx
+
+[multi_file_batch]
+files_processed=3
+raw_rows_read=12
+classified_rows=12
+approved_rows=6
+review_rows=3
+duplicate_rows=1
+row_coverage=MATCHED
+amount_reconciliation=MATCHED
+final_status=BALANCED_BUT_REVIEW_REQUIRED
+export=/tmp/gst_audit_multi_file_batch.xlsx
+
+Sample dataset checks passed.
+Cleaned local test/cache artifacts.
+Cleaned local test/cache artifacts.
+Cleaned local test/cache artifacts.

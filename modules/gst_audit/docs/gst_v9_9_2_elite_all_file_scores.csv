@@ -1,0 +1,185 @@
+path,type,lines,size_bytes,score,review
+.gitignore,file,12.0,96,90,Clean release file.
+GSTInvoiceAudit.spec,.spec,47.0,990,91,Clean release file.
+README.md,.md,73.0,4330,90,Current documentation retained for release clarity.
+START_GST_AUDIT_PRO.bat,.bat,2.0,34,91,Clean release file.
+app/README.md,.md,15.0,615,90,Current documentation retained for release clarity.
+app/__init__.py,.py,3.0,71,92,Clean release file.
+app/assets/README.md,.md,9.0,315,90,Current documentation retained for release clarity.
+app/assets/icons/dashboard.svg,.svg,1.0,265,90,Clean release file.
+app/assets/icons/error.svg,.svg,1.0,219,90,Clean release file.
+app/assets/icons/export.svg,.svg,1.0,265,90,Clean release file.
+app/assets/icons/filter.svg,.svg,1.0,219,90,Clean release file.
+app/assets/icons/reconciliation.svg,.svg,1.0,265,90,Clean release file.
+app/assets/icons/review.svg,.svg,1.0,265,90,Clean release file.
+app/assets/icons/search.svg,.svg,1.0,219,90,Clean release file.
+app/assets/icons/settings.svg,.svg,1.0,265,90,Clean release file.
+app/assets/icons/success.svg,.svg,1.0,219,90,Clean release file.
+app/assets/icons/suppliers.svg,.svg,1.0,265,90,Clean release file.
+app/assets/icons/upload.svg,.svg,1.0,265,90,Clean release file.
+app/assets/icons/warning.svg,.svg,1.0,219,90,Clean release file.
+app/assets/previews/preview_dashboard_dark.png,.png,,80244,90,Clean release file.
+app/assets/previews/preview_dashboard_light.png,.png,,80233,90,Clean release file.
+app/assets/previews/preview_theme_settings.png,.png,,73340,90,Clean release file.
+app/assets/styles/blue.qss,.qss,8.0,625,88,Meaningful reference stylesheet; runtime theme remains generated.
+app/assets/styles/custom.qss,.qss,7.0,626,88,Meaningful reference stylesheet; runtime theme remains generated.
+app/assets/styles/dark.qss,.qss,13.0,1124,88,Meaningful reference stylesheet; runtime theme remains generated.
+app/assets/styles/high_contrast.qss,.qss,7.0,624,88,Meaningful reference stylesheet; runtime theme remains generated.
+app/assets/styles/light.qss,.qss,13.0,1098,88,Meaningful reference stylesheet; runtime theme remains generated.
+app/assets/styles/main.qss,.qss,483.0,10351,90,Meaningful reference stylesheet; runtime theme remains generated.
+app/core/README.md,.md,18.0,523,90,Current documentation retained for release clarity.
+app/core/__init__.py,.py,17.0,509,92,Clean release file.
+app/core/analytics.py,.py,249.0,9401,92,Clean release file.
+app/core/audit_engine.py,.py,1045.0,55791,82,Core engine is strong but large; future split into parser/classifier/reconciliation services would improve maintainability.
+app/core/branding.py,.py,117.0,4201,94,Strong configurable branding module with sanitization and fallbacks.
+app/core/config.py,.py,55.0,2637,92,Clean release file.
+app/core/database.py,.py,452.0,20065,92,Clean release file.
+app/core/date_parser.py,.py,39.0,1119,92,Clean release file.
+app/core/exception_workflow.py,.py,124.0,5767,92,Clean release file.
+app/core/exporter.py,.py,408.0,19789,92,Clean release file.
+app/core/field_detector.py,.py,38.0,1203,92,Clean release file.
+app/core/gst_compliance.py,.py,145.0,5798,92,Clean release file.
+app/core/gst_override_tables.py,.py,58.0,2452,92,Clean release file.
+app/core/gstin.py,.py,117.0,4404,92,Clean release file.
+app/core/gstr_reconciliation.py,.py,356.0,14772,92,Clean release file.
+app/core/header_detector.py,.py,112.0,5320,92,Clean release file.
+app/core/hsn.py,.py,34.0,1149,92,Clean release file.
+app/core/import_profiles.py,.py,197.0,7716,92,Clean release file.
+app/core/invoice_number.py,.py,31.0,1027,92,Clean release file.
+app/core/logging_config.py,.py,24.0,766,92,Clean release file.
+app/core/models.py,.py,170.0,5991,92,Clean release file.
+app/core/money.py,.py,93.0,2739,92,Clean release file.
+app/core/performance.py,.py,45.0,1382,92,Clean release file.
+app/core/security.py,.py,136.0,4731,92,Clean release file.
+app/resources/README.md,.md,3.0,134,82,Short documentation; acceptable if intentionally focused.
+app/resources/style.qss,.qss,31.0,3038,88,Meaningful reference stylesheet; runtime theme remains generated.
+app/ui/README.md,.md,15.0,421,90,Current documentation retained for release clarity.
+app/ui/__init__.py,.py,20.0,523,92,Clean release file.
+app/ui/controllers/__init__.py,.py,5.0,147,92,Clean release file.
+app/ui/controllers/dashboard_controller.py,.py,966.0,53333,82,Powerful dashboard controller; still large due to analytics/view coordination. Future split by chart/table/filter responsibilities recommended.
+app/ui/dashboard_controller.py,.py,8.0,260,92,Clean release file.
+app/ui/main_window.py,.py,1016.0,48824,82,Functional shell/controller file; still large because it owns many UI actions. Future split into page controllers recommended.
+app/ui/processing_worker.py,.py,53.0,2079,92,Clean release file.
+app/ui/theme_manager.py,.py,861.0,28224,84,Functional but large; future component split recommended.
+app/ui/views/__init__.py,.py,1.0,62,92,Clean release file.
+app/ui/views/audit_view.py,.py,56.0,3206,92,Clean release file.
+app/ui/views/dashboard_view.py,.py,454.0,21733,92,Clean release file.
+app/ui/views/export_view.py,.py,39.0,1866,92,Clean release file.
+app/ui/views/reconciliation_view.py,.py,76.0,3325,92,Clean release file.
+app/ui/views/settings_view.py,.py,209.0,8361,92,Clean release file.
+app/ui/views/supplier_view.py,.py,33.0,1722,92,Clean release file.
+app/ui/views/upload_view.py,.py,58.0,2459,92,Clean release file.
+app/ui/widgets/__init__.py,.py,39.0,1359,92,Clean release file.
+app/ui/widgets/chart_panel.py,.py,283.0,12321,92,Clean release file.
+app/ui/widgets/data_table.py,.py,200.0,8632,92,Clean release file.
+app/ui/widgets/detail_panel.py,.py,54.0,2623,92,Clean release file.
+app/ui/widgets/empty_state.py,.py,18.0,645,92,Clean release file.
+app/ui/widgets/guided_filter.py,.py,1103.0,48290,82,Functional but oversized UI component; split into model/popup/chips/controller in future.
+app/ui/widgets/guided_search_picker.py,.py,369.0,15207,92,Clean release file.
+app/ui/widgets/loading_overlay.py,.py,18.0,571,92,Clean release file.
+app/ui/widgets/metric_card.py,.py,69.0,2456,92,Clean release file.
+app/ui/widgets/modern_combo.py,.py,137.0,5089,92,Clean release file.
+app/ui/widgets/status_card.py,.py,9.0,185,92,Clean release file.
+app/ui/widgets/status_chip.py,.py,83.0,2988,92,Clean release file.
+app/ui/widgets/toast.py,.py,17.0,491,92,Clean release file.
+app/ui/widgets/upload_card.py,.py,56.0,2384,92,Clean release file.
+app/version.py,.py,7.0,291,92,Clean release file.
+backend/README.md,.md,21.0,362,90,Current documentation retained for release clarity.
+backend/__init__.py,.py,6.0,134,92,Clean release file.
+backend/audit.py,.py,5.0,126,92,Clean release file.
+backend/models.py,.py,5.0,162,92,Clean release file.
+build_exe.bat,.bat,79.0,1883,93,Build gate now runs full release-check before PyInstaller.
+config/README.md,.md,13.0,635,90,Current documentation retained for release clarity.
+config/app_identity.json,.json,15.0,424,95,Editable app identity and navigation labels.
+data_layer/README.md,.md,10.0,189,90,Current documentation retained for release clarity.
+data_layer/__init__.py,.py,7.0,203,92,Clean release file.
+data_layer/database.py,.py,5.0,107,92,Clean release file.
+deployment/README.md,.md,13.0,333,90,Current documentation retained for release clarity.
+deployment/release_checklist.md,.md,11.0,481,90,Current documentation retained for release clarity.
+docs/ARCHITECTURE.md,.md,43.0,1097,90,Current documentation retained for release clarity.
+docs/ARCHITECTURE_DEPENDENCY_GRAPH.md,.md,37.0,1337,90,Current documentation retained for release clarity.
+docs/CLEAN_TREE_SNAPSHOT.txt,.txt,184.0,5959,90,Current documentation retained for release clarity.
+docs/DEVELOPER_ONBOARDING.md,.md,51.0,1157,90,Current documentation retained for release clarity.
+docs/ELITE_FOLDER_STRUCTURE_V9_9_2.md,.md,39.0,2452,94,"Current, release-specific, verification-oriented documentation."
+docs/ENTERPRISE_DEPLOYMENT_GAP_LIST.md,.md,32.0,1894,90,Current documentation retained for release clarity.
+docs/FINAL_ARCHITECTURE.md,.md,40.0,1067,90,Current documentation retained for release clarity.
+docs/FINAL_RUN_GUIDE.md,.md,54.0,1044,90,Current documentation retained for release clarity.
+docs/FOLDER_STRUCTURE.md,.md,75.0,4375,90,Current documentation retained for release clarity.
+docs/FOLDER_STRUCTURE_AND_WORKFLOW_ALGORITHM.md,.md,94.0,5312,90,Current documentation retained for release clarity.
+docs/MODULE_MAP.md,.md,61.0,3246,90,Current documentation retained for release clarity.
+docs/OWNERSHIP_AND_BOUNDARIES.md,.md,55.0,1499,90,Current documentation retained for release clarity.
+docs/PRODUCTION_HARDENING.md,.md,57.0,2278,90,Current documentation retained for release clarity.
+docs/README.md,.md,16.0,464,90,Current documentation retained for release clarity.
+docs/RELEASE_VALIDATION_CHECKLIST.md,.md,45.0,1114,90,Current documentation retained for release clarity.
+docs/REVIEW_PERSISTENCE.md,.md,30.0,582,90,Current documentation retained for release clarity.
+docs/STRICT_REVIEW_V9_9_2.md,.md,73.0,4165,94,"Current, release-specific, verification-oriented documentation."
+docs/STRUCTURE_CHANGE_LOG.md,.md,37.0,1099,90,Current documentation retained for release clarity.
+docs/TEST_RESULTS.md,.md,28.0,1016,94,"Current, release-specific, verification-oriented documentation."
+docs/THEME_DISPLAY_SETTINGS.md,.md,42.0,1176,90,Current documentation retained for release clarity.
+docs/V9_7_ARCHITECTURE_ENFORCEMENT.md,.md,28.0,1469,90,Current documentation retained for release clarity.
+docs/V9_8_UI_UX_COMPLETION.md,.md,36.0,2681,90,Current documentation retained for release clarity.
+docs/V9_9_EFFECTIVENESS_RELEASE.md,.md,34.0,1675,90,Current documentation retained for release clarity.
+docs/WINDOWS_GUI_TEST_CHECKLIST.md,.md,59.0,2014,90,Current documentation retained for release clarity.
+docs/WORKFLOW.md,.md,34.0,569,90,Current documentation retained for release clarity.
+docs/adr/0001-keep-app-runtime-root.md,.md,27.0,891,90,Current documentation retained for release clarity.
+docs/adr/0002-core-ui-separation.md,.md,16.0,440,90,Current documentation retained for release clarity.
+docs/adr/0003-report-export-boundary.md,.md,15.0,555,90,Current documentation retained for release clarity.
+docs/adr/0004-security-foundation-boundary.md,.md,15.0,626,90,Current documentation retained for release clarity.
+docs/adr/0005-guided-search-ui-decision.md,.md,14.0,454,90,Current documentation retained for release clarity.
+documentation/README.md,.md,13.0,163,90,Current documentation retained for release clarity.
+frontend/README.md,.md,19.0,336,90,Current documentation retained for release clarity.
+frontend/__init__.py,.py,8.0,255,92,Clean release file.
+frontend/views.py,.py,32.0,1015,92,Clean release file.
+frontend/widgets.py,.py,38.0,1312,92,Clean release file.
+main.py,.py,21.0,488,92,Clean release file.
+pyproject.toml,.toml,46.0,1259,91,Clean release file.
+pytest.ini,.ini,4.0,106,91,Clean release file.
+quality/README.md,.md,10.0,189,90,Current documentation retained for release clarity.
+quality/architecture_rules.md,.md,8.0,365,90,Current documentation retained for release clarity.
+quality/test_matrix.md,.md,9.0,482,90,Current documentation retained for release clarity.
+requirements.txt,.txt,14.0,202,90,Current documentation retained for release clarity.
+run_app.bat,.bat,81.0,2532,91,Clean release file.
+sample_data/01_balanced_invoices.xlsx,.xlsx,,5709,92,Golden/sample data file used by validation checks.
+sample_data/02_review_and_duplicate_cases.xlsx,.xlsx,,5694,92,Golden/sample data file used by validation checks.
+sample_data/03_csv_import_cases.csv,.csv,3.0,312,92,Golden/sample data file used by validation checks.
+scripts/README.md,.md,3.0,149,82,Short documentation; acceptable if intentionally focused.
+scripts/create_sample_data.py,.py,81.0,2734,90,Release/build helper; verified by release-check.
+scripts/dev.py,.py,86.0,2779,90,Release/build helper; verified by release-check.
+scripts/gui_smoke_test.py,.py,28.0,702,90,Release/build helper; verified by release-check.
+scripts/preflight_windows.py,.py,79.0,2434,90,Release/build helper; verified by release-check.
+scripts/run_real_data_v91.py,.py,148.0,5893,90,Release/build helper; verified by release-check.
+scripts/run_sample_dataset_checks.py,.py,59.0,2526,90,Release/build helper; verified by release-check.
+scripts/smoke_test_processor.py,.py,72.0,2786,90,Release/build helper; verified by release-check.
+scripts/verify_release.py,.py,149.0,5863,90,Release/build helper; verified by release-check.
+security_layer/README.md,.md,9.0,248,90,Current documentation retained for release clarity.
+security_layer/__init__.py,.py,7.0,196,92,Clean release file.
+security_layer/security.py,.py,5.0,241,92,Clean release file.
+tests/README.md,.md,9.0,262,90,Current documentation retained for release clarity.
+tests/conftest.py,.py,8.0,180,91,Useful regression/contract coverage.
+tests/test_analytics.py,.py,74.0,2943,91,Useful regression/contract coverage.
+tests/test_core_audit.py,.py,593.0,24741,86,Large core file; branch coverage/refactor can still improve maintainability.
+tests/test_core_security_performance_hardening.py,.py,98.0,4124,91,Useful regression/contract coverage.
+tests/test_dashboard_layout_contract.py,.py,39.0,1593,91,Useful regression/contract coverage.
+tests/test_gst_compliance.py,.py,85.0,2401,91,Useful regression/contract coverage.
+tests/test_gst_override_tables.py,.py,49.0,1514,91,Useful regression/contract coverage.
+tests/test_gstr_reconciliation_and_formats.py,.py,190.0,7758,91,Useful regression/contract coverage.
+tests/test_gui_runtime_interactions.py,.py,33.0,1176,91,Useful regression/contract coverage.
+tests/test_gui_screenshot_regression.py,.py,150.0,5144,91,Useful regression/contract coverage.
+tests/test_guided_search_contract.py,.py,30.0,1208,91,Useful regression/contract coverage.
+tests/test_release_packaging.py,.py,34.0,1237,91,Useful regression/contract coverage.
+tests/test_v10_branding_settings_control.py,.py,56.0,2270,91,Useful regression/contract coverage.
+tests/test_v8_7_final_ui_contract.py,.py,98.0,4555,91,Useful regression/contract coverage.
+tests/test_v8_8_unified_enter_value_contract.py,.py,36.0,1638,91,Useful regression/contract coverage.
+tests/test_v8_9_live_search_state_contract.py,.py,30.0,1330,91,Useful regression/contract coverage.
+tests/test_v9_0_core_correctness.py,.py,100.0,3790,91,Useful regression/contract coverage.
+tests/test_v9_1_real_data_hardening.py,.py,79.0,3195,91,Useful regression/contract coverage.
+tests/test_v9_2_credit_note_mapping.py,.py,70.0,3311,91,Useful regression/contract coverage.
+tests/test_v9_3_recalculation_credit_safety.py,.py,108.0,4731,91,Useful regression/contract coverage.
+tests/test_v9_4_credit_export_supplier_accuracy.py,.py,304.0,12890,91,Useful regression/contract coverage.
+tests/test_v9_6_top_level_hardening.py,.py,107.0,4408,91,Useful regression/contract coverage.
+tests/test_v9_7_architecture_enforcement.py,.py,102.0,3893,91,Useful regression/contract coverage.
+tests/test_v9_8_ui_workflow_completion.py,.py,60.0,2626,91,Useful regression/contract coverage.
+tests/test_v9_9_1_final_launcher_and_import_safety.py,.py,27.0,992,91,Useful regression/contract coverage.
+tests/test_v9_9_effectiveness_release.py,.py,57.0,1890,91,Useful regression/contract coverage.
+tests/test_window_startup_size_contract.py,.py,28.0,1039,91,Useful regression/contract coverage.
+tools/README.md,.md,9.0,152,90,Current documentation retained for release clarity.

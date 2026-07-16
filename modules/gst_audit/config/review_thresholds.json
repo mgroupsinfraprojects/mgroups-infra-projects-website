@@ -1,0 +1,9 @@
+{
+  "critical_amount": "10000.00",
+  "advisory_amount": "2500.00",
+  "ignore_amount": "500.00",
+  "critical_percent": "10.00",
+  "gst_critical_amount": "2500.00",
+  "duplicate_min_amount": "10000.00",
+  "high_value_supplier": "100000.00"
+}
