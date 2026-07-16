@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf_field, status_badge, empty_state %}
+{% block title %}Attendance{% endblock %}
+{% block topbar_title %}Daily Attendance{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div><div class="page-kicker">Daily workforce register</div><h1 class="page-title">Mark attendance</h1><p class="page-subtitle">Filter by project, apply a bulk status when appropriate, then review overtime before saving.</p></div>
+  <div class="page-actions"><a class="btn btn-light" href="{{ url_for('attendance_history') }}"><i class="bi bi-clock-history me-1"></i> Attendance history</a></div>
+</section>
+
+<form class="filter-panel" method="get">
+  <div class="filter-grid" style="grid-template-columns:minmax(180px,260px) minmax(200px,1fr) auto;">
+    <div><label class="form-label" for="date">Attendance date</label><input class="form-control" type="date" id="date" name="date" max="{{ today.isoformat() if today is defined else '' }}" value="{{ att_date.isoformat() }}"></div>
+    <div><label class="form-label" for="site_id">Project site</label><select class="form-select" id="site_id" name="site_id"><option value="">All active employees</option>{% for site in sites %}<option value="{{ site.id }}" {% if site_id|string == site.id|string %}selected{% endif %}>{{ site.name }}</option>{% endfor %}</select></div>
+    <div><button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i> Load register</button></div>
+  </div>
+</form>
+
+{% if employees %}
+<form method="post" data-attendance-form>
+  {{ csrf_field() }}
+  <input type="hidden" name="att_date" value="{{ att_date.isoformat() }}">
+  <input type="hidden" name="site_id" value="{{ site_id }}">
+
+  <div class="attendance-toolbar">
+    <div><strong>{{ employees|length }} employees</strong><span class="cell-subtitle">{{ marked_count }} previously saved for this date</span></div>
+    <div class="bulk-actions" aria-label="Bulk attendance actions"><button class="bulk-btn" type="button" data-bulk-status="Present"><i class="bi bi-check2-circle me-1"></i> All present</button><button class="bulk-btn" type="button" data-bulk-status="Absent"><i class="bi bi-x-circle me-1"></i> All absent</button><button class="bulk-btn" type="button" data-bulk-status="Holiday"><i class="bi bi-calendar-heart me-1"></i> Holiday</button></div>
+  </div>
+
+  <article class="panel table-card">
+    <div class="table-toolbar"><div><strong>{{ att_date.strftime('%A, %d %B %Y') }}</strong><small>Daily worker pay is calculated from Present and Half Day records.</small></div><div class="d-flex gap-2"><span class="status-pill status-success"><span data-present-count>0</span>&nbsp;working</span><span class="status-pill status-danger"><span data-absent-count>0</span>&nbsp;absent</span></div></div>
+    <div class="table-responsive">
+      <table class="table table-hover responsive-table">
+        <thead><tr><th>Employee</th><th>Site</th><th>Status</th><th style="width:150px">Overtime hours</th></tr></thead>
+        <tbody>
+        {% for employee in employees %}
+          {% set record = existing.get(employee.id) %}
+          <tr>
+            <td class="primary-mobile" data-label="Employee"><input type="hidden" name="emp_id" value="{{ employee.id }}"><div class="primary-cell"><span class="avatar">{{ employee.name[:1]|upper }}</span><span><span class="cell-title">{{ employee.name }}</span><span class="cell-subtitle">{{ employee.emp_code }} · {{ employee.role }}</span></span></div></td>
+            <td data-label="Site">{{ employee.site.name if employee.site else 'Unassigned' }}</td>
+            <td data-label="Status"><select class="form-select form-select-sm" name="status_{{ employee.id }}" data-attendance-status aria-label="Attendance status for {{ employee.name }}">{% for item in attendance_statuses %}<option value="{{ item }}" {% if record and record.status == item %}selected{% elif not record and item == 'Present' %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></td>
+            <td data-label="Overtime"><div class="input-group input-group-sm"><input class="form-control" type="number" name="ot_{{ employee.id }}" min="0" max="24" step="0.5" value="{{ record.overtime_hours if record else 0 }}" aria-label="Overtime hours for {{ employee.name }}"><span class="input-group-text">hrs</span></div></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <div class="sticky-submit"><div><strong>Review before saving</strong><span class="cell-subtitle">Saving updates existing records for this date; it does not create duplicates.</span></div><button class="btn btn-primary" type="submit"><i class="bi bi-cloud-check me-1"></i> Save attendance</button></div>
+</form>
+{% else %}
+<article class="panel">{{ empty_state('bi-person-x', 'No eligible employees', 'Add active employees or choose another project filter.') }}</article>
+{% endif %}
+{% endblock %}

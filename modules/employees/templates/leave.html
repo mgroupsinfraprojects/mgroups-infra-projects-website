@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf_field, status_badge, pagination_nav, empty_state %}
+{% block title %}Leave Management{% endblock %}
+{% block topbar_title %}Leave Management{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div><div class="page-kicker">Time-off workflow</div><h1 class="page-title">Leave management</h1><p class="page-subtitle">Submit, review, approve, and reject leave requests with date-order and overlap validation.</p></div>
+</section>
+
+<section class="summary-strip">
+  <div class="summary-item"><span>Total requests</span><strong>{{ summary.values()|sum }}</strong></div>
+  <div class="summary-item"><span>Pending</span><strong>{{ summary.get('Pending', 0) }}</strong></div>
+  <div class="summary-item"><span>Approved</span><strong>{{ summary.get('Approved', 0) }}</strong></div>
+  <div class="summary-item"><span>Rejected</span><strong>{{ summary.get('Rejected', 0) }}</strong></div>
+</section>
+
+<section class="split-grid">
+  <article class="form-panel align-self-start">
+    <form method="post" action="{{ url_for('apply_leave') }}">
+      {{ csrf_field() }}
+      <section class="form-section">
+        <div class="section-heading"><span class="section-icon"><i class="bi bi-calendar-plus"></i></span><div><h2>New leave request</h2><p>Overlapping pending or approved requests are blocked.</p></div></div>
+        <div class="row g-3">
+          <div class="col-12"><label class="form-label" for="emp_id">Employee *</label><select class="form-select" id="emp_id" name="emp_id" required><option value="">Select employee</option>{% for employee in employees %}<option value="{{ employee.id }}">{{ employee.name }} ({{ employee.emp_code }})</option>{% endfor %}</select></div>
+          <div class="col-sm-6"><label class="form-label" for="from_date">From *</label><input class="form-control" type="date" id="from_date" name="from_date" required></div>
+          <div class="col-sm-6"><label class="form-label" for="to_date">To *</label><input class="form-control" type="date" id="to_date" name="to_date" required></div>
+          <div class="col-12"><label class="form-label" for="reason">Reason</label><textarea class="form-control" id="reason" name="reason" rows="3" maxlength="250" placeholder="Brief operational reason"></textarea></div>
+        </div>
+      </section>
+      <div class="form-actions"><button class="btn btn-primary w-100" type="submit"><i class="bi bi-send me-1"></i> Submit request</button></div>
+    </form>
+  </article>
+
+  <article class="panel table-card">
+    <div class="table-toolbar"><div><strong>Leave register</strong><small>{{ pagination.total }} request(s)</small></div><form method="get"><select class="form-select form-select-sm" name="status" onchange="this.form.submit()"><option value="">All statuses</option>{% for item in ['Pending','Approved','Rejected'] %}<option value="{{ item }}" {% if status == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></form></div>
+    {% if leaves %}
+    <div class="table-responsive"><table class="table table-hover responsive-table"><thead><tr><th>Employee</th><th>Period</th><th>Days</th><th>Reason</th><th>Status</th><th class="text-end">Decision</th></tr></thead><tbody>{% for item in leaves %}<tr><td class="primary-mobile" data-label="Employee"><div class="primary-cell"><span class="avatar">{{ item.employee.name[:1]|upper }}</span><span><a class="cell-title" href="{{ url_for('employee_profile', employee_id=item.employee.id) }}">{{ item.employee.name }}</a><span class="cell-subtitle">{{ item.employee.emp_code }}</span></span></div></td><td data-label="Period" class="no-wrap">{{ item.from_date.strftime('%d %b') }} – {{ item.to_date.strftime('%d %b %Y') }}</td><td data-label="Days">{{ (item.to_date - item.from_date).days + 1 }}</td><td data-label="Reason">{{ item.reason or '—' }}</td><td data-label="Status">{{ status_badge(item.status) }}</td><td data-label="Decision"><div class="row-actions">{% if item.status == 'Pending' %}<form method="post" action="{{ url_for('decide_leave', leave_id=item.id, action='approve') }}">{{ csrf_field() }}<button class="action-btn" type="submit" title="Approve"><i class="bi bi-check-lg"></i></button></form><form method="post" action="{{ url_for('decide_leave', leave_id=item.id, action='reject') }}" data-confirm="Reject this leave request?">{{ csrf_field() }}<button class="action-btn danger" type="submit" title="Reject"><i class="bi bi-x-lg"></i></button></form>{% else %}<span class="text-muted">Completed</span>{% endif %}</div></td></tr>{% endfor %}</tbody></table></div>
+    {{ pagination_nav(pagination) }}
+    {% else %}{{ empty_state('bi-calendar2-week', 'No leave requests', 'Submit a leave request or clear the current status filter.') }}{% endif %}
+  </article>
+</section>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf_field %}
+{% block title %}{{ 'Edit site' if site else 'Add site' }}{% endblock %}
+{% block topbar_title %}Project Setup{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div><div class="page-kicker">{{ 'Project update' if site else 'New project' }}</div><h1 class="page-title">{{ 'Edit site details' if site else 'Add a project site' }}</h1><p class="page-subtitle">Keep project naming, client information, and location concise so workforce assignment remains easy to understand.</p></div>
+  <div class="page-actions"><a href="{{ url_for('sites') }}" class="btn btn-light"><i class="bi bi-arrow-left me-1"></i> Back to sites</a></div>
+</section>
+
+<form method="post" class="form-panel" style="max-width:980px;">
+  {{ csrf_field() }}
+  <section class="form-section">
+    <div class="section-heading"><span class="section-icon"><i class="bi bi-buildings"></i></span><div><h2>Project identity</h2><p>The name is used throughout employee assignment and reporting.</p></div></div>
+    <div class="row g-3">
+      <div class="col-md-7"><label class="form-label" for="name">Site / project name *</label><input class="form-control" id="name" name="name" required maxlength="120" value="{{ form_data.get('name', site.name if site else '') }}" placeholder="Example: Riverside Pipeline Phase 2"></div>
+      <div class="col-md-5"><label class="form-label" for="status">Status</label><select class="form-select" id="status" name="status">{% set selected_status = form_data.get('status', site.status if site else 'Ongoing') %}{% for item in site_statuses %}<option value="{{ item }}" {% if selected_status == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+      <div class="col-md-6"><label class="form-label" for="location">Location</label><input class="form-control" id="location" name="location" maxlength="200" value="{{ form_data.get('location', site.location if site else '') }}" placeholder="Town, district, or landmark"></div>
+      <div class="col-md-6"><label class="form-label" for="client_name">Client name</label><input class="form-control" id="client_name" name="client_name" maxlength="120" value="{{ form_data.get('client_name', site.client_name if site else '') }}" placeholder="Contracting client or department"></div>
+      <div class="col-md-5"><label class="form-label" for="start_date">Start date</label><input class="form-control" type="date" id="start_date" name="start_date" value="{{ form_data.get('start_date', site.start_date.isoformat() if site and site.start_date else '') }}"></div>
+    </div>
+  </section>
+  <div class="form-actions"><a href="{{ url_for('sites') }}" class="btn btn-light">Cancel</a><button class="btn btn-primary" type="submit"><i class="bi bi-check2 me-1"></i> Save project</button></div>
+</form>
+{% endblock %}

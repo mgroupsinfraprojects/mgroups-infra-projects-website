@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf_field %}
+{% block title %}{{ 'Edit employee' if employee else 'Add employee' }}{% endblock %}
+{% block topbar_title %}Employee Record{% endblock %}
+{% block content %}
+{% set value_name = form_data.get('name', employee.name if employee else '') %}
+{% set value_role = form_data.get('role', employee.role if employee else 'Helper') %}
+{% set value_phone = form_data.get('phone', employee.phone if employee else '') %}
+{% set value_email = form_data.get('email', employee.email if employee else '') %}
+{% set value_address = form_data.get('address', employee.address if employee else '') %}
+{% set value_site = form_data.get('site_id', employee.site_id if employee else '') %}
+{% set value_join = form_data.get('join_date', employee.join_date.isoformat() if employee and employee.join_date else '') %}
+{% set value_pay_type = form_data.get('pay_type', employee.pay_type if employee else 'Daily') %}
+{% set value_daily = form_data.get('daily_wage', employee.daily_wage if employee else '') %}
+{% set value_monthly = form_data.get('monthly_salary', employee.monthly_salary if employee else '') %}
+{% set value_status = form_data.get('status', employee.status if employee else 'Active') %}
+{% set value_aadhaar = form_data.get('aadhaar', employee.aadhaar if employee else '') %}
+{% set value_account = form_data.get('bank_account', employee.bank_account if employee else '') %}
+{% set value_ifsc = form_data.get('ifsc', employee.ifsc if employee else '') %}
+
+<section class="page-header">
+  <div><div class="page-kicker">{{ employee.emp_code if employee else 'New workforce record' }}</div><h1 class="page-title">{{ 'Edit employee details' if employee else 'Add an employee' }}</h1><p class="page-subtitle">Capture only operationally necessary information. Payroll values are validated against the selected pay type.</p></div>
+  <div class="page-actions"><a href="{{ url_for('employee_profile', employee_id=employee.id) if employee else url_for('employees') }}" class="btn btn-light"><i class="bi bi-arrow-left me-1"></i> Back</a></div>
+</section>
+
+<form method="post" class="form-panel">
+  {{ csrf_field() }}
+  <section class="form-section">
+    <div class="section-heading"><span class="section-icon"><i class="bi bi-person-vcard"></i></span><div><h2>Personal & contact details</h2><p>Core information used in employee lookup and communication.</p></div></div>
+    <div class="row g-3">
+      <div class="col-md-6"><label class="form-label" for="name">Full name *</label><input class="form-control" id="name" name="name" maxlength="120" required value="{{ value_name }}" placeholder="Employee full name"></div>
+      <div class="col-md-3"><label class="form-label" for="phone">Phone</label><input class="form-control" id="phone" name="phone" maxlength="20" value="{{ value_phone }}" placeholder="10-digit mobile number"></div>
+      <div class="col-md-3"><label class="form-label" for="email">Email</label><input class="form-control" type="email" id="email" name="email" maxlength="120" value="{{ value_email }}" placeholder="Optional email"></div>
+      <div class="col-12"><label class="form-label" for="address">Address</label><textarea class="form-control" id="address" name="address" rows="2" maxlength="250" placeholder="Current residential address">{{ value_address }}</textarea></div>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="section-heading"><span class="section-icon"><i class="bi bi-briefcase"></i></span><div><h2>Employment assignment</h2><p>Role, site allocation, joining date, and current employment status.</p></div></div>
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label" for="role">Role *</label><select class="form-select" id="role" name="role">{% for role in roles %}<option value="{{ role }}" {% if value_role == role %}selected{% endif %}>{{ role }}</option>{% endfor %}</select></div>
+      <div class="col-md-4"><label class="form-label" for="site_id">Assigned site</label><select class="form-select" id="site_id" name="site_id"><option value="">Unassigned</option>{% for site in sites %}<option value="{{ site.id }}" {% if value_site|string == site.id|string %}selected{% endif %}>{{ site.name }}</option>{% endfor %}</select></div>
+      <div class="col-md-2"><label class="form-label" for="join_date">Join date *</label><input class="form-control" type="date" id="join_date" name="join_date" required value="{{ value_join }}"></div>
+      <div class="col-md-2"><label class="form-label" for="status">Status</label><select class="form-select" id="status" name="status">{% for item in statuses %}<option value="{{ item }}" {% if value_status == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="section-heading"><span class="section-icon"><i class="bi bi-cash-coin"></i></span><div><h2>Compensation</h2><p>Choose one pay model. The inactive amount is ignored during payroll calculation.</p></div></div>
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label" for="pay_type">Pay type *</label><select class="form-select" id="pay_type" name="pay_type"><option value="Daily" {% if value_pay_type == 'Daily' %}selected{% endif %}>Daily wage</option><option value="Monthly" {% if value_pay_type == 'Monthly' %}selected{% endif %}>Monthly salary</option></select></div>
+      <div class="col-md-4" data-pay-group="daily"><label class="form-label" for="daily_wage">Daily wage (₹)</label><input class="form-control" type="number" min="0" step="0.01" id="daily_wage" name="daily_wage" value="{{ value_daily }}" placeholder="0.00"></div>
+      <div class="col-md-4" data-pay-group="monthly"><label class="form-label" for="monthly_salary">Monthly salary (₹)</label><input class="form-control" type="number" min="0" step="0.01" id="monthly_salary" name="monthly_salary" value="{{ value_monthly }}" placeholder="0.00"></div>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="section-heading"><span class="section-icon"><i class="bi bi-shield-lock"></i></span><div><h2>Identity & bank details</h2><p>Sensitive fields are masked on the employee profile.</p></div></div>
+    <div class="sensitive-note mb-3"><i class="bi bi-exclamation-triangle me-1"></i> This application currently has no login. Do not expose Aadhaar or bank details on a public URL until role-based authentication is added.</div>
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label" for="aadhaar">Aadhaar number</label><input class="form-control" inputmode="numeric" maxlength="12" id="aadhaar" name="aadhaar" value="{{ value_aadhaar }}" placeholder="12 digits"></div>
+      <div class="col-md-4"><label class="form-label" for="bank_account">Bank account number</label><input class="form-control" maxlength="30" id="bank_account" name="bank_account" value="{{ value_account }}"></div>
+      <div class="col-md-4"><label class="form-label" for="ifsc">IFSC</label><input class="form-control text-uppercase" maxlength="20" id="ifsc" name="ifsc" value="{{ value_ifsc }}"></div>
+    </div>
+  </section>
+
+  <div class="form-actions"><a href="{{ url_for('employee_profile', employee_id=employee.id) if employee else url_for('employees') }}" class="btn btn-light">Cancel</a><button class="btn btn-primary" type="submit"><i class="bi bi-check2 me-1"></i> {{ 'Update employee' if employee else 'Create employee' }}</button></div>
+</form>
+{% endblock %}

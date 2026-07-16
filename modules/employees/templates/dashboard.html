@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, empty_state %}
+{% block title %}Dashboard{% endblock %}
+{% block topbar_title %}Operations Dashboard{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div>
+    <div class="page-kicker">{{ today.strftime('%A, %d %B %Y') }}</div>
+    <h1 class="page-title">Workforce overview</h1>
+    <p class="page-subtitle">Current employee deployment, attendance completion, leave workload, and pending payroll in one operational view.</p>
+  </div>
+  <div class="page-actions">
+    <a class="btn btn-light" href="{{ url_for('sites') }}"><i class="bi bi-geo-alt me-1"></i> Manage sites</a>
+    <a class="btn btn-primary" href="{{ url_for('attendance') }}"><i class="bi bi-calendar2-check me-1"></i> Mark attendance</a>
+  </div>
+</section>
+
+<section class="metric-grid" aria-label="Key metrics">
+  <article class="metric-card">
+    <div class="metric-top"><span class="metric-label">Active employees</span><span class="metric-icon"><i class="bi bi-people-fill"></i></span></div>
+    <div class="metric-value">{{ total_emp }}</div>
+    <div class="metric-note">Across all active project sites</div>
+  </article>
+  <article class="metric-card metric-info">
+    <div class="metric-top"><span class="metric-label">Present today</span><span class="metric-icon"><i class="bi bi-person-check-fill"></i></span></div>
+    <div class="metric-value">{{ present_today }}</div>
+    <div class="metric-note">{{ marked_today }} attendance records marked</div>
+  </article>
+  <article class="metric-card metric-danger">
+    <div class="metric-top"><span class="metric-label">Absent today</span><span class="metric-icon"><i class="bi bi-person-x-fill"></i></span></div>
+    <div class="metric-value">{{ absent_today }}</div>
+    <div class="metric-note">Explicitly marked absent</div>
+  </article>
+  <article class="metric-card metric-warning">
+    <div class="metric-top"><span class="metric-label">Attendance completion</span><span class="metric-icon"><i class="bi bi-speedometer2"></i></span></div>
+    <div class="metric-value">{{ '%.0f'|format(attendance_completion) }}%</div>
+    <div class="progress-shell">
+      <div class="progress"><div class="progress-bar" style="width: {{ [attendance_completion, 100]|min }}%"></div></div>
+    </div>
+  </article>
+</section>
+
+<section class="summary-strip" aria-label="Operational summary">
+  <div class="summary-item"><span>Ongoing sites</span><strong>{{ total_sites }}</strong></div>
+  <div class="summary-item"><span>Pending leave</span><strong>{{ pending_leaves }}</strong></div>
+  <div class="summary-item"><span>Unpaid payrolls</span><strong>{{ unpaid_payrolls }}</strong></div>
+  <div class="summary-item"><span>Payroll due</span><strong class="money">₹{{ '{:,.0f}'.format(payroll_due) }}</strong></div>
+</section>
+
+<section class="dashboard-grid">
+  <article class="panel">
+    <div class="panel-header">
+      <div><h2 class="panel-title">Employee deployment</h2><p class="panel-subtitle">Active headcount by site or project.</p></div>
+      <a class="panel-link" href="{{ url_for('sites') }}">View projects <i class="bi bi-arrow-right"></i></a>
+    </div>
+    {% if site_counts %}
+      <div class="site-list">
+      {% for site, count in site_counts %}
+        <div class="site-row">
+          <div class="site-name"><strong>{{ site.name }}</strong><small>{{ site.location or 'Location not set' }} · {{ site.status }}</small></div>
+          <div class="site-bar" aria-label="{{ count }} active employees"><span style="width: {{ (count / max_site_count * 100) if max_site_count else 0 }}%"></span></div>
+          <div class="site-count">{{ count }}</div>
+        </div>
+      {% endfor %}
+      </div>
+    {% else %}
+      {{ empty_state('bi-buildings', 'No sites configured', 'Add the first project site before assigning employees.') }}
+    {% endif %}
+  </article>
+
+  <article class="panel">
+    <div class="panel-header"><div><h2 class="panel-title">Daily attendance</h2><p class="panel-subtitle">Completion for active employees.</p></div></div>
+    <div class="d-flex justify-content-between align-items-end gap-3">
+      <div><div class="metric-value">{{ marked_today }} / {{ total_emp }}</div><div class="metric-note">Employee records completed</div></div>
+      <span class="status-pill {% if attendance_completion >= 90 %}status-success{% elif attendance_completion >= 50 %}status-warning{% else %}status-danger{% endif %}">{{ '%.0f'|format(attendance_completion) }}%</span>
+    </div>
+    <div class="progress-shell">
+      <div class="progress-meta"><span>Today’s completion</span><span>{{ total_emp - marked_today if total_emp > marked_today else 0 }} remaining</span></div>
+      <div class="progress"><div class="progress-bar" style="width: {{ [attendance_completion, 100]|min }}%"></div></div>
+    </div>
+    <div class="d-grid mt-4"><a href="{{ url_for('attendance') }}" class="btn btn-primary">Open attendance register</a></div>
+  </article>
+</section>
+
+<section class="dashboard-grid">
+  <article class="panel table-card">
+    <div class="table-toolbar"><div><strong>Recent leave requests</strong><small>Latest employee submissions and decisions</small></div><a class="panel-link" href="{{ url_for('leave_list') }}">Manage leave</a></div>
+    {% if recent_leaves %}
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead><tr><th>Employee</th><th>Dates</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for leave in recent_leaves %}
+          <tr>
+            <td><span class="cell-title">{{ leave.employee.name }}</span><span class="cell-subtitle">{{ leave.employee.emp_code }}</span></td>
+            <td>{{ leave.from_date.strftime('%d %b') }} – {{ leave.to_date.strftime('%d %b %Y') }}</td>
+            <td>{{ status_badge(leave.status) }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}{{ empty_state('bi-calendar2-week', 'No leave requests', 'Leave applications will appear here.') }}{% endif %}
+  </article>
+
+  <article class="panel table-card">
+    <div class="table-toolbar"><div><strong>Payroll requiring payment</strong><small>Highest pending net-pay records</small></div><a class="panel-link" href="{{ url_for('payroll_list') }}">Open payroll</a></div>
+    {% if recent_payrolls %}
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead><tr><th>Employee</th><th>Period</th><th>Net pay</th></tr></thead>
+        <tbody>
+        {% for payroll in recent_payrolls %}
+          <tr>
+            <td><span class="cell-title">{{ payroll.employee.name }}</span><span class="cell-subtitle">{{ payroll.employee.emp_code }}</span></td>
+            <td>{{ calendar.month_abbr[payroll.month] if calendar is defined else payroll.month }}/{{ payroll.year }}</td>
+            <td class="money">₹{{ '{:,.0f}'.format(payroll.net_pay) }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}{{ empty_state('bi-check2-circle', 'Nothing pending', 'No unpaid payroll records are currently open.') }}{% endif %}
+  </article>
+</section>
+{% endblock %}

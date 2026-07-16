@@ -1,0 +1,5 @@
+ConstructERP v2.0 Owner-Ready
+Build date: 2026-07-16
+Status: Tested
+Primary test suite: 5/5 passed
+Deployment test: Gunicorn /healthz returned HTTP 200

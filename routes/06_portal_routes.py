@@ -120,20 +120,24 @@ def portal_stock():
 @permission_required('employees_view')
 def portal_employees():
     cards = [
-        {'title': 'Employee List', 'description': 'Employee records and contact details.', 'url': '#', 'permission': 'employees_view', 'icon': '👥'},
-        {'title': 'Attendance', 'description': 'Attendance module placeholder.', 'url': '#', 'permission': 'employees_edit', 'icon': '🗓️'},
-        {'title': 'Work Records', 'description': 'Daily work and assignment records.', 'url': '#', 'permission': 'employees_edit', 'icon': '📝'},
-        {'title': 'Employee Reports', 'description': 'Employee related reports.', 'url': '#', 'permission': 'reports_view', 'icon': '📊'},
+        {'title': 'Employee Dashboard', 'description': 'Headcount, attendance, payroll and site overview.', 'url': '/portal/employees/app/', 'permission': 'employees_view', 'icon': '👥'},
+        {'title': 'Sites / Projects', 'description': 'Create and manage work sites connected to employees.', 'url': '/portal/employees/app/sites', 'permission': 'employees_view', 'icon': '🏗️'},
+        {'title': 'Employee Directory', 'description': 'Add, edit and view employee profiles, wages and site assignment.', 'url': '/portal/employees/app/employees', 'permission': 'employees_view', 'icon': '🧑‍🔧'},
+        {'title': 'Attendance', 'description': 'Daily attendance, half-day, leave, holiday and overtime entries.', 'url': '/portal/employees/app/attendance', 'permission': 'employees_edit', 'icon': '🗓️'},
+        {'title': 'Attendance History', 'description': 'Month-wise attendance review by employee.', 'url': '/portal/employees/app/attendance/history', 'permission': 'employees_view', 'icon': '📅'},
+        {'title': 'Leave Requests', 'description': 'Apply, approve or reject employee leave requests.', 'url': '/portal/employees/app/leave', 'permission': 'employees_edit', 'icon': '📝'},
+        {'title': 'Salary Advances', 'description': 'Record and track salary advance recovery.', 'url': '/portal/employees/app/advances', 'permission': 'employees_edit', 'icon': '💵'},
+        {'title': 'Payroll', 'description': 'Generate payroll, lock paid records and export CSV.', 'url': '/portal/employees/app/payroll', 'permission': 'employees_reports', 'icon': '🧾'},
     ]
     cards = [c for c in cards if has_permission(c['permission'])]
     return render_template(
         'portal/module_hub.html',
         module_title='Employee Management',
-        module_kicker='Future Module',
-        module_description='Employee records, attendance, roles and work details will be handled here later.',
+        module_kicker='Protected Module',
+        module_description='Employee records, attendance, leave, salary advances and payroll are connected to the M-GROUPS portal.',
         cards=cards,
         back_url=url_for('portal_workspace'),
-        notice='Employee module is not integrated yet.',
+        notice=None if cards else 'Your role can open Employees, but no employee action permissions are enabled yet.',
     )
 
 

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf_field, status_badge, pagination_nav, empty_state %}
+{% block title %}Employees{% endblock %}
+{% block topbar_title %}Employee Directory{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div><div class="page-kicker">Workforce directory</div><h1 class="page-title">Employees</h1><p class="page-subtitle">Search, assign, review, and safely deactivate employee records without losing operational history.</p></div>
+  <div class="page-actions"><a href="{{ url_for('export_employees') }}" class="btn btn-light"><i class="bi bi-download me-1"></i> Export CSV</a><a href="{{ url_for('add_employee') }}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i> Add employee</a></div>
+</section>
+
+<form class="filter-panel" method="get">
+  <div class="filter-grid">
+    <div><label class="form-label" for="q">Search directory</label><div class="input-icon"><i class="bi bi-search"></i><input class="form-control" id="q" name="q" value="{{ q }}" placeholder="Name, employee code, phone, or role"></div></div>
+    <div><label class="form-label" for="site_id">Assigned site</label><select class="form-select" id="site_id" name="site_id"><option value="">All sites</option>{% for site in sites %}<option value="{{ site.id }}" {% if site_id|string == site.id|string %}selected{% endif %}>{{ site.name }}</option>{% endfor %}</select></div>
+    <div><label class="form-label" for="status">Employee status</label><select class="form-select" id="status" name="status"><option value="">All statuses</option>{% for item in statuses %}<option value="{{ item }}" {% if status == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+    <div class="d-flex gap-2"><button class="btn btn-primary" type="submit">Filter</button>{% if q or site_id or status %}<a class="btn btn-light" href="{{ url_for('employees') }}" title="Clear filters"><i class="bi bi-x-lg"></i></a>{% endif %}</div>
+  </div>
+</form>
+
+<article class="panel table-card">
+  <div class="table-toolbar"><div><strong>Employee register</strong><small>{{ pagination.total }} matching employee(s)</small></div><span class="status-pill status-neutral">Page {{ pagination.page }} of {{ pagination.pages or 1 }}</span></div>
+  {% if employees %}
+  <div class="table-responsive">
+    <table class="table table-hover responsive-table">
+      <thead><tr><th>Employee</th><th>Role</th><th>Site</th><th>Phone</th><th>Compensation</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+      <tbody>
+      {% for employee in employees %}
+        <tr>
+          <td class="primary-mobile" data-label="Employee"><div class="primary-cell"><span class="avatar">{{ employee.name[:1]|upper }}</span><span><a class="cell-title" href="{{ url_for('employee_profile', employee_id=employee.id) }}">{{ employee.name }}</a><span class="cell-subtitle">{{ employee.emp_code }} · Joined {{ employee.join_date.strftime('%d %b %Y') if employee.join_date else '—' }}</span></span></div></td>
+          <td data-label="Role"><span class="cell-title">{{ employee.role }}</span></td>
+          <td data-label="Site">{{ employee.site.name if employee.site else 'Unassigned' }}</td>
+          <td data-label="Phone">{{ employee.phone or '—' }}</td>
+          <td data-label="Compensation"><span class="money">₹{{ '{:,.0f}'.format(employee.daily_wage if employee.pay_type == 'Daily' else employee.monthly_salary) }}</span><span class="cell-subtitle">{{ 'per day' if employee.pay_type == 'Daily' else 'per month' }}</span></td>
+          <td data-label="Status">{{ status_badge(employee.status) }}</td>
+          <td data-label="Actions"><div class="row-actions"><a class="action-btn" href="{{ url_for('employee_profile', employee_id=employee.id) }}" title="View profile"><i class="bi bi-eye"></i></a><a class="action-btn" href="{{ url_for('edit_employee', employee_id=employee.id) }}" title="Edit"><i class="bi bi-pencil"></i></a>{% if employee.status != 'Inactive' %}<form method="post" action="{{ url_for('deactivate_employee', employee_id=employee.id) }}" data-confirm="Deactivate {{ employee.name }}? Their history will be retained.">{{ csrf_field() }}<button class="action-btn danger" type="submit" title="Deactivate"><i class="bi bi-person-dash"></i></button></form>{% endif %}</div></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {{ pagination_nav(pagination) }}
+  {% else %}{{ empty_state('bi-people', 'No employees found', 'Change the filters or add the first employee record.') }}{% endif %}
+</article>
+{% endblock %}

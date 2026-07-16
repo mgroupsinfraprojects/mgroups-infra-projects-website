@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf_field, status_badge, pagination_nav, empty_state %}
+{% block title %}Salary Advances{% endblock %}
+{% block topbar_title %}Salary Advances{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div><div class="page-kicker">Employee finance</div><h1 class="page-title">Salary advances</h1><p class="page-subtitle">Track original value, payroll recovery, and remaining balance. Payroll deductions never exceed available gross pay.</p></div>
+</section>
+
+<section class="summary-strip">
+  <div class="summary-item"><span>Total records</span><strong>{{ pagination.total }}</strong></div>
+  <div class="summary-item"><span>Outstanding balance</span><strong class="money">₹{{ '{:,.0f}'.format(total_outstanding) }}</strong></div>
+  <div class="summary-item"><span>Open advances</span><strong>{{ advances|rejectattr('settled')|list|length }}</strong></div>
+  <div class="summary-item"><span>Recovery method</span><strong>Payroll</strong></div>
+</section>
+
+<section class="split-grid">
+  <article class="form-panel align-self-start">
+    <form method="post">
+      {{ csrf_field() }}
+      <section class="form-section">
+        <div class="section-heading"><span class="section-icon"><i class="bi bi-wallet2"></i></span><div><h2>Record an advance</h2><p>Recovery is applied only when payroll is marked paid.</p></div></div>
+        <div class="row g-3">
+          <div class="col-12"><label class="form-label" for="emp_id">Employee *</label><select class="form-select" id="emp_id" name="emp_id" required><option value="">Select employee</option>{% for employee in employees %}<option value="{{ employee.id }}">{{ employee.name }} ({{ employee.emp_code }})</option>{% endfor %}</select></div>
+          <div class="col-sm-7"><label class="form-label" for="amount">Amount (₹) *</label><input class="form-control" type="number" id="amount" name="amount" min="0.01" step="0.01" required placeholder="0.00"></div>
+          <div class="col-sm-5"><label class="form-label" for="date_given">Date</label><input class="form-control" type="date" id="date_given" name="date_given"></div>
+          <div class="col-12"><label class="form-label" for="reason">Reason</label><textarea class="form-control" id="reason" name="reason" rows="3" maxlength="200" placeholder="Medical, travel, emergency, etc."></textarea></div>
+        </div>
+      </section>
+      <div class="form-actions"><button class="btn btn-primary w-100" type="submit"><i class="bi bi-plus-lg me-1"></i> Record advance</button></div>
+    </form>
+  </article>
+
+  <article class="panel table-card">
+    <div class="table-toolbar"><div><strong>Advance register</strong><small>Oldest outstanding advances are recovered first</small></div></div>
+    {% if advances %}
+    <div class="table-responsive"><table class="table table-hover responsive-table"><thead><tr><th>Employee</th><th>Date</th><th>Original</th><th>Recovered</th><th>Outstanding</th><th>Status</th><th class="text-end">Action</th></tr></thead><tbody>{% for item in advances %}<tr><td class="primary-mobile" data-label="Employee"><div class="primary-cell"><span class="avatar">{{ item.employee.name[:1]|upper }}</span><span><a class="cell-title" href="{{ url_for('employee_profile', employee_id=item.employee.id) }}">{{ item.employee.name }}</a><span class="cell-subtitle">{{ item.reason or item.employee.emp_code }}</span></span></div></td><td data-label="Date">{{ item.date_given.strftime('%d %b %Y') }}</td><td data-label="Original" class="money">₹{{ '{:,.2f}'.format(item.amount) }}</td><td data-label="Recovered" class="money">₹{{ '{:,.2f}'.format(item.recovered_amount) }}</td><td data-label="Outstanding" class="money">₹{{ '{:,.2f}'.format(item.outstanding_amount) }}</td><td data-label="Status">{{ status_badge('Paid' if item.settled else 'Pending') }}</td><td data-label="Action"><div class="row-actions">{% if not item.settled %}<form method="post" action="{{ url_for('settle_advance', advance_id=item.id) }}" data-confirm="Mark the entire outstanding balance as settled manually?">{{ csrf_field() }}<button class="btn btn-sm btn-outline-primary" type="submit">Settle</button></form>{% else %}<span class="text-muted">Closed</span>{% endif %}</div></td></tr>{% endfor %}</tbody></table></div>
+    {{ pagination_nav(pagination) }}
+    {% else %}{{ empty_state('bi-wallet2', 'No salary advances', 'Use the form to record the first employee advance.') }}{% endif %}
+  </article>
+</section>
+{% endblock %}

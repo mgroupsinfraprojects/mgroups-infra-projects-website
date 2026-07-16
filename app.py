@@ -172,6 +172,7 @@ SECTION_FILES = [
     "routes/06_portal_routes.py",
     "routes/07_stock_portal_mount.py",
     "routes/08_gst_audit_portal.py",
+    "routes/09_employee_portal_mount.py",
 ]
 
 

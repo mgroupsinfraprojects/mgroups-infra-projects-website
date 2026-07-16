@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} · {{ title }}{% endblock %}
+{% block topbar_title %}System Message{% endblock %}
+{% block content %}
+<section class="panel" style="max-width:760px;margin:8vh auto;text-align:center;padding:52px 28px;">
+  <div class="empty-icon" style="width:68px;height:68px;font-size:28px;"><i class="bi bi-exclamation-diamond"></i></div>
+  <div class="page-kicker">Error {{ code }}</div>
+  <h1 class="page-title">{{ title }}</h1>
+  <p class="page-subtitle" style="margin:12px auto 24px;">{{ message }}</p>
+  <a class="btn btn-primary" href="{{ url_for('dashboard') }}"><i class="bi bi-house me-1"></i> Return to dashboard</a>
+</section>
+{% endblock %}

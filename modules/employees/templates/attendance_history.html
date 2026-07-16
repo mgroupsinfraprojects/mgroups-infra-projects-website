@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, pagination_nav, empty_state %}
+{% block title %}Attendance History{% endblock %}
+{% block topbar_title %}Attendance History{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div><div class="page-kicker">Historical register</div><h1 class="page-title">Attendance history</h1><p class="page-subtitle">Review a month of recorded attendance without loading the complete database into memory.</p></div>
+  <div class="page-actions"><a class="btn btn-primary" href="{{ url_for('attendance') }}"><i class="bi bi-calendar2-check me-1"></i> Mark attendance</a></div>
+</section>
+
+<form class="filter-panel" method="get">
+  <div class="filter-grid" style="grid-template-columns:minmax(220px,1fr) minmax(170px,.7fr) minmax(130px,.5fr) auto;">
+    <div><label class="form-label" for="emp_id">Employee</label><select class="form-select" id="emp_id" name="emp_id"><option value="">All employees</option>{% for employee in employees %}<option value="{{ employee.id }}" {% if emp_id|string == employee.id|string %}selected{% endif %}>{{ employee.name }} ({{ employee.emp_code }})</option>{% endfor %}</select></div>
+    <div><label class="form-label" for="month">Month</label><select class="form-select" id="month" name="month">{% for item in range(1,13) %}<option value="{{ item }}" {% if item == month %}selected{% endif %}>{{ calendar.month_name[item] }}</option>{% endfor %}</select></div>
+    <div><label class="form-label" for="year">Year</label><input class="form-control" type="number" min="2000" max="2100" id="year" name="year" value="{{ year }}"></div>
+    <div><button class="btn btn-primary" type="submit">Apply</button></div>
+  </div>
+</form>
+
+<article class="panel table-card">
+  <div class="table-toolbar"><div><strong>{{ calendar.month_name[month] }} {{ year }}</strong><small>{{ pagination.total }} recorded attendance row(s)</small></div></div>
+  {% if records %}
+  <div class="table-responsive"><table class="table table-hover responsive-table"><thead><tr><th>Date</th><th>Employee</th><th>Role</th><th>Status</th><th>OT hours</th></tr></thead><tbody>{% for item in records %}<tr><td data-label="Date" class="no-wrap">{{ item.att_date.strftime('%d %b %Y') }}</td><td class="primary-mobile" data-label="Employee"><div class="primary-cell"><span class="avatar">{{ item.employee.name[:1]|upper }}</span><span><a class="cell-title" href="{{ url_for('employee_profile', employee_id=item.employee.id) }}">{{ item.employee.name }}</a><span class="cell-subtitle">{{ item.employee.emp_code }}</span></span></div></td><td data-label="Role">{{ item.employee.role }}</td><td data-label="Status">{{ status_badge(item.status) }}</td><td data-label="OT hours">{{ item.overtime_hours }} hrs</td></tr>{% endfor %}</tbody></table></div>
+  {{ pagination_nav(pagination) }}
+  {% else %}{{ empty_state('bi-calendar2-x', 'No records for this period', 'Select another month or employee, or mark attendance first.') }}{% endif %}
+</article>
+{% endblock %}

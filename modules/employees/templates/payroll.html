@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf_field, status_badge, pagination_nav, empty_state %}
+{% block title %}Payroll{% endblock %}
+{% block topbar_title %}Payroll{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div><div class="page-kicker">Monthly compensation</div><h1 class="page-title">Payroll</h1><p class="page-subtitle">Generate safely from attendance, prorate monthly staff by joining date, cap advance recovery, and lock paid records.</p></div>
+  <div class="page-actions"><a class="btn btn-light" href="{{ url_for('export_payroll', month=month, year=year) }}"><i class="bi bi-download me-1"></i> Export CSV</a></div>
+</section>
+
+<section class="summary-strip">
+  <div class="summary-item"><span>Gross payroll</span><strong class="money">₹{{ '{:,.0f}'.format(totals.gross) }}</strong></div>
+  <div class="summary-item"><span>Advance recovery</span><strong class="money">₹{{ '{:,.0f}'.format(totals.advance) }}</strong></div>
+  <div class="summary-item"><span>Net payable</span><strong class="money">₹{{ '{:,.0f}'.format(totals.net) }}</strong></div>
+  <div class="summary-item"><span>Paid / unpaid</span><strong>{{ totals.paid }} / {{ totals.unpaid }}</strong></div>
+</section>
+
+<section class="dashboard-grid">
+  <article class="form-panel">
+    <form method="post" action="{{ url_for('generate_payroll') }}">
+      {{ csrf_field() }}
+      <section class="form-section">
+        <div class="section-heading"><span class="section-icon"><i class="bi bi-calculator"></i></span><div><h2>Generate or recalculate</h2><p>Paid records are immutable and automatically skipped.</p></div></div>
+        <div class="row g-3">
+          <div class="col-md-5"><label class="form-label" for="generate-month">Month</label><select class="form-select" id="generate-month" name="month">{% for item in range(1,13) %}<option value="{{ item }}" {% if item == month %}selected{% endif %}>{{ calendar.month_name[item] }}</option>{% endfor %}</select></div>
+          <div class="col-md-4"><label class="form-label" for="generate-year">Year</label><input class="form-control" id="generate-year" type="number" name="year" min="2000" max="2100" value="{{ year }}"></div>
+          <div class="col-md-3 d-flex align-items-end"><button class="btn btn-primary w-100" type="submit">Generate</button></div>
+        </div>
+      </section>
+    </form>
+  </article>
+
+  <article class="panel">
+    <div class="panel-header"><div><h2 class="panel-title">Calculation policy</h2><p class="panel-subtitle">Rules applied by the rebuilt backend.</p></div></div>
+    <div class="info-list">
+      <div class="info-row"><dt>Daily workers</dt><dd>Present + Half Day + OT</dd></div>
+      <div class="info-row"><dt>Monthly staff</dt><dd>Prorated salary minus explicit absence</dd></div>
+      <div class="info-row"><dt>Advance recovery</dt><dd>Capped at available pay</dd></div>
+      <div class="info-row"><dt>Paid records</dt><dd>Locked from recalculation</dd></div>
+    </div>
+  </article>
+</section>
+
+<form class="filter-panel" method="get">
+  <div class="filter-grid" style="grid-template-columns:minmax(180px,280px) minmax(130px,180px) auto;">
+    <div><label class="form-label" for="month">Payroll month</label><select class="form-select" id="month" name="month">{% for item in range(1,13) %}<option value="{{ item }}" {% if item == month %}selected{% endif %}>{{ calendar.month_name[item] }}</option>{% endfor %}</select></div>
+    <div><label class="form-label" for="year">Year</label><input class="form-control" id="year" type="number" min="2000" max="2100" name="year" value="{{ year }}"></div>
+    <div><button class="btn btn-primary" type="submit">View period</button></div>
+  </div>
+</form>
+
+<article class="panel table-card">
+  <div class="table-toolbar"><div><strong>{{ calendar.month_name[month] }} {{ year }}</strong><small>{{ pagination.total }} payroll record(s)</small></div></div>
+  {% if records %}
+  <div class="table-responsive"><table class="table table-hover responsive-table"><thead><tr><th>Employee</th><th>Present</th><th>Absent</th><th>OT</th><th>Gross</th><th>Advance</th><th>Net pay</th><th>Status</th><th class="text-end">Action</th></tr></thead><tbody>{% for item in records %}<tr><td class="primary-mobile" data-label="Employee"><div class="primary-cell"><span class="avatar">{{ item.employee.name[:1]|upper }}</span><span><a class="cell-title" href="{{ url_for('employee_profile', employee_id=item.employee.id) }}">{{ item.employee.name }}</a><span class="cell-subtitle">{{ item.employee.emp_code }} · {{ item.employee.pay_type }}</span></span></div></td><td data-label="Present">{{ item.days_present }}</td><td data-label="Absent">{{ item.days_absent }}</td><td data-label="OT">{{ item.overtime_hours }} h</td><td data-label="Gross" class="money">₹{{ '{:,.2f}'.format(item.gross_pay) }}</td><td data-label="Advance" class="money">₹{{ '{:,.2f}'.format(item.advance_deduction) }}</td><td data-label="Net pay" class="money">₹{{ '{:,.2f}'.format(item.net_pay) }}</td><td data-label="Status">{{ status_badge('Paid' if item.paid else 'Unpaid') }}</td><td data-label="Action"><div class="row-actions">{% if not item.paid %}<form method="post" action="{{ url_for('mark_paid', payroll_id=item.id) }}" data-confirm="Mark this payroll as paid? This locks the record and applies the advance recovery.">{{ csrf_field() }}<button class="btn btn-sm btn-outline-primary" type="submit">Mark paid</button></form>{% else %}<span class="text-muted">Locked</span>{% endif %}</div></td></tr>{% endfor %}</tbody></table></div>
+  {{ pagination_nav(pagination) }}
+  {% else %}{{ empty_state('bi-cash-stack', 'No payroll generated', 'Generate payroll for this month to create employee pay records.') }}{% endif %}
+</article>
+{% endblock %}

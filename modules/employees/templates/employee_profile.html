@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, empty_state %}
+{% block title %}{{ e.name }}{% endblock %}
+{% block topbar_title %}Employee Profile{% endblock %}
+{% block content %}
+<section class="panel profile-hero">
+  <div class="profile-main"><span class="avatar avatar-lg">{{ e.name[:1]|upper }}</span><div><div class="d-flex align-items-center flex-wrap gap-2"><h1 class="profile-title">{{ e.name }}</h1>{{ status_badge(e.status) }}</div><div class="profile-meta"><span><i class="bi bi-upc-scan me-1"></i>{{ e.emp_code }}</span><span><i class="bi bi-briefcase me-1"></i>{{ e.role }}</span><span><i class="bi bi-geo-alt me-1"></i>{{ e.site.name if e.site else 'Unassigned' }}</span></div></div></div>
+  <div class="page-actions"><a href="{{ url_for('employees') }}" class="btn btn-light"><i class="bi bi-arrow-left me-1"></i> Directory</a><a href="{{ url_for('edit_employee', employee_id=e.id) }}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i> Edit profile</a></div>
+</section>
+
+<section class="summary-strip">
+  <div class="summary-item"><span>Recent paid days</span><strong>{{ present_days }}</strong></div>
+  <div class="summary-item"><span>Open advances</span><strong>{{ advances|rejectattr('settled')|list|length }}</strong></div>
+  <div class="summary-item"><span>Payroll records</span><strong>{{ payrolls|length }}</strong></div>
+  <div class="summary-item"><span>Current pay</span><strong class="money">₹{{ '{:,.0f}'.format(e.daily_wage if e.pay_type == 'Daily' else e.monthly_salary) }}</strong></div>
+</section>
+
+<section class="dashboard-grid">
+  <article class="panel">
+    <div class="panel-header"><div><h2 class="panel-title">Employment details</h2><p class="panel-subtitle">Assignment and compensation profile.</p></div></div>
+    <dl class="info-list">
+      <div class="info-row"><dt>Employee code</dt><dd>{{ e.emp_code }}</dd></div>
+      <div class="info-row"><dt>Role</dt><dd>{{ e.role }}</dd></div>
+      <div class="info-row"><dt>Assigned site</dt><dd>{{ e.site.name if e.site else 'Unassigned' }}</dd></div>
+      <div class="info-row"><dt>Join date</dt><dd>{{ e.join_date.strftime('%d %B %Y') if e.join_date else '—' }}</dd></div>
+      <div class="info-row"><dt>Pay model</dt><dd>{{ e.pay_type }}</dd></div>
+      <div class="info-row"><dt>Compensation</dt><dd class="money">₹{{ '{:,.2f}'.format(e.daily_wage if e.pay_type == 'Daily' else e.monthly_salary) }} {{ '/ day' if e.pay_type == 'Daily' else '/ month' }}</dd></div>
+    </dl>
+  </article>
+  <article class="panel">
+    <div class="panel-header"><div><h2 class="panel-title">Contact & protected data</h2><p class="panel-subtitle">Sensitive values remain masked in normal viewing.</p></div></div>
+    <dl class="info-list">
+      <div class="info-row"><dt>Phone</dt><dd>{{ e.phone or '—' }}</dd></div>
+      <div class="info-row"><dt>Email</dt><dd>{{ e.email or '—' }}</dd></div>
+      <div class="info-row"><dt>Address</dt><dd>{{ e.address or '—' }}</dd></div>
+      <div class="info-row"><dt>Aadhaar</dt><dd>{{ mask_value(e.aadhaar) }}</dd></div>
+      <div class="info-row"><dt>Bank account</dt><dd>{{ mask_value(e.bank_account) }}</dd></div>
+      <div class="info-row"><dt>IFSC</dt><dd>{{ e.ifsc or '—' }}</dd></div>
+    </dl>
+  </article>
+</section>
+
+<section class="three-grid">
+  <article class="panel table-card">
+    <div class="table-toolbar"><div><strong>Recent attendance</strong><small>Last 30 recorded days</small></div><a class="panel-link" href="{{ url_for('attendance_history', emp_id=e.id) }}">Full history</a></div>
+    {% if recent_att %}<div class="table-responsive"><table class="table"><thead><tr><th>Date</th><th>Status</th><th>OT</th></tr></thead><tbody>{% for item in recent_att %}<tr><td>{{ item.att_date.strftime('%d %b %Y') }}</td><td>{{ status_badge(item.status) }}</td><td>{{ item.overtime_hours }} h</td></tr>{% endfor %}</tbody></table></div>{% else %}{{ empty_state('bi-calendar2-check', 'No attendance', 'No attendance has been recorded for this employee.') }}{% endif %}
+  </article>
+  <article class="panel table-card">
+    <div class="table-toolbar"><div><strong>Leave history</strong><small>Recent requests and decisions</small></div></div>
+    {% if leaves %}<div class="table-responsive"><table class="table"><thead><tr><th>Period</th><th>Status</th></tr></thead><tbody>{% for item in leaves %}<tr><td>{{ item.from_date.strftime('%d %b') }} – {{ item.to_date.strftime('%d %b %Y') }}</td><td>{{ status_badge(item.status) }}</td></tr>{% endfor %}</tbody></table></div>{% else %}{{ empty_state('bi-calendar2-week', 'No leave history', 'No leave requests are linked to this employee.') }}{% endif %}
+  </article>
+  <article class="panel table-card">
+    <div class="table-toolbar"><div><strong>Payroll history</strong><small>Most recent generated records</small></div></div>
+    {% if payrolls %}<div class="table-responsive"><table class="table"><thead><tr><th>Period</th><th>Net pay</th><th>Status</th></tr></thead><tbody>{% for item in payrolls %}<tr><td>{{ item.month }}/{{ item.year }}</td><td class="money">₹{{ '{:,.0f}'.format(item.net_pay) }}</td><td>{{ status_badge('Paid' if item.paid else 'Unpaid') }}</td></tr>{% endfor %}</tbody></table></div>{% else %}{{ empty_state('bi-cash-stack', 'No payroll history', 'Generate payroll to create the first record.') }}{% endif %}
+  </article>
+</section>
+
+<article class="panel table-card mt-3">
+  <div class="table-toolbar"><div><strong>Salary advances</strong><small>Recovery progress across paid payrolls</small></div><a class="panel-link" href="{{ url_for('advances') }}">Manage advances</a></div>
+  {% if advances %}<div class="table-responsive"><table class="table responsive-table"><thead><tr><th>Date</th><th>Original amount</th><th>Recovered</th><th>Outstanding</th><th>Status</th></tr></thead><tbody>{% for item in advances %}<tr><td data-label="Date">{{ item.date_given.strftime('%d %b %Y') }}</td><td data-label="Original" class="money">₹{{ '{:,.2f}'.format(item.amount) }}</td><td data-label="Recovered" class="money">₹{{ '{:,.2f}'.format(item.recovered_amount) }}</td><td data-label="Outstanding" class="money">₹{{ '{:,.2f}'.format(item.outstanding_amount) }}</td><td data-label="Status">{{ status_badge('Paid' if item.settled else 'Pending') }}</td></tr>{% endfor %}</tbody></table></div>{% else %}{{ empty_state('bi-wallet2', 'No advances', 'No salary advance is linked to this employee.') }}{% endif %}
+</article>
+{% endblock %}
