@@ -142,20 +142,58 @@ def portal_employees():
 @permission_required('gst_view')
 def portal_gst():
     cards = [
-        {'title': 'GST Dashboard', 'description': 'GST summary and audit dashboard.', 'url': '#', 'permission': 'gst_view', 'icon': '🧾'},
-        {'title': 'Invoice Upload', 'description': 'Upload GST invoice files for checking.', 'url': '#', 'permission': 'gst_upload', 'icon': '⬆️'},
-        {'title': 'Audit Checks', 'description': 'Duplicate, mismatch and tax checks.', 'url': '#', 'permission': 'gst_view', 'icon': '🔍'},
-        {'title': 'GST Reports', 'description': 'GST reports and exports.', 'url': '#', 'permission': 'gst_reports', 'icon': '📊'},
+        {
+            'title': 'GST Audit Workspace',
+            'description': 'Upload Excel/CSV invoice files, review mismatches, supplier summary and dashboard totals.',
+            'url': '/portal/gst/tool',
+            'permission': 'gst_view',
+            'icon': '🧾',
+        },
+        {
+            'title': 'Upload & Run Audit',
+            'description': 'Open the GST workspace and upload invoice Excel/CSV files for audit.',
+            'url': '/portal/gst/tool#upload',
+            'permission': 'gst_upload',
+            'icon': '⬆️',
+        },
+        {
+            'title': 'Review Rows',
+            'description': 'Check only real invoice issues. Header/support rows are excluded from review.',
+            'url': '/portal/gst/tool#review',
+            'permission': 'gst_view',
+            'icon': '🔍',
+        },
+        {
+            'title': 'GST Report',
+            'description': 'Open printable GST audit report for current audit session.',
+            'url': '/portal/gst/report',
+            'permission': 'gst_reports',
+            'icon': '📊',
+        },
+        {
+            'title': 'Export Excel',
+            'description': 'Download verified audit workbook after running an audit.',
+            'url': '/portal/gst/export',
+            'permission': 'gst_reports',
+            'icon': '📥',
+        },
+        {
+            'title': 'Audit Log CSV',
+            'description': 'Download GST audit activity log for upload/review/export actions.',
+            'url': '/portal/gst/audit-log',
+            'permission': 'gst_reports',
+            'icon': '🧭',
+        },
     ]
     cards = [c for c in cards if has_permission(c['permission'])]
     return render_template(
         'portal/module_hub.html',
-        module_title='GST / Audit',
-        module_kicker='Future Module',
-        module_description='GST dashboard, invoice upload, audit checks and reports will be grouped here.',
+        module_title='GST / Invoice Audit',
+        module_kicker='Protected Module',
+        module_description='GST Invoice Audit is now connected to the portal. It is an audit/reconciliation assistant, not GST filing software.',
         cards=cards,
         back_url=url_for('portal_workspace'),
-        notice='GST / Audit module is not integrated yet.',
+        notice=None if cards else 'Your role can open GST, but no GST action permissions are enabled yet. Enable gst_upload/gst_reports as needed.',
     )
 
 
