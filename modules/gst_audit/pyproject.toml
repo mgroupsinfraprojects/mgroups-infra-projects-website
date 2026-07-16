@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gst-invoice-audit-desktop"
+version = "11.13.0"
+description = "GST invoice audit dual-mode desktop and browser-web software with V11 elite architecture readiness, persistent audit workflow, audit trail, RBAC, workspace, statutory integration contracts, reporting, backup, and release gates, fix-first dashboards, supplier drilldown, enforced UI/core architecture boundaries, premium PySide6 UI, GST reconciliation, verified export, Windows preflight checks, and strict release gates."
+requires-python = ">=3.11,<3.13"
+authors = [{ name = "GST Audit Pro Maintainers" }]
+readme = "README.md"
+license = { text = "Proprietary / internal evaluation source package" }
+keywords = ["GST", "invoice-audit", "PySide6", "desktop", "reconciliation"]
+dependencies = [
+  "pandas>=2.0",
+  "openpyxl>=3.1",
+  "xlsxwriter>=3.1",
+  "PySide6>=6.6",
+  "cryptography>=42",
+  "xlrd==2.0.1",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-q --cov=app.core --cov-report=term-missing"
+
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "pytest-cov>=5",
+  "pytest-qt>=4",
+  "ruff>=0.5",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*", "web_portal*", "frontend*", "backend*", "data_layer*", "security_layer*", "dashboard*", "theme*", "workflow*"]
